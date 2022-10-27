@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../common/util/duration_utils.dart';
@@ -31,6 +33,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   final playerState = AudioPlayerState();
   late AudioPlayer player;
+  StreamSubscription<AudioPlayerState>? stateSubscription;
+  StreamSubscription<Duration>? positionSubscription;
 
   @override
   void initState() {
@@ -43,20 +47,20 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     playerState.error = null;
     try {
       playerState.duration = await player.fetchDuration();
+      stateSubscription = player.stateStream().listen((state) {
+        setState(() {
+          playerState.merge(state);
+        });
+      });
+      positionSubscription = player.positionStream().listen((position) {
+        setState(() {
+          playerState.position = position;
+        });
+      });
     } catch (e) {
       playerState.error = e.toString(); // todo
     }
     setState(() {});
-    player.stateStream().listen((state) {
-      setState(() {
-        playerState.merge(state);
-      });
-    });
-    player.positionStream().listen((position) {
-      setState(() {
-        playerState.position = position;
-      });
-    });
   }
 
   @override
@@ -244,5 +248,12 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   Widget loadingContent() {
     return const CircularProgressIndicator.adaptive();
+  }
+
+  @override
+  void dispose() {
+    stateSubscription?.cancel();
+    positionSubscription?.cancel();
+    super.dispose();
   }
 }
