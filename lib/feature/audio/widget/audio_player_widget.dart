@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 
 import '../../../common/util/number_utils.dart';
-import '../../audio/model/audio_source.dart';
 import '../../audio/model/audio_track.dart';
-import '../../audio/model/play_state.dart';
+import '../data/audio_player.dart';
+import '../data/just_audio_player.dart';
+import '../model/audio_player_state.dart';
 
-class PlayerWidget extends StatefulWidget {
+class AudioPlayerWidget extends StatefulWidget {
   final AudioTrack track;
 
-  const PlayerWidget({
+  const AudioPlayerWidget({
     super.key,
     required this.track,
   });
 
   @override
-  State<PlayerWidget> createState() => _PlayerWidgetState();
+  State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
 }
 
-class _PlayerWidgetState extends State<PlayerWidget> {
+class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const maxWidth = 300.0;
   static const paddingSize = 22.0;
   static const coverScale = 0.75;
@@ -29,32 +29,26 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   static const smallTextScaleFactor = 0.85;
   static const smallTextLetterSpacing = 0.8;
 
-  final playState = PlayState();
-  final player = AudioPlayer();
+  final playerState = AudioPlayerState();
+  late AudioPlayer player;
   String? error;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, setupTrack);
+    player = JustAudioPlayer(widget.track);
+    Future.delayed(Duration.zero, setupPlayer);
   }
 
-  void setupTrack() async {
-    final trackSource = AudioTrackSource(widget.track);
+  void setupPlayer() async {
+    player.addListener((state) {
+      setState(() {
+        playerState.merge(state);
+      });
+    });
     error = null;
     try {
-      await player.setAudioSource(trackSource);
-      playState.duration = await player.durationFuture;
-      player.playerStateStream.listen((state) {
-        playState.playing = state.playing;
-        switch (state.processingState) {
-          case ProcessingState.ready:
-            {
-              playState.canPlay = true;
-            }
-        }
-        setState(() {});
-      });
+      playerState.duration = await player.fetchDuration();
     } catch (e) {
       error = e.toString();
     }
@@ -66,7 +60,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     Widget content;
     if (error != null) {
       content = errorContent();
-    } else if (playState.duration == null) {
+    } else if (playerState.duration == null) {
       content = loadingContent();
     } else {
       content = playerContent();
@@ -167,7 +161,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           ),
         ),
         Text(
-          playState.duration!.inSeconds.toDouble().secondsFormatted(),
+          playerState.duration!.inSeconds.toDouble().secondsFormatted(),
           textScaleFactor: smallTextScaleFactor,
           style: TextStyle(
             fontWeight: FontWeight.w500,
@@ -197,9 +191,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       mainAxisSize: MainAxisSize.max,
       children: [
         IconButton(
-          onPressed: playState.canPlay ? onPlay : null,
+          onPressed: playerState.canPlay ? onPlay : null,
           icon: Icon(
-            playState.playing ? Icons.pause_sharp : Icons.play_arrow_sharp,
+            playerState.playing ? Icons.pause_sharp : Icons.play_arrow_sharp,
           ),
         ),
       ],
@@ -207,7 +201,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void onPlay() {
-    if (playState.playing) {
+    if (playerState.playing) {
       player.pause();
     } else {
       player.play();

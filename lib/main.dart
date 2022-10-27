@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app/player_page.dart';
+import 'app/audio_player_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: const PlayerPage(),
+      home: const AudioPlayerPage(),
     );
   }
 }
