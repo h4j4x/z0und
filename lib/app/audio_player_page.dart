@@ -9,12 +9,14 @@ class AudioPlayerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = Theme.of(context).backgroundColor;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Z0und'),
         elevation: 0.0,
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: bgColor,
       ),
+      backgroundColor: bgColor,
       body: SafeArea(
         child: AudioPlayerWidget(
           track: AudioTrack(

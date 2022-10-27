@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:z0und/common/util/duration_utils.dart';
 
+import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_track.dart';
-import '../data/audio_player.dart';
-import '../data/just_audio_player.dart';
 import '../model/audio_player_state.dart';
+import '../use_case/audio_player.dart';
+import '../use_case/just_audio_player.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final AudioTrack track;
@@ -197,9 +197,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       children: [
         IconButton(
           onPressed: playerState.canPlay ? onPlay : null,
+          color: Theme.of(context).highlightColor,
           icon: Icon(
             playerState.playing ? Icons.pause_sharp : Icons.play_arrow_sharp,
           ),
+          iconSize: paddingSize * 2,
         ),
       ],
     );

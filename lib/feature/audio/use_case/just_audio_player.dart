@@ -8,6 +8,7 @@ import 'audio_player.dart';
 class JustAudioPlayer extends AudioPlayer {
   final AudioTrack track;
   just_audio.AudioPlayer? _audioPlayer;
+  Duration? _duration;
 
   JustAudioPlayer(this.track);
 
@@ -30,7 +31,13 @@ class JustAudioPlayer extends AudioPlayer {
   @override
   Stream<Duration> positionStream() {
     if (_audioPlayer != null) {
-      return _audioPlayer!.positionStream;
+      return _audioPlayer!.positionStream.map((position) {
+        final duration = _duration ?? Duration.zero;
+        if (position.compareTo(duration) > 0) {
+          return duration;
+        }
+        return position;
+      });
     }
     return const Stream.empty();
   }
@@ -52,7 +59,7 @@ class JustAudioPlayer extends AudioPlayer {
         // TODO: Handle this case.
         break;
       case just_audio.ProcessingState.completed:
-        // TODO: Handle this case.
+        playerState.playing = false;
         break;
     }
     return playerState;
@@ -60,8 +67,11 @@ class JustAudioPlayer extends AudioPlayer {
 
   @override
   Future<Duration?> fetchDuration() async {
-    await _init();
-    return _audioPlayer!.durationFuture;
+    if (_duration == null) {
+      await _init();
+      _duration = await _audioPlayer!.durationFuture;
+    }
+    return _duration;
   }
 
   @override
