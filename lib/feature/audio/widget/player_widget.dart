@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'audio_source.dart';
-import 'audio_track.dart';
-import 'number_utils.dart';
-import 'play_state.dart';
+import '../../../common/util/number_utils.dart';
+import '../../audio/model/audio_source.dart';
+import '../../audio/model/audio_track.dart';
+import '../../audio/model/play_state.dart';
 
 class PlayerWidget extends StatefulWidget {
   final AudioTrack track;
@@ -19,6 +19,7 @@ class PlayerWidget extends StatefulWidget {
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
+  static const maxWidth = 300.0;
   static const paddingSize = 22.0;
   static const coverScale = 0.75;
   static const bigTextScaleFactor = 2.8;
@@ -70,12 +71,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     } else {
       content = playerContent();
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: paddingSize,
-        horizontal: paddingSize * 1.2,
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(
+          maxWidth: maxWidth,
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: paddingSize,
+          horizontal: paddingSize * 1.2,
+        ),
+        child: Center(child: content),
       ),
-      child: Center(child: content),
     );
   }
 

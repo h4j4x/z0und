@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'audio_track.dart';
-import 'file_reader.dart';
-import 'player_widget.dart';
+import '../common/util/file_reader.dart';
+import '../feature/audio/model/audio_track.dart';
+import '../feature/audio/widget/player_widget.dart';
 
 class PlayerPage extends StatelessWidget {
   const PlayerPage({super.key});

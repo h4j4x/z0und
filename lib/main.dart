@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'player_page.dart';
+import 'app/player_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Z0und',
+      title: 'Z0und',
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),

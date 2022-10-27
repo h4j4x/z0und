@@ -1,4 +1,4 @@
-import 'file_reader.dart';
+import '../../../common/util/file_reader.dart';
 
 class AudioTrack {
   final FileSource fileSource;

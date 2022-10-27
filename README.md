@@ -1,6 +1,6 @@
 # z0und
 
-Zound Flutter project.
+Z0und Flutter project.
 
 ## Getting Started
 

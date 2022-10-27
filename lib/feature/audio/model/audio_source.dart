@@ -1,7 +1,7 @@
 import 'package:just_audio/just_audio.dart';
 
+import '../../../common/util/file_reader.dart';
 import 'audio_track.dart';
-import 'file_reader.dart';
 
 class AudioTrackSource extends StreamAudioSource {
   final AudioTrack track;
