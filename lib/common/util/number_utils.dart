@@ -8,11 +8,3 @@ extension NumberUtils on num {
     return value.padLeft(pad, '0');
   }
 }
-
-extension DoubleUtils on double {
-  String secondsFormatted() {
-    final minutes = this ~/ 60;
-    final seconds = this % 60;
-    return '${minutes.format(digits: 2)} : ${seconds.format(digits: 2)}';
-  }
-}

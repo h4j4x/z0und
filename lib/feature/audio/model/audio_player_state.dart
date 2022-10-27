@@ -2,6 +2,8 @@ class AudioPlayerState {
   bool? _canPlay;
   bool playing = false;
   Duration? duration;
+  Duration position = Duration.zero;
+  String? error;
 
   bool get canPlay => _canPlay ?? false;
 

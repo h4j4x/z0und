@@ -16,11 +16,26 @@ class JustAudioPlayer extends AudioPlayer {
       _audioPlayer = just_audio.AudioPlayer();
       final trackSource = AudioTrackSource(track);
       await _audioPlayer!.setAudioSource(trackSource);
-      _audioPlayer!.playerStateStream.listen(_onState);
     }
   }
 
-  void _onState(just_audio.PlayerState state) {
+  @override
+  Stream<AudioPlayerState> stateStream() {
+    if (_audioPlayer != null) {
+      return _audioPlayer!.playerStateStream.map(_parseState);
+    }
+    return const Stream.empty();
+  }
+
+  @override
+  Stream<Duration> positionStream() {
+    if (_audioPlayer != null) {
+      return _audioPlayer!.positionStream;
+    }
+    return const Stream.empty();
+  }
+
+  AudioPlayerState _parseState(just_audio.PlayerState state) {
     final playerState = AudioPlayerState();
     playerState.playing = state.playing;
     switch (state.processingState) {
@@ -40,7 +55,7 @@ class JustAudioPlayer extends AudioPlayer {
         // TODO: Handle this case.
         break;
     }
-    notifyListeners(playerState);
+    return playerState;
   }
 
   @override
@@ -59,6 +74,12 @@ class JustAudioPlayer extends AudioPlayer {
   Future<void> pause() async {
     await _init();
     return _audioPlayer!.pause();
+  }
+
+  @override
+  Future<void> seek(Duration duration) async {
+    await _init();
+    return _audioPlayer!.seek(duration);
   }
 }
 

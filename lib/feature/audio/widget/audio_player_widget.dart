@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:z0und/common/util/duration_utils.dart';
 
-import '../../../common/util/number_utils.dart';
 import '../../audio/model/audio_track.dart';
 import '../data/audio_player.dart';
 import '../data/just_audio_player.dart';
@@ -19,7 +19,7 @@ class AudioPlayerWidget extends StatefulWidget {
 }
 
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
-  static const maxWidth = 300.0;
+  static const maxWidth = 600.0;
   static const paddingSize = 22.0;
   static const coverScale = 0.75;
   static const bigTextScaleFactor = 2.8;
@@ -31,7 +31,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   final playerState = AudioPlayerState();
   late AudioPlayer player;
-  String? error;
 
   @override
   void initState() {
@@ -41,24 +40,29 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   void setupPlayer() async {
-    player.addListener((state) {
+    playerState.error = null;
+    try {
+      playerState.duration = await player.fetchDuration();
+    } catch (e) {
+      playerState.error = e.toString(); // todo
+    }
+    setState(() {});
+    player.stateStream().listen((state) {
       setState(() {
         playerState.merge(state);
       });
     });
-    error = null;
-    try {
-      playerState.duration = await player.fetchDuration();
-    } catch (e) {
-      error = e.toString();
-    }
-    setState(() {});
+    player.positionStream().listen((position) {
+      setState(() {
+        playerState.position = position;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     Widget content;
-    if (error != null) {
+    if (playerState.error != null) {
       content = errorContent();
     } else if (playerState.duration == null) {
       content = loadingContent();
@@ -152,7 +156,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       mainAxisSize: MainAxisSize.max,
       children: [
         Text(
-          'TODO', // todo
+          playerState.position.minutesFormatted(),
           textScaleFactor: smallTextScaleFactor,
           style: TextStyle(
             fontWeight: FontWeight.w500,
@@ -161,7 +165,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           ),
         ),
         Text(
-          playerState.duration!.inSeconds.toDouble().secondsFormatted(),
+          playerState.duration!.minutesFormatted(),
           textScaleFactor: smallTextScaleFactor,
           style: TextStyle(
             fontWeight: FontWeight.w500,
@@ -175,12 +179,13 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   Widget trackProgress() {
     return Slider(
-      value: 0.0, // todo
-      onChanged: (value) {
-        // setState(() {
-        //   progressValue = value;
-        // });
-      },
+      value: playerState.position.inSeconds.toDouble(),
+      max: (playerState.duration ?? Duration.zero).inSeconds.toDouble(),
+      onChanged: playerState.canPlay
+          ? (value) {
+              player.seek(Duration(seconds: value.toInt()));
+            }
+          : null,
       activeColor: Theme.of(context).colorScheme.secondary,
     );
   }
@@ -214,7 +219,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          error!,
+          playerState.error!,
           textAlign: TextAlign.center,
           textScaleFactor: mediumTextScaleFactor,
           style: TextStyle(
