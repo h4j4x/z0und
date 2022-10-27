@@ -105,7 +105,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
             child: trackTimes(),
           ),
           trackProgress(),
-          trackControls(),
+          Padding(
+            padding: const EdgeInsets.only(top: paddingSize),
+            child: trackControls(),
+          ),
         ],
       );
     });
@@ -191,17 +194,22 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackControls() {
+    const buttonSize = paddingSize * 2.0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
-        IconButton(
-          onPressed: playerState.canPlay ? onPlay : null,
-          color: Theme.of(context).highlightColor,
-          icon: Icon(
-            playerState.playing ? Icons.pause_sharp : Icons.play_arrow_sharp,
+        CircleAvatar(
+          radius: buttonSize,
+          backgroundColor: Theme.of(context).selectedRowColor,
+          child: IconButton(
+            onPressed: playerState.canPlay ? onPlay : null,
+            color: Theme.of(context).primaryColor,
+            icon: Icon(
+              playerState.playing ? Icons.pause_sharp : Icons.play_arrow_sharp,
+            ),
+            iconSize: buttonSize,
           ),
-          iconSize: paddingSize * 2,
         ),
       ],
     );
