@@ -24,7 +24,7 @@ class AudioPlayerWidget extends StatefulWidget {
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const maxWidth = 600.0;
   static const paddingSize = 22.0;
-  static const bigTextScaleFactor = 2.8;
+  static const bigTextScaleFactor = 2.5;
   static const bigTextLetterSpacing = 0.2;
   static const mediumTextScaleFactor = 1.3;
   static const mediumTextLetterSpacing = 0.3;
@@ -34,6 +34,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   var playerState = AudioPlayerState();
   late AudioPlayer player;
   StreamSubscription<AudioPlayerState>? stateSubscription;
+
+  get primaryColor => Theme.of(context).colorScheme.primaryContainer;
+
+  get secondaryColor => Theme.of(context).colorScheme.secondary.withAlpha(180);
 
   @override
   void initState() {
@@ -82,7 +86,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         children: [
           trackCover(constraints),
           Padding(
-            padding: const EdgeInsets.only(top: paddingSize),
+            padding: const EdgeInsets.only(top: paddingSize * 0.8),
             child: trackTitle(),
           ),
           trackAlbum(),
@@ -114,7 +118,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Theme.of(context).colorScheme.secondary,
+          color: primaryColor,
         ),
       ),
     );
@@ -125,10 +129,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       'Track Title TODO'.toUpperCase(),
       textAlign: TextAlign.center,
       textScaleFactor: bigTextScaleFactor,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.w900,
         letterSpacing: bigTextLetterSpacing,
-        color: Theme.of(context).colorScheme.tertiary,
       ),
     );
   }
@@ -141,7 +144,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       style: TextStyle(
         fontWeight: FontWeight.w800,
         letterSpacing: mediumTextLetterSpacing,
-        color: Theme.of(context).colorScheme.secondary,
+        color: secondaryColor,
       ),
     );
   }
@@ -154,19 +157,17 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         Text(
           playerState.position.minutesFormatted(),
           textScaleFactor: smallTextScaleFactor,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w500,
             letterSpacing: smallTextLetterSpacing,
-            color: Theme.of(context).colorScheme.tertiary,
           ),
         ),
         Text(
           playerState.duration.minutesFormatted(),
           textScaleFactor: smallTextScaleFactor,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w500,
             letterSpacing: smallTextLetterSpacing,
-            color: Theme.of(context).colorScheme.tertiary,
           ),
         ),
       ],
@@ -182,7 +183,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               player.seek(Duration(seconds: value.toInt()));
             }
           : null,
-      activeColor: Theme.of(context).colorScheme.secondary,
     );
   }
 
@@ -202,10 +202,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       children: [
         CircleAvatar(
           radius: buttonSize,
-          backgroundColor: Theme.of(context).selectedRowColor,
           child: IconButton(
             onPressed: playerState.canPlay ? onPlay : null,
-            color: Theme.of(context).primaryColor,
+            color: primaryColor,
             icon: Icon(icon),
             iconSize: buttonSize,
           ),
@@ -239,7 +238,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                   player.setVolume(value);
                 }
               : null,
-          activeColor: Theme.of(context).colorScheme.secondary,
+          activeColor: secondaryColor,
         ),
         const Icon(Icons.volume_up_sharp),
       ],
