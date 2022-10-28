@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,6 @@ class AudioPlayerWidget extends StatefulWidget {
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const maxWidth = 600.0;
   static const paddingSize = 22.0;
-  static const coverScale = 0.75;
   static const bigTextScaleFactor = 2.8;
   static const bigTextLetterSpacing = 0.2;
   static const mediumTextScaleFactor = 1.3;
@@ -89,12 +89,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   Widget playerContent() {
     return LayoutBuilder(builder: (context, constraints) {
-      final coverSize = constraints.maxWidth * coverScale;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          trackCover(coverSize),
+          trackCover(constraints),
           Padding(
             padding: const EdgeInsets.only(top: paddingSize),
             child: trackTitle(),
@@ -118,7 +117,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     });
   }
 
-  Widget trackCover(double size) {
+  Widget trackCover(BoxConstraints constraints) {
+    double size =
+        min(constraints.maxWidth * 0.75, constraints.maxHeight * 0.25);
     return Center(
       child: Container(
         width: size,
