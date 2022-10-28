@@ -24,9 +24,9 @@ class AudioPlayerWidget extends StatefulWidget {
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const maxWidth = 600.0;
   static const paddingSize = 22.0;
-  static const bigTextScaleFactor = 2.5;
+  static const bigTextScaleFactor = 2.0;
   static const bigTextLetterSpacing = 0.2;
-  static const mediumTextScaleFactor = 1.3;
+  static const mediumTextScaleFactor = 1.2;
   static const mediumTextLetterSpacing = 0.3;
   static const smallTextScaleFactor = 0.85;
   static const smallTextLetterSpacing = 0.8;
@@ -37,7 +37,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   get primaryColor => Theme.of(context).colorScheme.primaryContainer;
 
-  get secondaryColor => Theme.of(context).colorScheme.secondary.withAlpha(180);
+  get secondaryColor => Theme.of(context).colorScheme.secondaryContainer;
 
   @override
   void initState() {
@@ -70,7 +70,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           maxWidth: maxWidth,
         ),
         padding: const EdgeInsets.symmetric(
-          vertical: paddingSize,
           horizontal: paddingSize * 1.2,
         ),
         child: Center(child: content),
@@ -84,12 +83,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          trackCover(constraints),
-          Padding(
-            padding: const EdgeInsets.only(top: paddingSize * 0.8),
-            child: trackTitle(),
-          ),
-          trackAlbum(),
+          trackCard(constraints),
           Padding(
             padding: const EdgeInsets.only(
               top: paddingSize * 1.5,
@@ -107,6 +101,26 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         ],
       );
     });
+  }
+
+  Widget trackCard(BoxConstraints constraints) {
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: paddingSize,
+      child: Padding(
+        padding: const EdgeInsets.all(paddingSize * 0.65),
+        child: Column(
+          children: [
+            trackCover(constraints),
+            Padding(
+              padding: const EdgeInsets.only(top: paddingSize * 0.8),
+              child: trackTitle(),
+            ),
+            trackAlbum(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget trackCover(BoxConstraints constraints) {
@@ -200,14 +214,16 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
-        CircleAvatar(
-          radius: buttonSize,
-          child: IconButton(
-            onPressed: playerState.canPlay ? onPlay : null,
-            color: primaryColor,
-            icon: Icon(icon),
-            iconSize: buttonSize,
+        ElevatedButton(
+          onPressed: playerState.canPlay ? onPlay : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            elevation: paddingSize,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(buttonSize / 2),
+            ),
           ),
+          child: Icon(icon, size: buttonSize * 0.65),
         ),
       ],
     );
