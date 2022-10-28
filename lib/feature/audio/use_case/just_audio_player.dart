@@ -25,45 +25,46 @@ class JustAudioPlayer extends AudioPlayer {
     await _audioPlayer.setAudioSource(trackSource);
 
     final duration = await _audioPlayer.durationFuture;
-    _emitStateWith(duration: duration);
+    _emitState(duration: duration);
 
     _audioPlayer.playingStream.listen((playing) {
-      _emitStateWith(playing: playing);
+      _emitState(playing: playing);
     });
 
     _audioPlayer.positionStream.listen((position) {
       if (position.compareTo(_state.duration) > 0) {
-        _emitStateWith(position: _state.duration);
+        _emitState(position: _state.duration);
       } else {
-        _emitStateWith(position: position);
+        _emitState(position: position);
       }
     });
 
     _audioPlayer.playerStateStream.listen((state) {
       switch (state.processingState) {
         case just_audio.ProcessingState.ready:
-          _emitStateWith(loading: false, canPlay: true);
+          _emitState(loading: false, canPlay: true);
           break;
         case just_audio.ProcessingState.idle:
           // TODO: Handle this case.
           break;
         case just_audio.ProcessingState.loading:
-          _emitStateWith(loading: true, canPlay: false);
+          _emitState(loading: true, canPlay: false);
           break;
         case just_audio.ProcessingState.buffering:
           // TODO: Handle this case.
           break;
         case just_audio.ProcessingState.completed:
-          _emitStateWith(playing: false);
+          _emitState(playing: false, done: true);
           break;
       }
     });
   }
 
-  void _emitStateWith({
+  void _emitState({
     bool? loading,
     bool? canPlay,
     bool? playing,
+    bool? done,
     Duration? duration,
     Duration? position,
     String? error,
@@ -72,6 +73,7 @@ class JustAudioPlayer extends AudioPlayer {
       loading: loading ?? _state.loading,
       canPlay: canPlay ?? _state.canPlay,
       playing: playing ?? _state.playing,
+      done: done ?? _state.done,
       duration: duration ?? _state.duration,
       position: position ?? _state.position,
       error: error,
@@ -83,7 +85,10 @@ class JustAudioPlayer extends AudioPlayer {
   Stream<AudioPlayerState> get stateStream => _controller.stream;
 
   @override
-  Future<void> play() => _audioPlayer.play();
+  Future<void> play() {
+    _emitState(done: false, playing: true);
+    return _audioPlayer.play();
+  }
 
   @override
   Future<void> pause() => _audioPlayer.pause();

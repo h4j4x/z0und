@@ -187,6 +187,14 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   Widget trackControls() {
     const buttonSize = paddingSize * 2.0;
+    IconData icon;
+    if (playerState.done) {
+      icon = Icons.replay_sharp;
+    } else if (playerState.playing) {
+      icon = Icons.pause_sharp;
+    } else {
+      icon = Icons.play_arrow_sharp;
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
@@ -197,9 +205,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           child: IconButton(
             onPressed: playerState.canPlay ? onPlay : null,
             color: Theme.of(context).primaryColor,
-            icon: Icon(
-              playerState.playing ? Icons.pause_sharp : Icons.play_arrow_sharp,
-            ),
+            icon: Icon(icon),
             iconSize: buttonSize,
           ),
         ),
@@ -207,7 +213,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
-  void onPlay() {
+  void onPlay() async {
+    if (playerState.done) {
+      await player.seek(Duration.zero);
+    }
+
     if (playerState.playing) {
       player.pause();
     } else {
