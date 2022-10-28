@@ -5,6 +5,7 @@ class AudioPlayerState {
   final bool done;
   final Duration duration;
   final Duration position;
+  final double volume;
   final String? error;
 
   AudioPlayerState({
@@ -14,6 +15,7 @@ class AudioPlayerState {
     this.done = false,
     this.duration = Duration.zero,
     this.position = Duration.zero,
+    this.volume = 0.5,
     this.error,
   });
 }

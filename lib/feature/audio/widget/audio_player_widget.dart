@@ -96,9 +96,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           ),
           trackProgress(),
           Padding(
-            padding: const EdgeInsets.only(top: paddingSize),
+            padding: const EdgeInsets.symmetric(vertical: paddingSize),
             child: trackControls(),
           ),
+          volumeControls(),
         ],
       );
     });
@@ -223,6 +224,26 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     } else {
       player.play();
     }
+  }
+
+  Widget volumeControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        const Icon(Icons.volume_down_sharp),
+        Slider(
+          value: playerState.volume,
+          onChanged: playerState.canPlay
+              ? (value) {
+                  player.setVolume(value);
+                }
+              : null,
+          activeColor: Theme.of(context).colorScheme.secondary,
+        ),
+        const Icon(Icons.volume_up_sharp),
+      ],
+    );
   }
 
   Widget errorContent() {

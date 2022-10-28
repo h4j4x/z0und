@@ -25,7 +25,7 @@ class JustAudioPlayer extends AudioPlayer {
     await _audioPlayer.setAudioSource(trackSource);
 
     final duration = await _audioPlayer.durationFuture;
-    _emitState(duration: duration);
+    _emitState(duration: duration, volume: _audioPlayer.volume);
 
     _audioPlayer.playingStream.listen((playing) {
       _emitState(playing: playing);
@@ -39,25 +39,31 @@ class JustAudioPlayer extends AudioPlayer {
       }
     });
 
-    _audioPlayer.playerStateStream.listen((state) {
-      switch (state.processingState) {
-        case just_audio.ProcessingState.ready:
-          _emitState(loading: false, canPlay: true);
-          break;
-        case just_audio.ProcessingState.idle:
-          // TODO: Handle this case.
-          break;
-        case just_audio.ProcessingState.loading:
-          _emitState(loading: true, canPlay: false);
-          break;
-        case just_audio.ProcessingState.buffering:
-          // TODO: Handle this case.
-          break;
-        case just_audio.ProcessingState.completed:
-          _emitState(playing: false, done: true);
-          break;
-      }
+    _audioPlayer.volumeStream.listen((volume) {
+      _emitState(volume: volume);
     });
+
+    _audioPlayer.playerStateStream.listen(_handleState);
+  }
+
+  void _handleState(just_audio.PlayerState state) {
+    switch (state.processingState) {
+      case just_audio.ProcessingState.ready:
+        _emitState(loading: false, canPlay: true);
+        break;
+      case just_audio.ProcessingState.idle:
+        // TODO: Handle this case.
+        break;
+      case just_audio.ProcessingState.loading:
+        _emitState(loading: true, canPlay: false);
+        break;
+      case just_audio.ProcessingState.buffering:
+        // TODO: Handle this case.
+        break;
+      case just_audio.ProcessingState.completed:
+        _emitState(playing: false, done: true);
+        break;
+    }
   }
 
   void _emitState({
@@ -67,6 +73,7 @@ class JustAudioPlayer extends AudioPlayer {
     bool? done,
     Duration? duration,
     Duration? position,
+    double? volume,
     String? error,
   }) {
     _state = AudioPlayerState(
@@ -76,6 +83,7 @@ class JustAudioPlayer extends AudioPlayer {
       done: done ?? _state.done,
       duration: duration ?? _state.duration,
       position: position ?? _state.position,
+      volume: volume ?? _state.volume,
       error: error,
     );
     _controller.sink.add(_state);
@@ -104,6 +112,9 @@ class JustAudioPlayer extends AudioPlayer {
 
   @override
   Future<void> seek(Duration duration) => _audioPlayer.seek(duration);
+
+  @override
+  Future<void> setVolume(double volume) => _audioPlayer.setVolume(volume);
 }
 
 class AudioTrackSource extends just_audio.StreamAudioSource {
@@ -131,7 +142,7 @@ class AudioTrackSource extends just_audio.StreamAudioSource {
   Future<int> _trackLength() async {
     if (_trackLengthInBytes < 0) {
       _trackLengthInBytes =
-      await FileReader.readBytesLength(track.filePath, track.fileSource);
+          await FileReader.readBytesLength(track.filePath, track.fileSource);
     }
     return _trackLengthInBytes;
   }

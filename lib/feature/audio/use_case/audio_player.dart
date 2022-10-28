@@ -12,4 +12,6 @@ abstract class AudioPlayer {
   Future<void> dispose();
 
   Future<void> seek(Duration duration);
+
+  Future<void> setVolume(double volume);
 }
