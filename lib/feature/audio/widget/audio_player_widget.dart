@@ -31,10 +31,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const smallTextScaleFactor = 0.85;
   static const smallTextLetterSpacing = 0.8;
 
-  final playerState = AudioPlayerState();
+  var playerState = AudioPlayerState();
   late AudioPlayer player;
   StreamSubscription<AudioPlayerState>? stateSubscription;
-  StreamSubscription<Duration>? positionSubscription;
 
   @override
   void initState() {
@@ -44,23 +43,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   void setupPlayer() async {
-    playerState.error = null;
-    try {
-      playerState.duration = await player.fetchDuration();
-      stateSubscription = player.stateStream().listen((state) {
-        setState(() {
-          playerState.merge(state);
-        });
+    stateSubscription = player.stateStream.listen((state) {
+      setState(() {
+        playerState = state;
       });
-      positionSubscription = player.positionStream().listen((position) {
-        setState(() {
-          playerState.position = position;
-        });
-      });
-    } catch (e) {
-      playerState.error = e.toString(); // todo
-    }
-    setState(() {});
+    });
   }
 
   @override
@@ -68,7 +55,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     Widget content;
     if (playerState.error != null) {
       content = errorContent();
-    } else if (playerState.duration == null) {
+    } else if (playerState.loading) {
       content = loadingContent();
     } else {
       content = playerContent();
@@ -173,7 +160,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           ),
         ),
         Text(
-          playerState.duration!.minutesFormatted(),
+          playerState.duration.minutesFormatted(),
           textScaleFactor: smallTextScaleFactor,
           style: TextStyle(
             fontWeight: FontWeight.w500,
@@ -188,7 +175,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   Widget trackProgress() {
     return Slider(
       value: playerState.position.inSeconds.toDouble(),
-      max: (playerState.duration ?? Duration.zero).inSeconds.toDouble(),
+      max: playerState.duration.inSeconds.toDouble(),
       onChanged: playerState.canPlay
           ? (value) {
               player.seek(Duration(seconds: value.toInt()));
@@ -253,9 +240,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   @override
   void dispose() {
-    player.dispose();
     stateSubscription?.cancel();
-    positionSubscription?.cancel();
+    player.dispose();
     super.dispose();
   }
 }

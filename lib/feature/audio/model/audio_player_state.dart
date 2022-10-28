@@ -1,18 +1,17 @@
 class AudioPlayerState {
-  bool? _canPlay;
-  bool playing = false;
-  Duration? duration;
-  Duration position = Duration.zero;
-  String? error;
+  final bool loading;
+  final bool canPlay;
+  final bool playing;
+  final Duration duration;
+  final Duration position;
+  final String? error;
 
-  bool get canPlay => _canPlay ?? false;
-
-  set canPlay(bool value) => _canPlay = value;
-
-  void merge(AudioPlayerState state) {
-    if (state._canPlay != null) {
-      _canPlay = state._canPlay;
-    }
-    playing = state.playing;
-  }
+  AudioPlayerState({
+    this.loading = true,
+    this.canPlay = false,
+    this.playing = false,
+    this.duration = Duration.zero,
+    this.position = Duration.zero,
+    this.error,
+  });
 }

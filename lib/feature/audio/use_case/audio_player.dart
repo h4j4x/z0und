@@ -1,11 +1,7 @@
 import '../model/audio_player_state.dart';
 
 abstract class AudioPlayer {
-  Stream<AudioPlayerState> stateStream();
-
-  Stream<Duration> positionStream();
-
-  Future<Duration?> fetchDuration();
+  Stream<AudioPlayerState> get stateStream;
 
   Future<void> play();
 
