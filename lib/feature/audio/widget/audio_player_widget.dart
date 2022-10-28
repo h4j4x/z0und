@@ -253,6 +253,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   @override
   void dispose() {
+    player.dispose();
     stateSubscription?.cancel();
     positionSubscription?.cancel();
     super.dispose();

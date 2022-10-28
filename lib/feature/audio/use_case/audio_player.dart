@@ -11,5 +11,9 @@ abstract class AudioPlayer {
 
   Future<void> pause();
 
+  Future<void> stop();
+
+  Future<void> dispose();
+
   Future<void> seek(Duration duration);
 }

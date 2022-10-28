@@ -87,6 +87,18 @@ class JustAudioPlayer extends AudioPlayer {
   }
 
   @override
+  Future<void> stop() async {
+    await _init();
+    return _audioPlayer!.stop();
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _init();
+    return _audioPlayer!.dispose();
+  }
+
+  @override
   Future<void> seek(Duration duration) async {
     await _init();
     return _audioPlayer!.seek(duration);
