@@ -223,7 +223,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               borderRadius: BorderRadius.circular(buttonSize / 2),
             ),
           ),
-          child: Icon(icon, size: buttonSize * 0.65),
+          child: Icon(
+            icon,
+            size: buttonSize * 0.65,
+            color: Theme.of(context).hintColor,
+          ),
         ),
       ],
     );
