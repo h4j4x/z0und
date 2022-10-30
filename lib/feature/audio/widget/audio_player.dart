@@ -243,6 +243,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       children: [
         FloatingActionButton(
           onPressed: playerState.canPlay ? onPlay : null,
+          heroTag: 'playButton',
           backgroundColor: primaryColor,
           elevation: paddingSize,
           tooltip: playLabel,
@@ -279,6 +280,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           padding: const EdgeInsets.only(right: paddingSize / 2),
           child: FloatingActionButton.small(
             onPressed: onToggleMute,
+            heroTag: 'muteButton',
             tooltip: muteLabel,
             elevation: isMuted ? 0.1 : paddingSize / 4,
             foregroundColor: isMuted ? theme.colorScheme.onError : null,
