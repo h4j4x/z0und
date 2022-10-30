@@ -15,6 +15,8 @@ abstract class FileReader {
 
   Stream<ByteBuffer> stream(String path);
 
+  Future<ByteBuffer> readAll(String path);
+
   static final _readers = <FileSource, FileReader>{
     FileSource.asset: _AssetFileReader(),
     FileSource.device: _DeviceFileReader(),
@@ -35,6 +37,14 @@ abstract class FileReader {
     }
     return const Stream.empty();
   }
+
+  static Future<ByteBuffer?> readFull(String path, FileSource source) {
+    final reader = _readers[source];
+    if (reader != null) {
+      return reader.readAll(path);
+    }
+    return Future.value(null);
+  }
 }
 
 class _AssetFileReader implements FileReader {
@@ -49,6 +59,12 @@ class _AssetFileReader implements FileReader {
     final data = await rootBundle.load(path);
     yield data.buffer;
   }
+
+  @override
+  Future<ByteBuffer> readAll(String path) async {
+    final data = await rootBundle.load(path);
+    return data.buffer;
+  }
 }
 
 class _DeviceFileReader implements FileReader {
@@ -62,5 +78,12 @@ class _DeviceFileReader implements FileReader {
   Stream<ByteBuffer> stream(String path) {
     final file = File(path);
     return file.openRead().map((list) => Uint8List.fromList(list).buffer);
+  }
+
+  @override
+  Future<ByteBuffer> readAll(String path) async {
+    final file = File(path);
+    final bytes = await file.readAsBytes();
+    return bytes.buffer;
   }
 }

@@ -14,6 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flex_color_scheme: ^6.0.1
   google_fonts: ^3.0.1
+  id3: ^1.0.2
   just_audio: ^0.9.30
   path: ^1.8.2
   provider: ^6.0.4
