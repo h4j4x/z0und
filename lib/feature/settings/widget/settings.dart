@@ -6,7 +6,9 @@ import '../../../app/theme.dart';
 import '../use_case/theme_changer.dart';
 
 class SettingsWidget extends StatelessWidget {
-  const SettingsWidget({super.key});
+  final ThemeChanger _themeChanger;
+
+  SettingsWidget({super.key}) : _themeChanger = ThemeChanger.create();
 
   static const _maxWidth = 600.0;
   static const _paddingSize = 22.0;
@@ -40,7 +42,7 @@ class SettingsWidget extends StatelessWidget {
     final appTheme = context.watch<AppTheme>();
     final l10n = L10n.of(context);
     return ListTile(
-      leading: Icon(_iconOf((appTheme.themeMode))),
+      leading: Icon(_iconOf(appTheme.themeMode)),
       title: Text(_labelOf(appTheme.themeMode, l10n)),
       subtitle: Text(l10n.themeMode),
       trailing: ElevatedButton.icon(
@@ -50,7 +52,7 @@ class SettingsWidget extends StatelessWidget {
           size: _smallIconSize,
           semanticLabel: l10n.changeThemeMode,
         ),
-        label: Icon(_iconOf(ThemeChanger.nextThemeMode(appTheme))),
+        label: Icon(_iconOf(_themeChanger.getNextThemeMode(appTheme))),
       ),
       onTap: () => _onNextThemeMode(context),
     );
@@ -79,6 +81,6 @@ class SettingsWidget extends StatelessWidget {
   }
 
   void _onNextThemeMode(BuildContext context) {
-    ThemeChanger.setNextThemeMode(context);
+    _themeChanger.setNextThemeMode(context);
   }
 }
