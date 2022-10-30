@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../common/util/file_reader.dart';
 import '../../feature/audio/model/audio_track.dart';
 import '../../feature/audio/widget/audio_player_widget.dart';
+import '../l10n/app_l10n.g.dart';
 import '../theme.dart';
 
 class AudioPlayerPage extends StatelessWidget {
@@ -13,7 +14,7 @@ class AudioPlayerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Z0und'),
+        title: Text(L10n.of(context).appTitle),
         backgroundColor: Colors.transparent,
         actions: [
           _themeButton(context),

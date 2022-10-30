@@ -1,0 +1,32 @@
+{
+  "@@locale": "en",
+  "appTitle": "Z0und",
+  "mute": "Mute",
+  "pause": "Pause",
+  "play": "Play",
+  "replay": "Replay",
+  "trackDuration": "Track duration: {value}",
+  "@trackDuration": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackPosition": "Track position: {value}",
+  "@trackPosition": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "volumeValue": "Volume: {value}%",
+  "@volumeValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  }
+}

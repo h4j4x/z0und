@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../app/l10n/app_l10n.g.dart';
 import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_track.dart';
 import '../model/audio_metadata.dart';
@@ -35,11 +36,14 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   var playerState = AudioPlayerState();
   AudioMetadata? metadata;
   late AudioPlayer player;
+  var lastVolume = 0.0;
   StreamSubscription<AudioPlayerState>? stateSubscription;
 
-  get primaryColor => Theme.of(context).colorScheme.primaryContainer;
+  Color get primaryColor => Theme.of(context).colorScheme.primaryContainer;
 
-  get secondaryColor => Theme.of(context).colorScheme.secondaryContainer;
+  Color get secondaryColor => Theme.of(context).colorScheme.secondaryContainer;
+
+  bool get isMuted => playerState.volume < 0.01;
 
   @override
   void initState() {
@@ -177,12 +181,15 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackTimes() {
+    final position = playerState.position.minutesFormatted();
+    final duration = playerState.duration.minutesFormatted();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.max,
       children: [
         Text(
-          playerState.position.minutesFormatted(),
+          position,
+          semanticsLabel: L10n.of(context).trackPosition(position),
           textScaleFactor: smallTextScaleFactor,
           style: const TextStyle(
             fontWeight: FontWeight.w500,
@@ -190,7 +197,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           ),
         ),
         Text(
-          playerState.duration.minutesFormatted(),
+          duration,
+          semanticsLabel: L10n.of(context).trackDuration(duration),
           textScaleFactor: smallTextScaleFactor,
           style: const TextStyle(
             fontWeight: FontWeight.w500,
@@ -202,7 +210,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackProgress() {
-    return Slider(
+    return Slider.adaptive(
       value: playerState.position.inSeconds.toDouble(),
       max: playerState.duration.inSeconds.toDouble(),
       onChanged: playerState.canPlay
@@ -210,36 +218,38 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               player.seek(Duration(seconds: value.toInt()));
             }
           : null,
+      semanticFormatterCallback: (value) => L10n.of(context)
+          .trackPosition(Duration(seconds: value.toInt()).minutesFormatted()),
     );
   }
 
   Widget trackControls() {
-    const buttonSize = paddingSize * 2.0;
+    const buttonSize = paddingSize * 1.8;
     IconData icon;
+    String playLabel;
     if (playerState.done) {
       icon = Icons.replay_sharp;
+      playLabel = L10n.of(context).replay;
     } else if (playerState.playing) {
       icon = Icons.pause_sharp;
+      playLabel = L10n.of(context).pause;
     } else {
       icon = Icons.play_arrow_sharp;
+      playLabel = L10n.of(context).play;
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
-        ElevatedButton(
+        FloatingActionButton(
           onPressed: playerState.canPlay ? onPlay : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            elevation: paddingSize,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(buttonSize / 2),
-            ),
-          ),
+          backgroundColor: primaryColor,
+          elevation: paddingSize,
+          tooltip: playLabel,
           child: Icon(
             icon,
-            size: buttonSize * 0.65,
-            color: Theme.of(context).hintColor,
+            semanticLabel: playLabel,
+            size: buttonSize,
           ),
         ),
       ],
@@ -259,12 +269,28 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget volumeControls() {
+    final theme = Theme.of(context);
+    final muteLabel = L10n.of(context).mute;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
+        Padding(
+          padding: const EdgeInsets.only(right: paddingSize / 2),
+          child: FloatingActionButton.small(
+            onPressed: onToggleMute,
+            tooltip: muteLabel,
+            elevation: isMuted ? 0.1 : paddingSize / 4,
+            foregroundColor: isMuted ? theme.colorScheme.onError : null,
+            backgroundColor: isMuted ? theme.colorScheme.error : null,
+            child: Icon(
+              Icons.volume_off_sharp,
+              semanticLabel: muteLabel,
+            ),
+          ),
+        ),
         const Icon(Icons.volume_down_sharp),
-        Slider(
+        Slider.adaptive(
           value: playerState.volume,
           onChanged: playerState.canPlay
               ? (value) {
@@ -272,10 +298,21 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 }
               : null,
           activeColor: secondaryColor,
+          semanticFormatterCallback: (value) =>
+              L10n.of(context).volumeValue(value.toStringAsFixed(1)),
         ),
         const Icon(Icons.volume_up_sharp),
       ],
     );
+  }
+
+  void onToggleMute() {
+    if (isMuted) {
+      player.setVolume(lastVolume);
+    } else {
+      lastVolume = playerState.volume;
+      player.setVolume(0.0);
+    }
   }
 
   Widget errorContent() {
