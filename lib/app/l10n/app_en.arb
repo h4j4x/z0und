@@ -1,10 +1,15 @@
 {
   "@@locale": "en",
   "appTitle": "Z0und",
+  "darkMode": "Dark mode",
+  "lightMode": "Light mode",
   "mute": "Mute",
   "pause": "Pause",
   "play": "Play",
   "replay": "Replay",
+  "settings": "Settings",
+  "systemMode": "System mode",
+  "themeMode": "Theme mode",
   "trackDuration": "Track duration: {value}",
   "@trackDuration": {
     "placeholders": {

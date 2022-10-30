@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'app/l10n/app_l10n.g.dart';
-import 'app/pages/audio_player_page.dart';
+import 'app/routes.dart';
 import 'app/theme.dart';
 
 void main() {
@@ -32,7 +32,8 @@ class App extends StatelessWidget {
       supportedLocales: L10n.supportedLocales,
       onGenerateTitle: (context) => L10n.of(context).appTitle,
       // route
-      home: const AudioPlayerPage(),
+      initialRoute: Routes.audioPlayer,
+      routes: Routes.map,
     );
   }
 }

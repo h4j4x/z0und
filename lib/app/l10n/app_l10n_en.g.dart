@@ -8,6 +8,12 @@ class L10nEn extends L10n {
   String get appTitle => 'Z0und';
 
   @override
+  String get darkMode => 'Dark mode';
+
+  @override
+  String get lightMode => 'Light mode';
+
+  @override
   String get mute => 'Mute';
 
   @override
@@ -18,6 +24,15 @@ class L10nEn extends L10n {
 
   @override
   String get replay => 'Replay';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get systemMode => 'System mode';
+
+  @override
+  String get themeMode => 'Theme mode';
 
   @override
   String trackDuration(String value) {

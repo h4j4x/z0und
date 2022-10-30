@@ -97,6 +97,18 @@ abstract class L10n {
   /// **'Z0und'**
   String get appTitle;
 
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get darkMode;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light mode'**
+  String get lightMode;
+
   /// No description provided for @mute.
   ///
   /// In en, this message translates to:
@@ -120,6 +132,24 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Replay'**
   String get replay;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @systemMode.
+  ///
+  /// In en, this message translates to:
+  /// **'System mode'**
+  String get systemMode;
+
+  /// No description provided for @themeMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme mode'**
+  String get themeMode;
 
   /// No description provided for @trackDuration.
   ///
