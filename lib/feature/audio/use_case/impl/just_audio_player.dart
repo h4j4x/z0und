@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:just_audio/just_audio.dart' as just_audio;
 
-import '../../../common/util/file_reader.dart';
-import '../model/audio_player_state.dart';
-import '../model/audio_track.dart';
-import 'audio_player.dart';
+import '../../../../common/util/file_reader.dart';
+import '../../model/audio_player_state.dart';
+import '../../model/audio_track.dart';
+import '../audio_player.dart';
 
 class JustAudioPlayer extends AudioPlayer {
   final AudioTrack track;

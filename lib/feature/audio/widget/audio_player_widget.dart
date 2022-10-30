@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 
 import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_track.dart';
+import '../model/audio_metadata.dart';
 import '../model/audio_player_state.dart';
+import '../use_case/audio_meta_fetcher.dart';
 import '../use_case/audio_player.dart';
-import '../use_case/just_audio_player.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final AudioTrack track;
@@ -32,6 +33,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const smallTextLetterSpacing = 0.8;
 
   var playerState = AudioPlayerState();
+  AudioMetadata? metadata;
   late AudioPlayer player;
   StreamSubscription<AudioPlayerState>? stateSubscription;
 
@@ -42,8 +44,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   @override
   void initState() {
     super.initState();
-    player = JustAudioPlayer(widget.track);
-    Future.delayed(Duration.zero, setupPlayer);
+    player = AudioPlayer.create(widget.track);
+    Future.delayed(Duration.zero, () {
+      setupPlayer();
+      fetchMetadata();
+    });
   }
 
   void setupPlayer() async {
@@ -52,6 +57,12 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         playerState = state;
       });
     });
+  }
+
+  void fetchMetadata() async {
+    final fetcher = AudioMetaFetcher.create(widget.track);
+    metadata = await fetcher.metadata;
+    setState(() {});
   }
 
   @override
@@ -139,8 +150,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackTitle() {
+    String title = metadata?.title ?? widget.track.filePath;
     return Text(
-      'Track Title TODO'.toUpperCase(),
+      title.toUpperCase(),
       textAlign: TextAlign.center,
       textScaleFactor: bigTextScaleFactor,
       style: const TextStyle(
@@ -151,8 +163,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackAlbum() {
+    String album = metadata?.album ?? '-';
     return Text(
-      'Track Album TODO'.toUpperCase(),
+      album.toUpperCase(),
       textAlign: TextAlign.center,
       textScaleFactor: mediumTextScaleFactor,
       style: TextStyle(
