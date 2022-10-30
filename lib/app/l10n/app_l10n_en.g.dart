@@ -8,6 +8,9 @@ class L10nEn extends L10n {
   String get appTitle => 'Z0und';
 
   @override
+  String get changeThemeMode => 'Change theme mode';
+
+  @override
   String get darkMode => 'Dark mode';
 
   @override

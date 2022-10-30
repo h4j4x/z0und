@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "appTitle": "Z0und",
+  "changeThemeMode": "Change theme mode",
   "darkMode": "Dark mode",
   "lightMode": "Light mode",
   "mute": "Mute",

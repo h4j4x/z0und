@@ -283,8 +283,12 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
             heroTag: 'muteButton',
             tooltip: muteLabel,
             elevation: isMuted ? 0.1 : paddingSize / 4,
-            foregroundColor: isMuted ? theme.colorScheme.onError : null,
-            backgroundColor: isMuted ? theme.colorScheme.error : null,
+            foregroundColor: isMuted
+                ? theme.colorScheme.onError
+                : theme.colorScheme.onBackground,
+            backgroundColor: isMuted
+                ? theme.colorScheme.error
+                : theme.colorScheme.background,
             child: Icon(
               Icons.volume_off_sharp,
               semanticLabel: muteLabel,
