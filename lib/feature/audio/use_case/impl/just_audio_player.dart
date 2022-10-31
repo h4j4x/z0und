@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:just_audio/just_audio.dart' as just_audio;
+import 'package:mime/mime.dart';
 
 import '../../../../common/util/file_reader.dart';
 import '../../model/audio_player_state.dart';
@@ -135,7 +136,7 @@ class AudioTrackSource extends just_audio.StreamAudioSource {
       offset: start,
       stream: stream
           .map((buffer) => buffer.asInt8List(start!, end! - start).toList()),
-      contentType: 'audio/mpeg', // todo
+      contentType: lookupMimeType(track.filePath) ?? 'audio/mpeg',
     );
   }
 
