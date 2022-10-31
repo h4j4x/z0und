@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:mime/mime.dart';
 
-import '../../../../common/util/file_reader.dart';
+import '../../../../common/util/file_utils.dart';
 import '../../model/audio_player_state.dart';
 import '../../model/audio_track.dart';
 import '../audio_player.dart';
@@ -127,7 +127,7 @@ class AudioTrackSource extends just_audio.StreamAudioSource {
   @override
   Future<just_audio.StreamAudioResponse> request([int? start, int? end]) async {
     final length = await _trackLength();
-    final stream = FileReader.read(track.filePath, track.fileSource);
+    final stream = FileUtils.read(track.filePath, track.fileSource);
     start ??= 0;
     end ??= length;
     return just_audio.StreamAudioResponse(
@@ -143,7 +143,7 @@ class AudioTrackSource extends just_audio.StreamAudioSource {
   Future<int> _trackLength() async {
     if (_trackLengthInBytes < 0) {
       _trackLengthInBytes =
-          await FileReader.readBytesLength(track.filePath, track.fileSource);
+          await FileUtils.readBytesLength(track.filePath, track.fileSource);
     }
     return _trackLengthInBytes;
   }

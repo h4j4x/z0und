@@ -1,53 +1,22 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-enum FileSource {
-  asset,
-  device,
-  googleDrive,
-}
-
-abstract class FileReader {
+abstract class SourceHandler {
   Future<int> bytesLength(String path);
 
   Stream<ByteBuffer> stream(String path);
 
   Future<ByteBuffer> readAll(String path);
 
-  static final _readers = <FileSource, FileReader>{
-    FileSource.asset: _AssetFileReader(),
-    FileSource.device: _DeviceFileReader(),
-  };
-
-  static Future<int> readBytesLength(String path, FileSource source) {
-    final reader = _readers[source];
-    if (reader != null) {
-      return reader.bytesLength(path);
-    }
-    return Future.value(-1);
-  }
-
-  static Stream<ByteBuffer> read(String path, FileSource source) {
-    final reader = _readers[source];
-    if (reader != null) {
-      return reader.stream(path);
-    }
-    return const Stream.empty();
-  }
-
-  static Future<ByteBuffer?> readFull(String path, FileSource source) {
-    final reader = _readers[source];
-    if (reader != null) {
-      return reader.readAll(path);
-    }
-    return Future.value(null);
+  Future<void> copyToFile(String path, File target) async {
+    final data = await readAll(path);
+    await target.writeAsBytes(data.asUint8List());
   }
 }
 
-class _AssetFileReader implements FileReader {
+class AssetHandler extends SourceHandler {
   @override
   Future<int> bytesLength(String path) async {
     final data = await rootBundle.load(path);
@@ -67,7 +36,7 @@ class _AssetFileReader implements FileReader {
   }
 }
 
-class _DeviceFileReader implements FileReader {
+class DeviceHandler extends SourceHandler {
   @override
   Future<int> bytesLength(String path) async {
     final file = File(path);

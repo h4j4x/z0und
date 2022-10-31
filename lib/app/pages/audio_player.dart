@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../common/util/file_reader.dart';
+import '../../common/model/file_source.dart';
 import '../../feature/audio/model/audio_track.dart';
 import '../../feature/audio/widget/audio_player.dart';
 import '../l10n/app_l10n.g.dart';

@@ -10,6 +10,8 @@ import '../model/audio_metadata.dart';
 import '../model/audio_player_state.dart';
 import '../use_case/audio_meta_fetcher.dart';
 import '../use_case/audio_player.dart';
+import '../use_case/audio_waver.dart';
+import 'audio_wave.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final AudioTrack track;
@@ -36,6 +38,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   var playerState = AudioPlayerState();
   AudioMetadata? metadata;
   late AudioPlayer player;
+  late AudioWaver waver;
   var lastVolume = 0.0;
   StreamSubscription<AudioPlayerState>? stateSubscription;
 
@@ -49,6 +52,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   void initState() {
     super.initState();
     player = AudioPlayer.create(widget.track);
+    waver = AudioWaver.create(widget.track);
     Future.delayed(Duration.zero, () {
       setupPlayer();
       fetchMetadata();
@@ -148,6 +152,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: primaryColor,
+        ),
+        child: AudioWaveWidget(
+          audioWaver: waver,
+          position: playerState.position,
         ),
       ),
     );
