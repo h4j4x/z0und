@@ -29,9 +29,11 @@ class AudioWaveWidget extends StatelessWidget {
           // todo: handle error
           if (snapshot.data is WaveformProgress) {
             final WaveformProgress data = snapshot.data as WaveformProgress;
-            if (data.waveform == null) {
-              return const Center(
-                child: CircularProgressIndicator.adaptive(),
+            if (data.waveform == null || data.progress < 1.0) {
+              return Center(
+                child: CircularProgressIndicator.adaptive(
+                  value: data.progress,
+                ),
               );
             }
             return LayoutBuilder(builder: (context, constraints) {

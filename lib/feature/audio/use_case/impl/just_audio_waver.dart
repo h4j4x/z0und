@@ -39,4 +39,9 @@ class JustAudioWaver implements AudioWaver {
 
   @override
   Stream<Object> get waveStream => _controller.stream;
+
+  @override
+  void dispose() {
+    _controller.close();
+  }
 }

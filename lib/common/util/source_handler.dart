@@ -12,7 +12,7 @@ abstract class SourceHandler {
 
   Future<void> copyToFile(String path, File target) async {
     final data = await readAll(path);
-    await target.writeAsBytes(data.asUint8List());
+    await target.writeAsBytes(data.asUint8List().toList());
   }
 }
 

@@ -356,6 +356,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   void dispose() {
     stateSubscription?.cancel();
     player.dispose();
+    waver.dispose();
     super.dispose();
   }
 }
