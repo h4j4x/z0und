@@ -32,7 +32,7 @@ class App extends StatelessWidget {
       supportedLocales: L10n.supportedLocales,
       onGenerateTitle: (context) => L10n.of(context).appTitle,
       // route
-      initialRoute: Routes.audioPlayer,
+      initialRoute: Routes.playlist,
       routes: Routes.map,
     );
   }
