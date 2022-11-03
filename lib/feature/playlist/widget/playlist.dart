@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:z0und/feature/audio/model/audio_track.dart';
 
+import '../use_case/track_picker.dart';
+
 class PlaylistWidget extends StatefulWidget {
   final List<AudioTrack> list;
 
@@ -15,6 +17,7 @@ class PlaylistWidget extends StatefulWidget {
 
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   static const maxWidth = 600.0;
+  static const paddingSize = 22.0;
 
   final list = <AudioTrack>[];
 
@@ -30,7 +33,24 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       constraints: const BoxConstraints(
         maxWidth: maxWidth,
       ),
-      child: Center(child: listView()),
+      child: Stack(
+        children: [
+          listView(),
+          Positioned(
+            bottom: paddingSize,
+            right: paddingSize,
+            child: FloatingActionButton(
+              onPressed: () async {
+                final tracks = await TrackPicker.create().pickTracks();
+                setState(() {
+                  list.addAll(tracks);
+                });
+              },
+              child: const Icon(Icons.add_sharp),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
