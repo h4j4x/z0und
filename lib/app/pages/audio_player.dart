@@ -24,7 +24,7 @@ class AudioPlayerPage extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: AudioPlayerWidget(
           track: AudioTrack(
             fileSource: FileSource.asset,

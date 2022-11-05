@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'app/l10n/app_l10n.g.dart';
+import 'app/playing_now.dart';
 import 'app/routes.dart';
 import 'app/theme.dart';
 
@@ -10,6 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppTheme()),
+        ChangeNotifierProvider(create: (_) => PlayingAudio()),
       ],
       child: const App(),
     ),

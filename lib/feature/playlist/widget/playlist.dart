@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:z0und/feature/audio/model/audio_track.dart';
 
+import '../../../app/playing_now.dart';
 import '../use_case/track_picker.dart';
 
 class PlaylistWidget extends StatefulWidget {
@@ -55,22 +57,43 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
 
   Widget listView() {
+    final playingNow = context.watch<PlayingAudio>();
     return ListView.builder(
       itemCount: list.length,
       itemBuilder: (context, index) => trackListItem(
         context,
         list[index],
+        playingNow,
       ),
     );
   }
 
-  Widget trackListItem(BuildContext context, AudioTrack track) {
+  Widget trackListItem(
+    BuildContext context,
+    AudioTrack track,
+    PlayingAudio playingAudio,
+  ) {
+    IconData icon;
+    if (playingAudio.playingNow == track && playingAudio.isPlaying) {
+      icon = Icons.pause_circle_sharp;
+    } else {
+      icon = Icons.play_circle_sharp;
+    }
     return ListTile(
       title: Text(track.filePath),
       trailing: IconButton(
-        icon: const Icon(Icons.play_arrow_sharp),
-        onPressed: () {},
+        icon: Icon(icon),
+        onPressed: () => onPlay(track),
       ),
     );
+  }
+
+  void onPlay(AudioTrack track) {
+    final playingAudio = context.read<PlayingAudio>();
+    if (playingAudio.playingNow == track && playingAudio.isPlaying) {
+      playingAudio.pause();
+    } else {
+      playingAudio.play(track: track);
+    }
   }
 }

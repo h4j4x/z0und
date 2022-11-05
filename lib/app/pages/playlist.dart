@@ -24,7 +24,7 @@ class PlaylistPage extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: PlaylistWidget(
           list: [
             AudioTrack(
