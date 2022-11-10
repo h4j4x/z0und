@@ -7,6 +7,8 @@ import '../../../app/l10n/app_l10n.g.dart';
 import '../../../common/state/playing_audio.dart';
 import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_track.dart';
+import '../use_case/audio_waver.dart';
+import 'audio_wave.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final AudioTrack track;
@@ -30,7 +32,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const smallTextScaleFactor = 0.85;
   static const smallTextLetterSpacing = 0.8;
 
-  // late AudioWaver waver;
+  late AudioWaver waver;
   var lastVolume = 0.0;
 
   Color get primaryColor => Theme.of(context).colorScheme.primaryContainer;
@@ -45,6 +47,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
+      waver = AudioWaver.create(widget.track);
       final playingAudio = context.read<PlayingAudio>();
       playingAudio.play(track: widget.track);
     });
@@ -132,10 +135,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           shape: BoxShape.circle,
           color: primaryColor,
         ),
-        // child: AudioWaveWidget(
-        //   audioWaver: waver,
-        //   position: playingAudio.state.position,
-        // ),
+        child: AudioWaveWidget(
+          audioWaver: waver,
+          position: playingAudio.state.position,
+        ),
       ),
     );
   }
