@@ -13,7 +13,7 @@ class SettingsPage extends StatelessWidget {
         title: Text(L10n.of(context).settings),
         backgroundColor: Colors.transparent,
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: SettingsWidget(),
       ),
     );

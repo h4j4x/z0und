@@ -24,8 +24,19 @@ class AppTheme with ChangeNotifier {
 
   ThemeData get darkTheme => _darkTheme;
 
+  ThemeMode get nextThemeMode {
+    final modeIndex = ThemeMode.values.indexOf(_themeMode);
+    final nextIndex = (modeIndex + 1) % ThemeMode.values.length;
+    return ThemeMode.values[nextIndex];
+  }
+
   set themeMode(ThemeMode value) {
     _themeMode = value;
+    notifyListeners();
+  }
+
+  void setNextThemeMode() {
+    _themeMode = nextThemeMode;
     notifyListeners();
   }
 }

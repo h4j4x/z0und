@@ -3,12 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../../../app/l10n/app_l10n.g.dart';
 import '../../../app/theme.dart';
-import '../use_case/theme_changer.dart';
 
 class SettingsWidget extends StatelessWidget {
-  final ThemeChanger _themeChanger;
-
-  SettingsWidget({super.key}) : _themeChanger = ThemeChanger.create();
+  const SettingsWidget({super.key});
 
   static const _maxWidth = 600.0;
   static const _paddingSize = 22.0;
@@ -52,7 +49,7 @@ class SettingsWidget extends StatelessWidget {
           size: _smallIconSize,
           semanticLabel: l10n.changeThemeMode,
         ),
-        label: Icon(_iconOf(_themeChanger.getNextThemeMode(appTheme))),
+        label: Icon(_iconOf(appTheme.nextThemeMode)),
       ),
       onTap: () => _onNextThemeMode(context),
     );
@@ -81,6 +78,7 @@ class SettingsWidget extends StatelessWidget {
   }
 
   void _onNextThemeMode(BuildContext context) {
-    _themeChanger.setNextThemeMode(context);
+    final appTheme = context.read<AppTheme>();
+    appTheme.setNextThemeMode();
   }
 }
