@@ -8,6 +8,7 @@ import '../../model/audio_player_state.dart';
 import '../../model/audio_track.dart';
 import '../audio_player.dart';
 
+// todo: handle playlist
 class JustAudioPlayer extends AudioPlayer {
   final AudioTrack track;
   final just_audio.AudioPlayer _audioPlayer;
@@ -45,6 +46,8 @@ class JustAudioPlayer extends AudioPlayer {
     });
 
     _audioPlayer.playerStateStream.listen(_handleState);
+
+    // todo: listen to track changed
   }
 
   void _handleState(just_audio.PlayerState state) {

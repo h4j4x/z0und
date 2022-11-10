@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:z0und/feature/audio/model/audio_metadata.dart';
 
 import '../../../common/state/playing_audio.dart';
-import '../../audio/model/audio_track.dart';
 import '../use_case/track_picker.dart';
 
 class PlaylistWidget extends StatefulWidget {
-  final List<AudioTrack> list;
-
-  const PlaylistWidget({
-    super.key,
-    required this.list,
-  });
+  const PlaylistWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _PlaylistWidgetState();
@@ -20,14 +15,6 @@ class PlaylistWidget extends StatefulWidget {
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   static const maxWidth = 600.0;
   static const paddingSize = 22.0;
-
-  final list = <AudioTrack>[];
-
-  @override
-  void initState() {
-    super.initState();
-    list.addAll(widget.list);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +29,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             bottom: paddingSize,
             right: paddingSize,
             child: FloatingActionButton(
-              onPressed: () async {
-                final tracks = await TrackPicker.create().pickTracks();
-                setState(() {
-                  list.addAll(tracks);
-                });
-              },
+              onPressed: onPickTracks,
               child: const Icon(Icons.add_sharp),
             ),
           ),
@@ -56,44 +38,63 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     );
   }
 
+  void onPickTracks() async {
+    final tracks = await TrackPicker.create().pickTracks();
+    if (mounted) {
+      final playingNow = context.read<PlayingAudio>();
+      playingNow.addToPlaylist(tracks);
+    }
+  }
+
   Widget listView() {
-    final playingNow = context.watch<PlayingAudio>();
-    return ListView.builder(
-      itemCount: list.length,
-      itemBuilder: (context, index) => trackListItem(
-        context,
-        list[index],
-        playingNow,
-      ),
-    );
+    return Consumer<PlayingAudio>(builder: (context, playingAudio, _) {
+      return ListView.builder(
+        itemCount: playingAudio.playlist.length,
+        itemBuilder: (context, index) => trackListItem(
+          context,
+          playingAudio.playlist.elementAt(index),
+          playingAudio,
+        ),
+      );
+    });
   }
 
   Widget trackListItem(
     BuildContext context,
-    AudioTrack track,
+    AudioMetadata metadata,
     PlayingAudio playingAudio,
   ) {
-    IconData icon;
-    if (playingAudio.track == track && playingAudio.state.playing) {
-      icon = Icons.pause_circle_sharp;
+    IconData actionIcon;
+    final active = playingAudio.playingNow == metadata;
+    if (active && playingAudio.state.playing) {
+      actionIcon = Icons.pause_circle_sharp;
     } else {
-      icon = Icons.play_circle_sharp;
+      actionIcon = Icons.play_circle_sharp;
     }
-    return ListTile(
-      title: Text(track.filePath),
-      trailing: IconButton(
-        icon: Icon(icon),
-        onPressed: () => onPlay(track),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor),
+        ),
+      ),
+      child: ListTile(
+        selected: active,
+        title: Text(metadata.title),
+        subtitle: Text(metadata.album),
+        trailing: IconButton(
+          icon: Icon(actionIcon),
+          onPressed: () => onPlay(metadata),
+        ),
       ),
     );
   }
 
-  void onPlay(AudioTrack track) {
+  void onPlay(AudioMetadata metadata) {
     final playingAudio = context.read<PlayingAudio>();
-    if (playingAudio.track == track && playingAudio.state.playing) {
+    if (playingAudio.playingNow == metadata && playingAudio.state.playing) {
       playingAudio.pause();
     } else {
-      playingAudio.play(track: track);
+      playingAudio.play(track: metadata.track);
     }
   }
 }

@@ -11,6 +11,19 @@ class ID3AudioMetaFetcher extends AudioMetaFetcher {
 
   ID3AudioMetaFetcher(this.track);
 
+  get _rawTitle => basenameWithoutExtension(track.filePath)
+      .replaceAll('-', ' ')
+      .replaceAll('_', ' ');
+
+  get _rawAlbum => '~~~';
+
+  @override
+  AudioMetadata get initial => AudioMetadata(
+        track: track,
+        title: _rawTitle,
+        album: _rawAlbum,
+      );
+
   @override
   Future<AudioMetadata> get metadata async {
     String? title;
@@ -29,14 +42,10 @@ class ID3AudioMetaFetcher extends AudioMetaFetcher {
         }
       }
     }
-
-    title ??= basenameWithoutExtension(track.filePath)
-        .replaceAll('-', ' ')
-        .replaceAll('_', ' ');
-    album ??= '~~~';
     return AudioMetadata(
-      title: title,
-      album: album,
+      track: track,
+      title: title ?? _rawTitle,
+      album: album ?? _rawAlbum,
     );
   }
 }

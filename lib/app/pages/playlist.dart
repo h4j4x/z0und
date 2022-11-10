@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../common/model/file_source.dart';
-import '../../feature/audio/model/audio_track.dart';
 import '../../feature/playlist/widget/playlist.dart';
 import '../l10n/app_l10n.g.dart';
 import '../routes.dart';
@@ -25,14 +23,7 @@ class PlaylistPage extends StatelessWidget {
         ],
       ),
       body: const SafeArea(
-        child: PlaylistWidget(
-          list: [
-            AudioTrack(
-              fileSource: FileSource.asset,
-              filePath: 'assets/sample-audio-track.mp3',
-            ),
-          ],
-        ),
+        child: PlaylistWidget(),
       ),
     );
   }

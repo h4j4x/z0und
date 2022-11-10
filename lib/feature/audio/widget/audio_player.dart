@@ -144,7 +144,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackTitle(PlayingAudio playingAudio) {
-    String title = playingAudio.metadata?.title ?? widget.track.filePath;
+    String title = playingAudio.playingNow?.title ?? widget.track.filePath;
     return Text(
       title.toUpperCase(),
       textAlign: TextAlign.center,
@@ -157,7 +157,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackAlbum(PlayingAudio playingAudio) {
-    String album = playingAudio.metadata?.album ?? '-';
+    String album = playingAudio.playingNow?.album ?? '-';
     return Text(
       album.toUpperCase(),
       textAlign: TextAlign.center,
