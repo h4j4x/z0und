@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
-import 'package:z0und/common/model/file_source.dart';
-import 'package:z0und/feature/audio/model/audio_track.dart';
 
+import '../../../../common/model/file_source.dart';
+import '../../../audio/model/audio_track.dart';
 import '../track_picker.dart';
 
 class FileTrackPicker implements TrackPicker {

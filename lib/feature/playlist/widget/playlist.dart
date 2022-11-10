@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:z0und/feature/audio/model/audio_track.dart';
 
-import '../../../app/playing_now.dart';
+import '../../../common/state/playing_audio.dart';
+import '../../audio/model/audio_track.dart';
 import '../use_case/track_picker.dart';
 
 class PlaylistWidget extends StatefulWidget {
@@ -74,7 +74,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     PlayingAudio playingAudio,
   ) {
     IconData icon;
-    if (playingAudio.playingNow == track && playingAudio.isPlaying) {
+    if (playingAudio.track == track && playingAudio.state.playing) {
       icon = Icons.pause_circle_sharp;
     } else {
       icon = Icons.play_circle_sharp;
@@ -90,7 +90,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   void onPlay(AudioTrack track) {
     final playingAudio = context.read<PlayingAudio>();
-    if (playingAudio.playingNow == track && playingAudio.isPlaying) {
+    if (playingAudio.track == track && playingAudio.state.playing) {
       playingAudio.pause();
     } else {
       playingAudio.play(track: track);

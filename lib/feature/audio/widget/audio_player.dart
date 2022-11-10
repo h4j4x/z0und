@@ -1,17 +1,12 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../app/l10n/app_l10n.g.dart';
+import '../../../common/state/playing_audio.dart';
 import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_track.dart';
-import '../model/audio_metadata.dart';
-import '../model/audio_player_state.dart';
-import '../use_case/audio_meta_fetcher.dart';
-import '../use_case/audio_player.dart';
-import '../use_case/audio_waver.dart';
-import 'audio_wave.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final AudioTrack track;
@@ -35,94 +30,78 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const smallTextScaleFactor = 0.85;
   static const smallTextLetterSpacing = 0.8;
 
-  var playerState = AudioPlayerState();
-  AudioMetadata? metadata;
-  late AudioPlayer player;
-  late AudioWaver waver;
+  // late AudioWaver waver;
   var lastVolume = 0.0;
-  StreamSubscription<AudioPlayerState>? stateSubscription;
 
   Color get primaryColor => Theme.of(context).colorScheme.primaryContainer;
 
   Color get secondaryColor => Theme.of(context).colorScheme.secondaryContainer;
 
-  bool get isMuted => playerState.volume < 0.01;
+  bool audioIsMuted(PlayingAudio playingAudio) {
+    return playingAudio.state.volume < 0.01;
+  }
 
   @override
   void initState() {
     super.initState();
-    player = AudioPlayer.create(widget.track);
-    waver = AudioWaver.create(widget.track);
     Future.delayed(Duration.zero, () {
-      setupPlayer();
-      fetchMetadata();
+      final playingAudio = context.read<PlayingAudio>();
+      playingAudio.play(track: widget.track);
     });
-  }
-
-  void setupPlayer() async {
-    stateSubscription = player.stateStream.listen((state) {
-      setState(() {
-        playerState = state;
-      });
-    });
-  }
-
-  void fetchMetadata() async {
-    final fetcher = AudioMetaFetcher.create(widget.track);
-    metadata = await fetcher.metadata;
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-    if (playerState.error != null) {
-      content = errorContent();
-    } else if (playerState.loading) {
-      content = loadingContent();
-    } else {
-      content = playerContent();
-    }
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(
-          maxWidth: maxWidth,
+    return Consumer<PlayingAudio>(builder: (context, playingAudio, _) {
+      Widget content;
+      if (playingAudio.state.error != null) {
+        content = errorContent(playingAudio.state.error!);
+      } else if (playingAudio.state.loading) {
+        content = loadingContent();
+      } else {
+        content = playerContent(playingAudio);
+      }
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(
+            maxWidth: maxWidth,
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: paddingSize * 1.2,
+          ),
+          child: Center(child: content),
         ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: paddingSize * 1.2,
-        ),
-        child: Center(child: content),
-      ),
-    );
+      );
+    });
   }
 
-  Widget playerContent() {
+  Widget playerContent(PlayingAudio playingAudio) {
     return LayoutBuilder(builder: (context, constraints) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          trackCard(constraints),
+          trackCard(constraints, playingAudio),
           Padding(
             padding: const EdgeInsets.only(
               top: paddingSize * 1.5,
               left: paddingSize,
               right: paddingSize,
             ),
-            child: trackTimes(),
+            child: trackTimes(playingAudio),
           ),
-          trackProgress(),
+          trackProgress(playingAudio),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: paddingSize),
-            child: trackControls(),
+            child: trackControls(playingAudio),
           ),
-          volumeControls(),
+          volumeControls(playingAudio),
         ],
       );
     });
   }
 
-  Widget trackCard(BoxConstraints constraints) {
+  Widget trackCard(BoxConstraints constraints, PlayingAudio playingAudio) {
     return Card(
       margin: EdgeInsets.zero,
       elevation: paddingSize,
@@ -130,19 +109,19 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         padding: const EdgeInsets.all(paddingSize * 0.65),
         child: Column(
           children: [
-            trackCover(constraints),
+            trackCover(constraints, playingAudio),
             Padding(
               padding: const EdgeInsets.only(top: paddingSize * 0.8),
-              child: trackTitle(),
+              child: trackTitle(playingAudio),
             ),
-            trackAlbum(),
+            trackAlbum(playingAudio),
           ],
         ),
       ),
     );
   }
 
-  Widget trackCover(BoxConstraints constraints) {
+  Widget trackCover(BoxConstraints constraints, PlayingAudio playingAudio) {
     double size =
         min(constraints.maxWidth * 0.75, constraints.maxHeight * 0.25);
     return Center(
@@ -153,16 +132,16 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           shape: BoxShape.circle,
           color: primaryColor,
         ),
-        child: AudioWaveWidget(
-          audioWaver: waver,
-          position: playerState.position,
-        ),
+        // child: AudioWaveWidget(
+        //   audioWaver: waver,
+        //   position: playingAudio.state.position,
+        // ),
       ),
     );
   }
 
-  Widget trackTitle() {
-    String title = metadata?.title ?? widget.track.filePath;
+  Widget trackTitle(PlayingAudio playingAudio) {
+    String title = playingAudio.metadata?.title ?? widget.track.filePath;
     return Text(
       title.toUpperCase(),
       textAlign: TextAlign.center,
@@ -174,8 +153,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
-  Widget trackAlbum() {
-    String album = metadata?.album ?? '-';
+  Widget trackAlbum(PlayingAudio playingAudio) {
+    String album = playingAudio.metadata?.album ?? '-';
     return Text(
       album.toUpperCase(),
       textAlign: TextAlign.center,
@@ -188,9 +167,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
-  Widget trackTimes() {
-    final position = playerState.position.minutesFormatted();
-    final duration = playerState.duration.minutesFormatted();
+  Widget trackTimes(PlayingAudio playingAudio) {
+    final position = playingAudio.state.position.minutesFormatted();
+    final duration = playingAudio.state.duration.minutesFormatted();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.max,
@@ -217,28 +196,29 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
-  Widget trackProgress() {
+  Widget trackProgress(PlayingAudio playingAudio) {
     return Slider.adaptive(
-      value: playerState.position.inSeconds.toDouble(),
-      max: playerState.duration.inSeconds.toDouble(),
-      onChanged: playerState.canPlay
-          ? (value) {
-              player.seek(Duration(seconds: value.toInt()));
-            }
-          : null,
+      value: playingAudio.state.position.inSeconds.toDouble(),
+      max: playingAudio.state.duration.inSeconds.toDouble(),
+      onChanged: playingAudio.state.canPlay ? onSeekTrack : null,
       semanticFormatterCallback: (value) => L10n.of(context)
           .trackPosition(Duration(seconds: value.toInt()).minutesFormatted()),
     );
   }
 
-  Widget trackControls() {
+  void onSeekTrack(double value) {
+    final playingAudio = context.read<PlayingAudio>();
+    playingAudio.player?.seek(Duration(seconds: value.toInt()));
+  }
+
+  Widget trackControls(PlayingAudio playingAudio) {
     const buttonSize = paddingSize * 1.8;
     IconData icon;
     String playLabel;
-    if (playerState.done) {
+    if (playingAudio.state.done) {
       icon = Icons.replay_sharp;
       playLabel = L10n.of(context).replay;
-    } else if (playerState.playing) {
+    } else if (playingAudio.state.playing) {
       icon = Icons.pause_sharp;
       playLabel = L10n.of(context).pause;
     } else {
@@ -250,7 +230,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       mainAxisSize: MainAxisSize.max,
       children: [
         FloatingActionButton(
-          onPressed: playerState.canPlay ? onPlay : null,
+          onPressed: playingAudio.state.canPlay ? onPlay : null,
           heroTag: 'playButton',
           backgroundColor: primaryColor,
           elevation: paddingSize,
@@ -266,20 +246,21 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   void onPlay() async {
-    if (playerState.done) {
-      await player.seek(Duration.zero);
+    final playingAudio = context.read<PlayingAudio>();
+    if (playingAudio.state.done) {
+      await playingAudio.player?.seek(Duration.zero);
     }
-
-    if (playerState.playing) {
-      player.pause();
+    if (playingAudio.state.playing) {
+      playingAudio.player?.pause();
     } else {
-      player.play();
+      playingAudio.player?.play();
     }
   }
 
-  Widget volumeControls() {
+  Widget volumeControls(PlayingAudio playingAudio) {
     final theme = Theme.of(context);
     final muteLabel = L10n.of(context).mute;
+    final isMuted = audioIsMuted(playingAudio);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
@@ -305,12 +286,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         ),
         const Icon(Icons.volume_down_sharp),
         Slider.adaptive(
-          value: playerState.volume,
-          onChanged: playerState.canPlay
-              ? (value) {
-                  player.setVolume(value);
-                }
-              : null,
+          value: playingAudio.state.volume,
+          onChanged: playingAudio.state.canPlay ? onVolumeChanged : null,
           activeColor: secondaryColor,
           semanticFormatterCallback: (value) =>
               L10n.of(context).volumeValue(value.toStringAsFixed(1)),
@@ -320,22 +297,28 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
+  void onVolumeChanged(double value) {
+    final playingAudio = context.read<PlayingAudio>();
+    playingAudio.player?.setVolume(value);
+  }
+
   void onToggleMute() {
-    if (isMuted) {
-      player.setVolume(lastVolume);
+    final playingAudio = context.read<PlayingAudio>();
+    if (audioIsMuted(playingAudio)) {
+      playingAudio.player?.setVolume(lastVolume);
     } else {
-      lastVolume = playerState.volume;
-      player.setVolume(0.0);
+      lastVolume = playingAudio.state.volume;
+      playingAudio.player?.setVolume(0.0);
     }
   }
 
-  Widget errorContent() {
+  Widget errorContent(String error) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          playerState.error!,
+          error,
           textAlign: TextAlign.center,
           textScaleFactor: mediumTextScaleFactor,
           style: TextStyle(
@@ -350,13 +333,5 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   Widget loadingContent() {
     return const CircularProgressIndicator.adaptive();
-  }
-
-  @override
-  void dispose() {
-    stateSubscription?.cancel();
-    player.dispose();
-    waver.dispose();
-    super.dispose();
   }
 }

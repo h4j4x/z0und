@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'app/l10n/app_l10n.g.dart';
-import 'app/playing_now.dart';
 import 'app/routes.dart';
 import 'app/theme.dart';
+import 'common/state/playing_audio.dart';
 
 void main() {
   runApp(
@@ -34,7 +34,7 @@ class App extends StatelessWidget {
       supportedLocales: L10n.supportedLocales,
       onGenerateTitle: (context) => L10n.of(context).appTitle,
       // route
-      initialRoute: Routes.playlist,
+      initialRoute: Routes.audioPlayer,
       routes: Routes.map,
     );
   }
