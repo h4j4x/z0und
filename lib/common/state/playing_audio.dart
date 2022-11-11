@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -8,15 +9,18 @@ import '../../feature/audio/model/audio_track.dart';
 import '../../feature/audio/use_case/audio_meta_fetcher.dart';
 import '../../feature/audio/use_case/audio_player.dart';
 import '../model/file_source.dart';
+import '../model/playlist_next_mode.dart';
 
 class PlayingAudio with ChangeNotifier {
+  PlaylistNextMode _playlistNextMode; // todo: allow config
   AudioMetadata? _playingNow;
   final _playlist = <AudioTrack, AudioMetadata>{};
   AudioPlayer? player;
   AudioPlayerState? _state;
   StreamSubscription<AudioPlayerState>? _stateSubscription;
 
-  PlayingAudio() {
+  PlayingAudio({PlaylistNextMode playlistNextMode = PlaylistNextMode.loop})
+      : _playlistNextMode = playlistNextMode {
     const assetTrack = AudioTrack(
       fileSource: FileSource.asset,
       filePath: 'assets/sample-audio-track.mp3',
@@ -29,6 +33,9 @@ class PlayingAudio with ChangeNotifier {
   AudioPlayerState get state => _state ?? AudioPlayerState();
 
   Iterable<AudioMetadata> get playlist => _playlist.values;
+
+  get _nowIndex =>
+      playingNow != null ? _playlist.values.toList().indexOf(playingNow!) : -1;
 
   Future<void> play({AudioTrack? track}) async {
     if (track != null && track != _playingNow?.track) {
@@ -44,6 +51,9 @@ class PlayingAudio with ChangeNotifier {
       _stateSubscription = player!.stateStream.listen((playerState) {
         _state = playerState;
         notifyListeners();
+        if (playerState.done) {
+          _playNext();
+        }
       });
       // playlist
       addToPlaylist([track]);
@@ -55,9 +65,35 @@ class PlayingAudio with ChangeNotifier {
     return player?.pause() ?? Future.value();
   }
 
+  void _playNext() {
+    int nextIndex = -1;
+    switch (_playlistNextMode) {
+      case PlaylistNextMode.repeat:
+        player?.seek(Duration.zero);
+        player?.play();
+        break;
+      case PlaylistNextMode.random:
+        final random = Random();
+        final nowIndex = _nowIndex;
+        nextIndex = nowIndex;
+        while (nextIndex == nowIndex) {
+          nextIndex = random.nextInt(_playlist.length);
+        }
+        break;
+      case PlaylistNextMode.doNotLoop:
+        nextIndex = _nowIndex + 1;
+        break;
+      case PlaylistNextMode.loop:
+        nextIndex = (_nowIndex + 1) % _playlist.length;
+        break;
+    }
+    if (nextIndex >= 0 && nextIndex < _playlist.length) {
+      play(track: _playlist.keys.elementAt(nextIndex));
+    }
+  }
+
   void addToPlaylist(Iterable<AudioTrack> tracks) {
     for (AudioTrack track in tracks) {
-      // todo: add to player playlist
       final fetcher = AudioMetaFetcher.create(track);
       _playlist[track] = fetcher.initial;
       notifyListeners();

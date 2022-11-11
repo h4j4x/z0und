@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:z0und/feature/audio/model/audio_metadata.dart';
 
 import '../../../common/state/playing_audio.dart';
+import '../../audio/model/audio_metadata.dart';
 import '../use_case/track_picker.dart';
 
 class PlaylistWidget extends StatefulWidget {
