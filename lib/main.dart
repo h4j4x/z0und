@@ -4,14 +4,23 @@ import 'package:provider/provider.dart';
 import 'app/l10n/app_l10n.g.dart';
 import 'app/routes.dart';
 import 'app/theme.dart';
+import 'common/model/playlist_next_mode.dart';
 import 'common/state/playing_audio.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppTheme()),
-        ChangeNotifierProvider(create: (_) => PlayingAudio()),
+        ChangeNotifierProvider(
+          create: (_) => AppTheme(
+            themeMode: ThemeMode.system, // todo: from storage
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PlayingAudio(
+            playlistNextMode: PlaylistNextMode.loop, // todo: from storage
+          ),
+        ),
       ],
       child: const App(),
     ),

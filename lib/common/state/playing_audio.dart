@@ -10,16 +10,17 @@ import '../../feature/audio/use_case/audio_meta_fetcher.dart';
 import '../../feature/audio/use_case/audio_player.dart';
 import '../model/file_source.dart';
 import '../model/playlist_next_mode.dart';
+import '../util/collection_utils.dart';
 
 class PlayingAudio with ChangeNotifier {
-  PlaylistNextMode _playlistNextMode; // todo: allow config
+  PlaylistNextMode _playlistNextMode;
   AudioMetadata? _playingNow;
   final _playlist = <AudioTrack, AudioMetadata>{};
   AudioPlayer? player;
   AudioPlayerState? _state;
   StreamSubscription<AudioPlayerState>? _stateSubscription;
 
-  PlayingAudio({PlaylistNextMode playlistNextMode = PlaylistNextMode.loop})
+  PlayingAudio({required PlaylistNextMode playlistNextMode})
       : _playlistNextMode = playlistNextMode {
     const assetTrack = AudioTrack(
       fileSource: FileSource.asset,
@@ -34,8 +35,14 @@ class PlayingAudio with ChangeNotifier {
 
   Iterable<AudioMetadata> get playlist => _playlist.values;
 
-  get _nowIndex =>
-      playingNow != null ? _playlist.values.toList().indexOf(playingNow!) : -1;
+  PlaylistNextMode get playlistNextMode => _playlistNextMode;
+
+  set playlistNextMode(PlaylistNextMode nextMode) {
+    _playlistNextMode = nextMode;
+    notifyListeners();
+  }
+
+  int get _nowIndex => _playlist.indexOfValue(playingNow);
 
   Future<void> play({AudioTrack? track}) async {
     if (track != null && track != _playingNow?.track) {

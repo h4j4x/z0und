@@ -10,10 +10,10 @@ class AppTheme with ChangeNotifier {
   late ThemeData _lightTheme;
   late ThemeData _darkTheme;
 
-  AppTheme()
+  AppTheme({required ThemeMode themeMode})
       : _flexScheme = FlexScheme.damask,
         _fontFamily = GoogleFonts.notoSans().fontFamily,
-        _themeMode = ThemeMode.system {
+        _themeMode = themeMode {
     _lightTheme = _createLightTheme(_flexScheme, _fontFamily);
     _darkTheme = _createDarkTheme(_flexScheme, _fontFamily);
   }
