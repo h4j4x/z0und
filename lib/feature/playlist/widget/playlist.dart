@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../common/state/playing_audio.dart';
+import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_metadata.dart';
 import '../use_case/track_picker.dart';
 
@@ -71,6 +72,20 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     } else {
       actionIcon = Icons.play_circle_sharp;
     }
+
+    Widget trackTime;
+    if (metadata == playingAudio.playingNow) {
+      trackTime = Text(
+        playingAudio.state.position.minutesFormatted(),
+        textScaleFactor: 0.8,
+        style: const TextStyle(
+          fontWeight: FontWeight.w200,
+        ),
+      );
+    } else {
+      trackTime = Container();
+    }
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -81,9 +96,17 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         selected: active,
         title: Text(metadata.title),
         subtitle: Text(metadata.album),
-        trailing: IconButton(
-          icon: Icon(actionIcon),
-          onPressed: () => onPlay(metadata),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            trackTime,
+            IconButton(
+              icon: Icon(actionIcon),
+              onPressed: () => onPlay(metadata),
+            ),
+          ],
         ),
       ),
     );
