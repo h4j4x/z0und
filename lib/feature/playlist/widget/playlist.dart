@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../app/routes.dart';
 import '../../../common/state/playing_audio.dart';
 import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_metadata.dart';
@@ -96,6 +97,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         selected: active,
         title: Text(metadata.title),
         subtitle: Text(metadata.album),
+        onTap: () {
+          Navigator.of(context).pushNamed(Routes.audioPlayer);
+        },
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
