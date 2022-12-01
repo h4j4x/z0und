@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 
 import '../../feature/audio/model/audio_metadata.dart';
 import '../../feature/audio/model/audio_player_state.dart';
-import '../../feature/audio/model/audio_track.dart';
+import '../model/audio_track.dart';
 import '../../feature/audio/use_case/audio_meta_fetcher.dart';
 import '../../feature/audio/use_case/audio_player.dart';
-import '../model/file_source.dart';
 import '../model/playlist_next_mode.dart';
 import '../util/collection_utils.dart';
 
@@ -21,13 +20,7 @@ class PlayingAudio with ChangeNotifier {
   StreamSubscription<AudioPlayerState>? _stateSubscription;
 
   PlayingAudio({required PlaylistNextMode playlistNextMode})
-      : _playlistNextMode = playlistNextMode {
-    const assetTrack = AudioTrack(
-      fileSource: FileSource.asset,
-      filePath: 'assets/sample-audio-track.mp3',
-    );
-    addToPlaylist([assetTrack]);
-  }
+      : _playlistNextMode = playlistNextMode;
 
   AudioMetadata? get playingNow => _playingNow;
 

@@ -1,11 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:mime/mime.dart';
 
-import '../../../../common/util/file_utils.dart';
+import '../../../../common/model/audio_track.dart';
 import '../../model/audio_player_state.dart';
-import '../../model/audio_track.dart';
 import '../audio_player.dart';
 
 class JustAudioPlayer extends AudioPlayer {
@@ -120,31 +120,21 @@ class JustAudioPlayer extends AudioPlayer {
 
 class AudioTrackSource extends just_audio.StreamAudioSource {
   final AudioTrack track;
-  int _trackLengthInBytes = -1;
 
   AudioTrackSource(this.track);
 
   @override
   Future<just_audio.StreamAudioResponse> request([int? start, int? end]) async {
-    final length = await _trackLength();
-    final stream = FileUtils.read(track.filePath, track.fileSource);
+    final length = track.buffer.lengthInBytes;
     start ??= 0;
     end ??= length;
     return just_audio.StreamAudioResponse(
       sourceLength: length,
       contentLength: end - start,
       offset: start,
-      stream: stream
+      stream: Stream<ByteBuffer>.fromFuture(Future.value(track.buffer))
           .map((buffer) => buffer.asInt8List(start!, end! - start).toList()),
-      contentType: lookupMimeType(track.filePath) ?? 'audio/mpeg',
+      contentType: lookupMimeType(track.name) ?? 'audio/mpeg',
     );
-  }
-
-  Future<int> _trackLength() async {
-    if (_trackLengthInBytes < 0) {
-      _trackLengthInBytes =
-          await FileUtils.readBytesLength(track.filePath, track.fileSource);
-    }
-    return _trackLengthInBytes;
   }
 }

@@ -6,7 +6,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../common/util/file_utils.dart';
-import '../../model/audio_track.dart';
+import '../../../../common/model/audio_track.dart';
 import '../audio_waver.dart';
 
 class JustAudioWaver implements AudioWaver {
@@ -23,11 +23,11 @@ class JustAudioWaver implements AudioWaver {
 
   void _setupStream() async {
     final tmpDir = await getTemporaryDirectory();
-    final trackPath = path.join(tmpDir.path, path.basename(track.filePath));
+    final trackPath = path.join(tmpDir.path, path.basename(track.name));
     final trackFile = File(trackPath);
-    await FileUtils.copyToFile(track.filePath, track.fileSource, trackFile);
+    await FileUtils.copyToFile(track, trackFile);
     final wavePath = path.join(
-        tmpDir.path, '${path.basenameWithoutExtension(track.filePath)}.wave');
+        tmpDir.path, '${path.basenameWithoutExtension(track.name)}.wave');
     JustWaveform.extract(
       audioInFile: trackFile,
       waveOutFile: File(wavePath),

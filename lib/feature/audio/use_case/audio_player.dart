@@ -1,5 +1,5 @@
 import '../model/audio_player_state.dart';
-import '../model/audio_track.dart';
+import '../../../common/model/audio_track.dart';
 import 'impl/just_audio_player.dart';
 
 abstract class AudioPlayer {

@@ -1,7 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 
-import '../../../../common/model/file_source.dart';
-import '../../../audio/model/audio_track.dart';
+import '../../../../common/model/audio_track.dart';
 import '../track_picker.dart';
 
 class FileTrackPicker implements TrackPicker {
@@ -13,12 +12,14 @@ class FileTrackPicker implements TrackPicker {
       allowedExtensions: ['mp3'],
       allowMultiple: true,
       lockParentWindow: true,
+      withData: true,
+      withReadStream: false,
     );
     if (result != null) {
       return result.files
-          .where((file) => file.path != null)
+          .where((file) => file.path != null && file.bytes != null)
           .map((file) =>
-              AudioTrack(filePath: file.path!, fileSource: FileSource.device))
+              AudioTrack(name: file.path!, buffer: file.bytes!.buffer))
           .toList();
     }
     return [];

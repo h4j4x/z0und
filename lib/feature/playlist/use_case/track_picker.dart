@@ -1,4 +1,4 @@
-import '../../audio/model/audio_track.dart';
+import '../../../common/model/audio_track.dart';
 import 'impl/file_track_picker.dart';
 
 abstract class TrackPicker {

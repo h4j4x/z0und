@@ -5,10 +5,16 @@ import '../../../app/routes.dart';
 import '../../../common/state/playing_audio.dart';
 import '../../../common/util/duration_utils.dart';
 import '../../audio/model/audio_metadata.dart';
+import '../../../common/model/audio_track.dart';
 import '../use_case/track_picker.dart';
 
 class PlaylistWidget extends StatefulWidget {
-  const PlaylistWidget({super.key});
+  final List<AudioTrack> tracks;
+
+  const PlaylistWidget({
+    super.key,
+    this.tracks = const <AudioTrack>[],
+  });
 
   @override
   State<StatefulWidget> createState() => _PlaylistWidgetState();
@@ -17,6 +23,15 @@ class PlaylistWidget extends StatefulWidget {
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   static const maxWidth = 600.0;
   static const paddingSize = 22.0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      final playingNow = context.read<PlayingAudio>();
+      playingNow.addToPlaylist(widget.tracks);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

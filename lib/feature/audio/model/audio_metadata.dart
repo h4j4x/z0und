@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'audio_track.dart';
+import '../../../common/model/audio_track.dart';
 
 class AudioMetadata with EquatableMixin {
   final AudioTrack track;

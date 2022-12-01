@@ -1,4 +1,4 @@
-import '../model/audio_track.dart';
+import '../../../common/model/audio_track.dart';
 import 'impl/just_audio_waver.dart';
 
 abstract class AudioWaver {

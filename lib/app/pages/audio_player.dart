@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../common/model/file_source.dart';
-import '../../feature/audio/model/audio_track.dart';
+import '../../common/model/audio_track.dart';
 import '../../feature/audio/widget/audio_player.dart';
+import '../constants.dart';
 import '../l10n/app_l10n.g.dart';
 import '../routes.dart';
 
@@ -24,12 +24,15 @@ class AudioPlayerPage extends StatelessWidget {
           ),
         ],
       ),
-      body: const SafeArea(
-        child: AudioPlayerWidget(
-          track: AudioTrack(
-            fileSource: FileSource.asset,
-            filePath: 'assets/sample-audio-track.mp3',
-          ),
+      body: SafeArea(
+        child: FutureBuilder<AudioTrack>(
+          future: AudioTrack.fromAsset(sampleAudioAssetPath),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              return AudioPlayerWidget(track: snapshot.data!);
+            }
+            return const CircularProgressIndicator.adaptive();
+          },
         ),
       ),
     );
