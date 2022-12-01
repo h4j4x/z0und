@@ -20,6 +20,9 @@ class L10nEn extends L10n {
   String get mute => 'Mute';
 
   @override
+  String get nothingHere => 'Nothing here :/';
+
+  @override
   String get pause => 'Pause';
 
   @override

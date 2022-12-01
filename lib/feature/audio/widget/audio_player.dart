@@ -4,19 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/l10n/app_l10n.g.dart';
-import '../../../common/model/audio_track.dart';
 import '../../../common/state/playing_audio.dart';
 import '../../../common/util/duration_utils.dart';
 import '../use_case/audio_waver.dart';
 import 'audio_wave.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
-  final AudioTrack track;
-
-  const AudioPlayerWidget({
-    super.key,
-    required this.track,
-  });
+  const AudioPlayerWidget({super.key});
 
   @override
   State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
@@ -44,16 +38,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      waver = AudioWaver.create(widget.track);
-      final playingAudio = context.read<PlayingAudio>();
-      playingAudio.play(track: widget.track);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Consumer<PlayingAudio>(builder: (context, playingAudio, _) {
       Widget content;
@@ -61,8 +45,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         content = errorContent(playingAudio.state.error!);
       } else if (playingAudio.state.loading) {
         content = loadingContent();
-      } else {
+      } else if (playingAudio.playingNow != null) {
         content = playerContent(playingAudio);
+      } else {
+        content = noContent();
       }
       return Center(
         child: Container(
@@ -146,7 +132,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackTitle(PlayingAudio playingAudio) {
-    String title = playingAudio.playingNow?.title ?? widget.track.name;
+    String title = playingAudio.playingNow!.title;
     return Text(
       title.toUpperCase(),
       textAlign: TextAlign.center,
@@ -159,7 +145,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget trackAlbum(PlayingAudio playingAudio) {
-    String album = playingAudio.playingNow?.album ?? '-';
+    String album = playingAudio.playingNow!.album;
     return Text(
       album.toUpperCase(),
       textAlign: TextAlign.center,
@@ -338,5 +324,18 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   Widget loadingContent() {
     return const CircularProgressIndicator.adaptive();
+  }
+
+  Widget noContent() {
+    return Center(
+      child: Text(
+        L10n.of(context).nothingHere,
+        textScaleFactor: bigTextScaleFactor,
+        style: const TextStyle(
+          fontWeight: FontWeight.w900,
+          letterSpacing: bigTextLetterSpacing,
+        ),
+      ),
+    );
   }
 }

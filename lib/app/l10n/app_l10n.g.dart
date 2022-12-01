@@ -121,6 +121,12 @@ abstract class L10n {
   /// **'Mute'**
   String get mute;
 
+  /// No description provided for @nothingHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here :/'**
+  String get nothingHere;
+
   /// No description provided for @pause.
   ///
   /// In en, this message translates to:
