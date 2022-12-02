@@ -109,6 +109,12 @@ abstract class L10n {
   /// **'Dark mode'**
   String get darkMode;
 
+  /// No description provided for @goToPlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to playlist'**
+  String get goToPlaylist;
+
   /// No description provided for @lightMode.
   ///
   /// In en, this message translates to:

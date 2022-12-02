@@ -14,6 +14,9 @@ class L10nEn extends L10n {
   String get darkMode => 'Dark mode';
 
   @override
+  String get goToPlaylist => 'Go to playlist';
+
+  @override
   String get lightMode => 'Light mode';
 
   @override

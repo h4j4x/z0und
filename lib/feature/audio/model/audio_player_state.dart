@@ -9,7 +9,7 @@ class AudioPlayerState {
   final String? error;
 
   AudioPlayerState({
-    this.loading = true,
+    this.loading = false,
     this.canPlay = false,
     this.playing = false,
     this.done = false,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/l10n/app_l10n.g.dart';
+import '../../../app/routes.dart';
 import '../../../common/state/playing_audio.dart';
 import '../../../common/util/duration_utils.dart';
 import '../use_case/audio_waver.dart';
@@ -25,6 +26,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   static const mediumTextLetterSpacing = 0.3;
   static const smallTextScaleFactor = 0.85;
   static const smallTextLetterSpacing = 0.8;
+  static const smallIconSize = 10.0;
 
   AudioWaver? waver;
   var lastVolume = 0.0;
@@ -50,25 +52,21 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       } else {
         content = noContent();
       }
-      return Center(
-        child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: maxWidth,
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: paddingSize * 1.2,
-          ),
-          child: Center(child: content),
+      return Container(
+        constraints: const BoxConstraints(
+          maxWidth: maxWidth,
         ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: paddingSize * 1.1,
+        ),
+        child: Center(child: content),
       );
     });
   }
 
   Widget playerContent(PlayingAudio playingAudio) {
     return LayoutBuilder(builder: (context, constraints) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
+      return ListView(
         children: [
           trackCard(constraints, playingAudio),
           Padding(
@@ -327,15 +325,34 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   Widget noContent() {
-    return Center(
-      child: Text(
-        L10n.of(context).nothingHere,
-        textScaleFactor: bigTextScaleFactor,
-        style: const TextStyle(
-          fontWeight: FontWeight.w900,
-          letterSpacing: bigTextLetterSpacing,
+    final l10n = L10n.of(context);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          L10n.of(context).nothingHere,
+          textScaleFactor: bigTextScaleFactor,
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: bigTextLetterSpacing,
+          ),
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.only(top: paddingSize),
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(Routes.playlist, (_) => false);
+            },
+            icon: Icon(
+              Icons.arrow_back_sharp,
+              size: smallIconSize,
+              semanticLabel: l10n.goToPlaylist,
+            ),
+            label: Text(l10n.goToPlaylist),
+          ),
+        ),
+      ],
     );
   }
 }
