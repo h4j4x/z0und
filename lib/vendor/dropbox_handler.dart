@@ -7,57 +7,16 @@ import '../helper/http.dart';
 import '../service/storage.dart';
 import 'openid_handler.dart';
 
-const authKey = 'dropbox_auth';
-const accountIdKey = 'accountId';
-const accessTokenKey = 'access_token';
-const refreshTokenKey = 'refresh_token';
-const expiresInKey = 'expires_in';
-const updatedAtKey = 'updated_at';
-
-class _DropboxAuth {
-  String? accountId;
-  String? accessToken;
-  String? refreshToken;
-  int? expiresInSeconds;
-  DateTime updatedAt = DateTime.now();
-
-  bool get isExpired {
-    if (expiresInSeconds != null) {
-      final expiresAt = updatedAt.add(Duration(seconds: expiresInSeconds!));
-      return expiresAt.isAfter(DateTime.now());
-    }
-    return true;
-  }
-
-  void putAll(Map<String, dynamic> data) {
-    accountId = data[accountIdKey] as String?;
-    accessToken = data[accessTokenKey] as String?;
-    refreshToken = data[refreshTokenKey] as String?;
-    expiresInSeconds = data[expiresInKey] as int?;
-    if (data.containsKey(updatedAtKey)) {
-      final millis = data[updatedAtKey] as int;
-      updatedAt = DateTime.fromMillisecondsSinceEpoch(millis);
-    } else {
-      updatedAt = DateTime.now();
-    }
-  }
-
-  Map<String, dynamic> get map => <String, dynamic>{
-        accountIdKey: accountId,
-        accessTokenKey: accessToken,
-        refreshTokenKey: refreshToken,
-        expiresInKey: expiresInSeconds,
-        updatedAtKey: updatedAt.millisecondsSinceEpoch,
-      };
-}
-
+/// Dropbox integration.
+///
+/// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
 class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   static DropboxOpenidHandler of(BuildContext context, {bool listen = true}) {
     return Provider.of<DropboxOpenidHandler>(context, listen: listen);
   }
 
   DropboxOpenidHandler.create() {
-    StorageService().read(authKey).then((value) {
+    StorageService().read(_authKey).then((value) {
       if (value != null) {
         final Map<String, dynamic> data = jsonDecode(value);
         _auth.putAll(data);
@@ -109,7 +68,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   Future _save(Map<String, dynamic> data) async {
     _auth.putAll(data);
     notifyListeners();
-    await StorageService().write(authKey, jsonEncode(_auth.map));
+    await StorageService().write(_authKey, jsonEncode(_auth.map));
   }
 
   Future _refreshAuth() async {
@@ -127,4 +86,48 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       // todo: handle
     }
   }
+}
+
+const _authKey = 'dropbox_auth';
+const _accountIdKey = 'accountId';
+const _accessTokenKey = 'access_token';
+const _refreshTokenKey = 'refresh_token';
+const _expiresInKey = 'expires_in';
+const _updatedAtKey = 'updated_at';
+
+class _DropboxAuth {
+  String? accountId;
+  String? accessToken;
+  String? refreshToken;
+  int? expiresInSeconds;
+  DateTime updatedAt = DateTime.now();
+
+  bool get isExpired {
+    if (expiresInSeconds != null) {
+      final expiresAt = updatedAt.add(Duration(seconds: expiresInSeconds!));
+      return expiresAt.isAfter(DateTime.now());
+    }
+    return true;
+  }
+
+  void putAll(Map<String, dynamic> data) {
+    accountId = data[_accountIdKey] as String?;
+    accessToken = data[_accessTokenKey] as String?;
+    refreshToken = data[_refreshTokenKey] as String?;
+    expiresInSeconds = data[_expiresInKey] as int?;
+    if (data.containsKey(_updatedAtKey)) {
+      final millis = data[_updatedAtKey] as int;
+      updatedAt = DateTime.fromMillisecondsSinceEpoch(millis);
+    } else {
+      updatedAt = DateTime.now();
+    }
+  }
+
+  Map<String, dynamic> get map => <String, dynamic>{
+        _accountIdKey: accountId,
+        _accessTokenKey: accessToken,
+        _refreshTokenKey: refreshToken,
+        _expiresInKey: expiresInSeconds,
+        _updatedAtKey: updatedAt.millisecondsSinceEpoch,
+      };
 }
