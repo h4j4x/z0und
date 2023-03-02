@@ -24,6 +24,7 @@ class OpenidLoginPage extends StatefulWidget {
 class _OpenidLoginPageState extends State<OpenidLoginPage>
     implements WebBrowserListener {
   bool processing = false;
+  String? error;
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +33,42 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
         title: Text(widget.title),
       ),
       body: SafeArea(
-        child: processing
-            ? const Center(
-                child: CircularProgressIndicator.adaptive(),
-              )
-            : WebBrowser(
-                initialUrl: widget.authUrl,
-                listener: this,
-              ),
+        child: body(),
       ),
+    );
+  }
+
+  Widget body() {
+    if (error != null) {
+      return ListView(
+        padding: const EdgeInsets.all(8.0),
+        children: [
+          Text(
+            error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+            ),
+            textScaleFactor: 1.6,
+          ),
+          ListTile(
+            leading: const Icon(Icons.arrow_back_sharp),
+            title: const Text('EXIT TODO'),
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    }
+    if (processing) {
+      return const Center(
+        child: CircularProgressIndicator.adaptive(),
+      );
+    }
+    return WebBrowser(
+      initialUrl: widget.authUrl,
+      listener: this,
     );
   }
 
@@ -52,11 +80,12 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
         processing = true;
       });
       final error = await handler.processUrl(url);
+      setState(() {
+        this.error = error;
+        processing = false;
+      });
       if (error == null && mounted) {
         Navigator.of(context).pop();
-      }
-      if (error != null) {
-        // todo: alert with error, allow retry or exit
       }
     }
   }

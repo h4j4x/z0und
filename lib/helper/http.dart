@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class HttpHelper {
@@ -22,6 +23,8 @@ class HttpHelper {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body);
     }
+    debugPrint(
+        'Error http POST $url: ${response.statusCode} (${response.reasonPhrase})');
     throw Exception('Failed TODO'); // todo
   }
 }

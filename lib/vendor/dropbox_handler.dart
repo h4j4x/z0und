@@ -61,6 +61,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     final uri = Uri.parse(url);
     final code = uri.queryParameters['code'];
     try {
+      debugPrint('Processing dropbox auth url with code: $code');
       final Map<String, dynamic> data = await HttpHelper.postJson(url, data: {
         'code': code,
         'grant_type': 'authorization_code',
@@ -71,11 +72,13 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       await _save(data);
       return null;
     } catch (e) {
+      debugPrint('Processing dropbox auth url error: $e');
       return e.toString(); // todo
     }
   }
 
   Future _save(Map<String, dynamic> data) async {
+    debugPrint('Saving dropbox auth data: $data');
     _auth.putAll(data);
     notifyListeners();
     await StorageService().write(_authKey, jsonEncode(_auth.map));
@@ -93,6 +96,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       });
       await _save(data);
     } catch (e) {
+      debugPrint('Refreshing dropbox auth error: $e');
       // todo: handle
     }
   }
