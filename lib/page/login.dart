@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../auth/openid_handler.dart';
+import '../vendor/dropbox_handler.dart';
 import 'openid_login.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,8 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final OpenidHandler dropboxOpenidHandler = DropboxOpenidHandler();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +36,9 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.of(context).push(MaterialPageRoute<void>(
           builder: (context) => OpenidLoginPage(
             title: title,
-            handler: dropboxOpenidHandler,
+            authUrl: DropboxOpenidHandler.of(context, listen: false).authUrl(),
+            handlerGetter: (context) =>
+                DropboxOpenidHandler.of(context, listen: false),
           ),
         ));
       },

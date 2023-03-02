@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../auth/openid_handler.dart';
+import '../vendor/openid_handler.dart';
 import '../widget/web_browser.dart';
+
+typedef OpenidHandlerGetter = OpenidHandler Function(BuildContext context);
 
 class OpenidLoginPage extends StatefulWidget {
   final String title;
-  final OpenidHandler handler;
+  final String authUrl;
+  final OpenidHandlerGetter handlerGetter;
 
   const OpenidLoginPage({
     super.key,
     required this.title,
-    required this.handler,
+    required this.authUrl,
+    required this.handlerGetter,
   });
 
   @override
@@ -33,7 +37,7 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
                 child: CircularProgressIndicator.adaptive(),
               )
             : WebBrowser(
-                initialUrl: widget.handler.authUrl(),
+                initialUrl: widget.authUrl,
                 listener: this,
               ),
       ),
@@ -42,11 +46,12 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
 
   @override
   void onLoadedUrl(String url) async {
-    if (widget.handler.canProcessUrl(url)) {
+    final handler = widget.handlerGetter(context);
+    if (handler.canProcessUrl(url)) {
       setState(() {
         processing = true;
       });
-      final error = await widget.handler.processUrl(url);
+      final error = await handler.processUrl(url);
       if (error == null && mounted) {
         Navigator.of(context).pop();
       }
