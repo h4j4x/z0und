@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:z0und/z0und.dart';
 
 import '../helper/http.dart';
 import '../service/storage.dart';
@@ -15,6 +16,12 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     return Provider.of<DropboxOpenidHandler>(context, listen: listen);
   }
 
+  late String _clientId;
+  late String _clientSecret;
+  late String _redirectUri;
+  final _auth = _DropboxAuth();
+  final _authKey = 'dropbox_auth';
+
   DropboxOpenidHandler.create() {
     StorageService().read(_authKey).then((value) {
       if (value != null) {
@@ -22,12 +29,10 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
         _auth.putAll(data);
       }
     });
+    _clientId = Z0undConfig.getConfig(Z0undConfig.dropboxClientId);
+    _clientSecret = Z0undConfig.getConfig(Z0undConfig.dropboxClientSecret);
+    _redirectUri = Z0undConfig.getConfig(Z0undConfig.dropboxRedirectUri);
   }
-
-  final _clientId = 'j93nushune46690'; // fixme: from config
-  final _clientSecret = 'bpgio0mka9erelz'; // fixme: from config
-  final _redirectUri = 'https://z0und.flutter'; // fixme: from config
-  final _auth = _DropboxAuth();
 
   Future<String?> get authToken async {
     if (_auth.accessToken != null && _auth.isExpired) {
@@ -88,14 +93,13 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   }
 }
 
-const _authKey = 'dropbox_auth';
-const _accountIdKey = 'accountId';
-const _accessTokenKey = 'access_token';
-const _refreshTokenKey = 'refresh_token';
-const _expiresInKey = 'expires_in';
-const _updatedAtKey = 'updated_at';
-
 class _DropboxAuth {
+  final accountIdKey = 'accountId';
+  final accessTokenKey = 'access_token';
+  final refreshTokenKey = 'refresh_token';
+  final expiresInKey = 'expires_in';
+  final updatedAtKey = 'updated_at';
+
   String? accountId;
   String? accessToken;
   String? refreshToken;
@@ -111,12 +115,12 @@ class _DropboxAuth {
   }
 
   void putAll(Map<String, dynamic> data) {
-    accountId = data[_accountIdKey] as String?;
-    accessToken = data[_accessTokenKey] as String?;
-    refreshToken = data[_refreshTokenKey] as String?;
-    expiresInSeconds = data[_expiresInKey] as int?;
-    if (data.containsKey(_updatedAtKey)) {
-      final millis = data[_updatedAtKey] as int;
+    accountId = data[accountIdKey] as String?;
+    accessToken = data[accessTokenKey] as String?;
+    refreshToken = data[refreshTokenKey] as String?;
+    expiresInSeconds = data[expiresInKey] as int?;
+    if (data.containsKey(updatedAtKey)) {
+      final millis = data[updatedAtKey] as int;
       updatedAt = DateTime.fromMillisecondsSinceEpoch(millis);
     } else {
       updatedAt = DateTime.now();
@@ -124,10 +128,10 @@ class _DropboxAuth {
   }
 
   Map<String, dynamic> get map => <String, dynamic>{
-        _accountIdKey: accountId,
-        _accessTokenKey: accessToken,
-        _refreshTokenKey: refreshToken,
-        _expiresInKey: expiresInSeconds,
-        _updatedAtKey: updatedAt.millisecondsSinceEpoch,
+        accountIdKey: accountId,
+        accessTokenKey: accessToken,
+        refreshTokenKey: refreshToken,
+        expiresInKey: expiresInSeconds,
+        updatedAtKey: updatedAt.millisecondsSinceEpoch,
       };
 }
