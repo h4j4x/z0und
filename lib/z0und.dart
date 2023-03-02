@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_config/flutter_config.dart';
 
 import 'page/login.dart';
 
@@ -14,5 +15,13 @@ class Z0undApp extends StatelessWidget {
       ),
       home: const LoginPage(),
     );
+  }
+}
+
+class Z0undConfig {
+  static const dropboxClientId = 'DROPBOX_CLIENT_ID';
+
+  static String getConfig(String key) {
+    return FlutterConfig.get(key);
   }
 }
