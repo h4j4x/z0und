@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_config/flutter_config.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'page/login.dart';
 
@@ -23,7 +23,5 @@ class Z0undConfig {
   static const dropboxClientSecret = 'DROPBOX_CLIENT_SECRET';
   static const dropboxRedirectUri = 'DROPBOX_REDIRECT_URI';
 
-  static String getConfig(String key) {
-    return FlutterConfig.get(key);
-  }
+  static String? read(String key) => dotenv.env[key];
 }

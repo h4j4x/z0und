@@ -19,7 +19,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   late String _clientId;
   late String _clientSecret;
   late String _redirectUri;
-  final _auth = _DropboxAuth();
+  final _auth = DropboxAuth();
   final _authKey = 'dropbox_auth';
 
   DropboxOpenidHandler.create() {
@@ -29,10 +29,15 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
         _auth.putAll(data);
       }
     });
-    _clientId = Z0undConfig.getConfig(Z0undConfig.dropboxClientId);
-    _clientSecret = Z0undConfig.getConfig(Z0undConfig.dropboxClientSecret);
-    _redirectUri = Z0undConfig.getConfig(Z0undConfig.dropboxRedirectUri);
+    _clientId = Z0undConfig.read(Z0undConfig.dropboxClientId) ?? '-';
+    _clientSecret = Z0undConfig.read(Z0undConfig.dropboxClientSecret) ?? '-';
+    _redirectUri = Z0undConfig.read(Z0undConfig.dropboxRedirectUri) ?? '-';
   }
+
+  bool get isEnabled =>
+      _clientId.length > 1 &&
+      _clientSecret.length > 1 &&
+      _redirectUri.length > 1;
 
   Future<String?> get authToken async {
     if (_auth.accessToken != null && _auth.isExpired) {
@@ -93,12 +98,12 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   }
 }
 
-class _DropboxAuth {
-  final accountIdKey = 'accountId';
-  final accessTokenKey = 'access_token';
-  final refreshTokenKey = 'refresh_token';
-  final expiresInKey = 'expires_in';
-  final updatedAtKey = 'updated_at';
+class DropboxAuth {
+  static const accountIdKey = 'accountId';
+  static const accessTokenKey = 'access_token';
+  static const refreshTokenKey = 'refresh_token';
+  static const expiresInKey = 'expires_in';
+  static const updatedAtKey = 'updated_at';
 
   String? accountId;
   String? accessToken;
@@ -109,7 +114,7 @@ class _DropboxAuth {
   bool get isExpired {
     if (expiresInSeconds != null) {
       final expiresAt = updatedAt.add(Duration(seconds: expiresInSeconds!));
-      return expiresAt.isAfter(DateTime.now());
+      return expiresAt.isBefore(DateTime.now());
     }
     return true;
   }
