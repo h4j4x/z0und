@@ -18,6 +18,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
 
   late String _clientId;
   late String _clientSecret;
+  late String _codeChallenge;
   late String _redirectUri;
   final _auth = DropboxAuth();
   final _authKey = 'dropbox_auth';
@@ -31,12 +32,14 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     });
     _clientId = Z0undConfig.dropboxClientId ?? '-';
     _clientSecret = Z0undConfig.dropboxClientSecret ?? '-';
+    _codeChallenge = Z0undConfig.dropboxCodeChallenge ?? '-';
     _redirectUri = Z0undConfig.dropboxRedirectUri ?? '-';
   }
 
   bool get isEnabled =>
       _clientId.length > 1 &&
       _clientSecret.length > 1 &&
+      _codeChallenge.length > 1 &&
       _redirectUri.length > 1;
 
   Future<String?> get authToken async {
@@ -50,8 +53,9 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   String authUrl() => 'https://www.dropbox.com/oauth2/authorize'
       '?client_id=$_clientId'
       '&response_type=code'
-      '&scope=openid%20email'
       '&token_access_type=offline'
+      '&code_challenge=$_codeChallenge'
+      '&code_challenge_method=S256'
       '&redirect_uri=$_redirectUri';
 
   @override
@@ -60,14 +64,16 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   @override
   Future<String?> processUrl(String url) async {
     final uri = Uri.parse(url);
-    debugPrint('Processing dropbox auth url: $url');
     final code = uri.queryParameters['code'];
     try {
       debugPrint('Processing dropbox auth url with code: $code');
-      final Map<String, dynamic> data = await HttpHelper.postJson(url, data: {
+      const authUrl = 'https://api.dropbox.com/oauth2/token';
+      final Map<String, dynamic> data =
+          await HttpHelper.postJson(authUrl, data: {
         'code': code,
         'grant_type': 'authorization_code',
         'redirect_uri': _redirectUri,
+        'code_verifier': _codeChallenge,
         'client_id': _clientId,
         'client_secret': _clientSecret,
       });

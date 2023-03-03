@@ -13,6 +13,7 @@ class HttpHelper {
   }) async {
     final headersMap = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
     };
     headersMap.addAll(headers);
     final response = await http.post(
@@ -23,8 +24,8 @@ class HttpHelper {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body);
     }
-    debugPrint(
-        'Error http POST $url: ${response.statusCode} (${response.reasonPhrase})');
+    debugPrint('Error http POST $url: ${response.statusCode}');
+    debugPrint('---- ${response.reasonPhrase} : ${jsonDecode(response.body)}');
     throw Exception('Failed TODO'); // todo
   }
 }
