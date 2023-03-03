@@ -29,9 +29,9 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
         _auth.putAll(data);
       }
     });
-    _clientId = Z0undConfig.read(Z0undConfig.dropboxClientId) ?? '-';
-    _clientSecret = Z0undConfig.read(Z0undConfig.dropboxClientSecret) ?? '-';
-    _redirectUri = Z0undConfig.read(Z0undConfig.dropboxRedirectUri) ?? '-';
+    _clientId = Z0undConfig.dropboxClientId ?? '-';
+    _clientSecret = Z0undConfig.dropboxClientSecret ?? '-';
+    _redirectUri = Z0undConfig.dropboxRedirectUri ?? '-';
   }
 
   bool get isEnabled =>
@@ -51,6 +51,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       '?client_id=$_clientId'
       '&response_type=code'
       '&scope=openid%20email'
+      '&token_access_type=offline'
       '&redirect_uri=$_redirectUri';
 
   @override
@@ -59,6 +60,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   @override
   Future<String?> processUrl(String url) async {
     final uri = Uri.parse(url);
+    debugPrint('Processing dropbox auth url: $url');
     final code = uri.queryParameters['code'];
     try {
       debugPrint('Processing dropbox auth url with code: $code');

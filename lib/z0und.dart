@@ -19,9 +19,11 @@ class Z0undApp extends StatelessWidget {
 class Z0undConfig {
   Z0undConfig._();
 
-  static const dropboxClientId = 'DROPBOX_CLIENT_ID';
-  static const dropboxClientSecret = 'DROPBOX_CLIENT_SECRET';
-  static const dropboxRedirectUri = 'DROPBOX_REDIRECT_URI';
+  static String? get dropboxClientId => _read('DROPBOX_CLIENT_ID');
 
-  static String? read(String key) => dotenv.env[key];
+  static String? get dropboxClientSecret => _read('DROPBOX_CLIENT_SECRET');
+
+  static String? get dropboxRedirectUri => _read('DROPBOX_REDIRECT_URI');
+
+  static String? _read(String key) => dotenv.env[key];
 }
