@@ -19,6 +19,21 @@ class OpenidLoginPage extends StatefulWidget {
 
   @override
   State<OpenidLoginPage> createState() => _OpenidLoginPageState();
+
+  static Future<dynamic> pushRouteTo(
+    BuildContext context, {
+    required String title,
+    required String authUrl,
+    required OpenidHandlerGetter handlerGetter,
+  }) {
+    return Navigator.of(context).push(MaterialPageRoute<dynamic>(
+      builder: (context) => OpenidLoginPage(
+        title: title,
+        authUrl: authUrl,
+        handlerGetter: handlerGetter,
+      ),
+    ));
+  }
 }
 
 class _OpenidLoginPageState extends State<OpenidLoginPage>

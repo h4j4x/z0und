@@ -8,10 +8,11 @@ import 'z0und.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
+  final dropboxOpenidHandler = await DropboxOpenidHandler.create();
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => DropboxOpenidHandler.create()),
+        ChangeNotifierProvider(create: (_) => dropboxOpenidHandler),
       ],
       child: const Z0undApp(),
     ),

@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:z0und/helper/string.dart';
+
+import 'string.dart';
 
 extension UriExtension on Uri {
   Future<dynamic> postJson({

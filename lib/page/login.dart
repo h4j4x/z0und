@@ -18,16 +18,12 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
-      final dropboxOpenidHandler =
-          DropboxOpenidHandler.of(context, listen: false);
       setState(() {
-        dropboxEnabled = dropboxOpenidHandler.isEnabled;
+        dropboxEnabled =
+            DropboxOpenidHandler.of(context, listen: false).isEnabled;
       });
       if (dropboxEnabled) {
-        final dropboxToken = await dropboxOpenidHandler.authToken;
-        setState(() {
-          dropboxLinked = dropboxToken != null;
-        });
+        updateDropboxLinked();
       }
     });
   }
@@ -49,39 +45,59 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget dropboxButton() {
     const title = 'DROPBOX TODO';
-    Widget icon;
+    Widget leading;
+    Widget? trailing;
     if (dropboxLinked == null) {
-      icon = const SizedBox(
+      leading = const SizedBox(
         width: 20.0,
         height: 20.0,
         child: CircularProgressIndicator.adaptive(),
       );
     } else if (dropboxLinked == true) {
-      icon = const Icon(Icons.check_circle_sharp);
+      leading = Icon(
+        Icons.check_circle_sharp,
+        color: Theme.of(context).colorScheme.primary, // todo .success
+      );
+      trailing = Icon(
+        Icons.delete_sharp,
+        color: Theme.of(context).colorScheme.error,
+      );
     } else {
-      icon = const Icon(Icons.cancel_sharp);
+      leading = Icon(
+        Icons.cancel_sharp,
+        color: Theme.of(context).colorScheme.error,
+      );
+      trailing = const Icon(Icons.arrow_forward_sharp);
     }
     return ListTile(
-      leading: icon,
+      leading: leading,
       title: const Text(title),
-      trailing: const Icon(Icons.arrow_forward_sharp),
+      trailing: trailing,
       onTap: (dropboxLinked != null) ? () => onDropbox(title) : null,
     );
   }
 
-  void onDropbox(String title) {
+  void onDropbox(String title) async {
     if (dropboxLinked == true) {
       // todo: remove dropbox authentication with confirm dialog
     }
     if (dropboxLinked == false) {
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (context) => OpenidLoginPage(
-          title: title,
-          authUrl: DropboxOpenidHandler.of(context, listen: false).authUrl(),
-          handlerGetter: (context) =>
-              DropboxOpenidHandler.of(context, listen: false),
-        ),
-      ));
+      await OpenidLoginPage.pushRouteTo(
+        context,
+        title: title,
+        authUrl: DropboxOpenidHandler.of(context, listen: false).authUrl(),
+        handlerGetter: (context) =>
+            DropboxOpenidHandler.of(context, listen: false),
+      );
     }
+    updateDropboxLinked();
+  }
+
+  void updateDropboxLinked() async {
+    final dropboxToken =
+        await DropboxOpenidHandler.of(context, listen: false).authToken;
+    setState(() {
+      dropboxLinked = dropboxToken != null;
+    });
   }
 }

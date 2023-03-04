@@ -13,33 +13,41 @@ import 'openid_handler.dart';
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
 class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
+  static const _authKey = 'dropbox_auth';
+
   static DropboxOpenidHandler of(BuildContext context, {bool listen = true}) {
     return Provider.of<DropboxOpenidHandler>(context, listen: listen);
   }
 
-  late String _clientId;
-  late String _clientSecret;
-  late String _redirectUri;
-  final String _codeChallenge = generateRandomString(45);
-  final _auth = DropboxAuth();
-  final _authKey = 'dropbox_auth';
-
-  DropboxOpenidHandler.create() {
-    StorageService().read(_authKey).then((value) {
-      if (value != null) {
-        final Map<String, dynamic> data = jsonDecode(value);
-        _auth.putAll(data);
-      }
-    });
-    _clientId = Z0undConfig.dropboxClientId ?? '-';
-    _clientSecret = Z0undConfig.dropboxClientSecret ?? '-';
-    _redirectUri = Z0undConfig.dropboxRedirectUri ?? '-';
+  static Future<DropboxOpenidHandler> create() async {
+    final authJson = await StorageService().read(_authKey);
+    final data = <String, dynamic>{};
+    if (authJson != null) {
+      data.addAll(jsonDecode(authJson));
+    }
+    return DropboxOpenidHandler._(
+      data: data,
+      clientId: Z0undConfig.dropboxClientId ?? '-',
+      clientSecret: Z0undConfig.dropboxClientSecret ?? '-',
+      redirectUri: Z0undConfig.dropboxRedirectUri ?? '-',
+    );
   }
 
+  final String clientId;
+  final String clientSecret;
+  final String redirectUri;
+  final String _codeChallenge = generateRandomString(45);
+  final DropboxAuth _auth;
+
+  DropboxOpenidHandler._({
+    required Map<String, dynamic> data,
+    required this.clientId,
+    required this.clientSecret,
+    required this.redirectUri,
+  }) : _auth = DropboxAuth.fromMap(data);
+
   bool get isEnabled =>
-      _clientId.length > 1 &&
-      _clientSecret.length > 1 &&
-      _redirectUri.length > 1;
+      clientId.length > 1 && clientSecret.length > 1 && redirectUri.length > 1;
 
   Future<String?> get authToken async {
     if (_auth.accessToken != null && _auth.isExpired) {
@@ -52,15 +60,15 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
 
   @override
   String authUrl() => 'https://www.dropbox.com/oauth2/authorize'
-      '?client_id=$_clientId'
+      '?client_id=$clientId'
       '&response_type=code'
       '&token_access_type=offline'
       '&code_challenge=$_codeChallenge'
       '&code_challenge_method=plain'
-      '&redirect_uri=$_redirectUri';
+      '&redirect_uri=$redirectUri';
 
   @override
-  bool canProcessUrl(String url) => url.startsWith(_redirectUri);
+  bool canProcessUrl(String url) => url.startsWith(redirectUri);
 
   @override
   Future<String?> processUrl(String url) async {
@@ -72,12 +80,12 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
         'code': code,
         'grant_type': 'authorization_code',
         'code_verifier': _codeChallenge,
-        'redirect_uri': _redirectUri,
+        'redirect_uri': redirectUri,
       };
       final Map<String, dynamic> data = await tokenUri.postForm(
         body: body,
-        basicAuthUser: _clientId,
-        basicAuthPass: _clientSecret,
+        basicAuthUser: clientId,
+        basicAuthPass: clientSecret,
       );
       await _save(data);
       return null;
@@ -91,9 +99,9 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     final body = <String, dynamic>{
       'refresh_token': _auth.refreshToken,
       'grant_type': 'refresh_token',
-      'redirect_uri': _redirectUri,
-      'client_id': _clientId,
-      'client_secret': _clientSecret,
+      'redirect_uri': redirectUri,
+      'client_id': clientId,
+      'client_secret': clientSecret,
     };
     try {
       final Map<String, dynamic> data = await tokenUri.postJson(body: body);
@@ -113,17 +121,23 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
 }
 
 class DropboxAuth {
-  static const accountIdKey = 'accountId';
   static const accessTokenKey = 'access_token';
   static const refreshTokenKey = 'refresh_token';
   static const expiresInKey = 'expires_in';
   static const updatedAtKey = 'updated_at';
 
-  String? accountId;
   String? accessToken;
   String? refreshToken;
   int? expiresInSeconds;
-  DateTime updatedAt = DateTime.now();
+  DateTime updatedAt;
+
+  DropboxAuth() : updatedAt = DateTime.now();
+
+  factory DropboxAuth.fromMap(Map<String, dynamic> data) {
+    final auth = DropboxAuth();
+    auth.putAll(data);
+    return auth;
+  }
 
   bool get isExpired {
     if (expiresInSeconds != null) {
@@ -134,7 +148,6 @@ class DropboxAuth {
   }
 
   void putAll(Map<String, dynamic> data) {
-    accountId = data[accountIdKey] as String?;
     accessToken = data[accessTokenKey] as String?;
     refreshToken = data[refreshTokenKey] as String?;
     expiresInSeconds = data[expiresInKey] as int?;
@@ -146,8 +159,7 @@ class DropboxAuth {
     }
   }
 
-  Map<String, dynamic> get map => <String, dynamic>{
-        accountIdKey: accountId,
+  get map => <String, dynamic>{
         accessTokenKey: accessToken,
         refreshTokenKey: refreshToken,
         expiresInKey: expiresInSeconds,
