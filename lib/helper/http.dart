@@ -2,12 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:z0und/helper/string.dart';
 
-class HttpHelper {
-  HttpHelper._();
-
-  static Future<dynamic> postJson(
-    String url, {
+extension UriExtension on Uri {
+  Future<dynamic> postJson({
     Map<String, String> headers = const {},
     Map<String, dynamic> body = const {},
   }) async {
@@ -16,41 +14,36 @@ class HttpHelper {
       'Accept': 'application/json',
     };
     headersMap.addAll(headers);
-    final response = await http.post(
-      Uri.parse(url),
-      headers: headersMap,
-      body: jsonEncode(body),
-    );
+    final bodyJson = jsonEncode(body);
+    final response = await http.post(this, headers: headersMap, body: bodyJson);
     final responseJson = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseJson;
     }
-    debugPrint('Error http POST $url: ${response.statusCode}');
+    debugPrint('http POST ${toString()}: ${response.statusCode}');
     debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }
 
-  static Future<dynamic> postForm(
-    String url, {
+  Future<dynamic> postForm({
     Map<String, String> headers = const {},
     Map<String, String> body = const {},
     String? basicAuthUser,
     String? basicAuthPass,
   }) async {
-    final request = http.MultipartRequest('POST', Uri.parse(url));
+    final request = http.MultipartRequest('POST', this);
     request.fields.addAll(body);
     request.headers.addAll(headers);
     if (basicAuthUser != null && basicAuthPass != null) {
-      final authToken =
-          base64.encode(utf8.encode('$basicAuthUser:$basicAuthPass'));
-      request.headers['Authorization'] = 'Basic $authToken';
+      final basicAuth = '$basicAuthUser:$basicAuthPass';
+      request.headers['Authorization'] = 'Basic ${basicAuth.encodeBase64()}';
     }
     final response = await request.send();
     final responseJson = jsonDecode(await response.stream.bytesToString());
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseJson;
     }
-    debugPrint('Error http POST MULTIPART $url: ${response.statusCode}');
+    debugPrint(' http POST MULTIPART ${toString()}: ${response.statusCode}');
     debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }

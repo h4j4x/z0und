@@ -65,19 +65,23 @@ class _LoginPageState extends State<LoginPage> {
       leading: icon,
       title: const Text(title),
       trailing: const Icon(Icons.arrow_forward_sharp),
-      onTap: (dropboxLinked != null)
-          ? () {
-              Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (context) => OpenidLoginPage(
-                  title: title,
-                  authUrl:
-                      DropboxOpenidHandler.of(context, listen: false).authUrl(),
-                  handlerGetter: (context) =>
-                      DropboxOpenidHandler.of(context, listen: false),
-                ),
-              ));
-            }
-          : null,
+      onTap: (dropboxLinked != null) ? () => onDropbox(title) : null,
     );
+  }
+
+  void onDropbox(String title) {
+    if (dropboxLinked == true) {
+      // todo: remove dropbox authentication with confirm dialog
+    }
+    if (dropboxLinked == false) {
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (context) => OpenidLoginPage(
+          title: title,
+          authUrl: DropboxOpenidHandler.of(context, listen: false).authUrl(),
+          handlerGetter: (context) =>
+              DropboxOpenidHandler.of(context, listen: false),
+        ),
+      ));
+    }
   }
 }
