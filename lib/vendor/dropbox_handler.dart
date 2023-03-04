@@ -19,6 +19,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   late String _clientId;
   late String _clientSecret;
   late String _codeChallenge;
+  late String _codeChallengeSha256;
   late String _redirectUri;
   final _auth = DropboxAuth();
   final _authKey = 'dropbox_auth';
@@ -33,6 +34,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     _clientId = Z0undConfig.dropboxClientId ?? '-';
     _clientSecret = Z0undConfig.dropboxClientSecret ?? '-';
     _codeChallenge = Z0undConfig.dropboxCodeChallenge ?? '-';
+    _codeChallengeSha256 = Z0undConfig.dropboxCodeChallengeSha256 ?? '-';
     _redirectUri = Z0undConfig.dropboxRedirectUri ?? '-';
   }
 
@@ -40,6 +42,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       _clientId.length > 1 &&
       _clientSecret.length > 1 &&
       _codeChallenge.length > 1 &&
+      _codeChallengeSha256.length > 1 &&
       _redirectUri.length > 1;
 
   Future<String?> get authToken async {
@@ -56,7 +59,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       '?client_id=$_clientId'
       '&response_type=code'
       '&token_access_type=offline'
-      '&code_challenge=$_codeChallenge'
+      '&code_challenge=$_codeChallengeSha256'
       '&code_challenge_method=S256'
       '&redirect_uri=${Uri.encodeQueryComponent(_redirectUri)}';
 
@@ -72,7 +75,6 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       final body = <String, String>{
         'code': code,
         'grant_type': 'authorization_code',
-        'redirect_uri': _redirectUri,
         'code_verifier': _codeChallenge,
       };
       final Map<String, dynamic> data = await HttpHelper.postForm(

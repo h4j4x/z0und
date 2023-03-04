@@ -25,6 +25,9 @@ class Z0undConfig {
 
   static String? get dropboxCodeChallenge => _read('DROPBOX_CODE_CHALLENGE');
 
+  static String? get dropboxCodeChallengeSha256 =>
+      _read('DROPBOX_CODE_CHALLENGE_SHA256');
+
   static String? get dropboxRedirectUri => _read('DROPBOX_REDIRECT_URI');
 
   static String? _read(String key) => dotenv.env[key];

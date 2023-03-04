@@ -64,9 +64,11 @@ class _WebBrowserState extends State<WebBrowser> {
             pullToRefreshController?.endRefreshing();
           },
           onProgressChanged: (controller, progress) {
-            setState(() {
-              loadingProgress = progress / 100.0;
-            });
+            if (mounted) {
+              setState(() {
+                loadingProgress = progress / 100.0;
+              });
+            }
             if (progress >= 100) {
               pullToRefreshController?.endRefreshing();
             }
@@ -86,5 +88,12 @@ class _WebBrowserState extends State<WebBrowser> {
       webController?.loadUrl(
           urlRequest: URLRequest(url: await webController?.getUrl()));
     }
+  }
+
+  @override
+  void dispose() {
+    webController?.stopLoading();
+    webController?.pause();
+    super.dispose();
   }
 }
