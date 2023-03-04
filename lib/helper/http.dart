@@ -9,7 +9,7 @@ class HttpHelper {
   static Future<dynamic> postJson(
     String url, {
     Map<String, String> headers = const {},
-    Map<String, dynamic> data = const {},
+    Map<String, dynamic> body = const {},
   }) async {
     final headersMap = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -19,13 +19,39 @@ class HttpHelper {
     final response = await http.post(
       Uri.parse(url),
       headers: headersMap,
-      body: jsonEncode(data),
+      body: jsonEncode(body),
     );
+    final responseJson = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return jsonDecode(response.body);
+      return responseJson;
     }
     debugPrint('Error http POST $url: ${response.statusCode}');
-    debugPrint('---- ${response.reasonPhrase} : ${jsonDecode(response.body)}');
+    debugPrint('---- ${response.reasonPhrase} : $responseJson');
+    throw Exception('Failed TODO'); // todo
+  }
+
+  static Future<dynamic> postForm(
+    String url, {
+    Map<String, String> headers = const {},
+    Map<String, String> body = const {},
+    String? basicAuthUser,
+    String? basicAuthPass,
+  }) async {
+    final request = http.MultipartRequest('POST', Uri.parse(url));
+    request.fields.addAll(body);
+    request.headers.addAll(headers);
+    if (basicAuthUser != null && basicAuthPass != null) {
+      final authToken =
+          base64.encode(utf8.encode('$basicAuthUser:$basicAuthPass'));
+      request.headers['Authorization'] = 'Basic $authToken';
+    }
+    final response = await request.send();
+    final responseJson = jsonDecode(await response.stream.bytesToString());
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return responseJson;
+    }
+    debugPrint('Error http POST MULTIPART $url: ${response.statusCode}');
+    debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }
 }

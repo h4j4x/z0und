@@ -49,6 +49,8 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     return _auth.accessToken;
   }
 
+  String get tokenUrl => 'https://api.dropbox.com/oauth2/token';
+
   @override
   String authUrl() => 'https://www.dropbox.com/oauth2/authorize'
       '?client_id=$_clientId'
@@ -56,7 +58,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
       '&token_access_type=offline'
       '&code_challenge=$_codeChallenge'
       '&code_challenge_method=S256'
-      '&redirect_uri=$_redirectUri';
+      '&redirect_uri=${Uri.encodeQueryComponent(_redirectUri)}';
 
   @override
   bool canProcessUrl(String url) => url.startsWith(_redirectUri);
@@ -64,19 +66,21 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   @override
   Future<String?> processUrl(String url) async {
     final uri = Uri.parse(url);
-    final code = uri.queryParameters['code'];
+    final code = uri.queryParameters['code'].toString();
     try {
       debugPrint('Processing dropbox auth url with code: $code');
-      const authUrl = 'https://api.dropbox.com/oauth2/token';
-      final Map<String, dynamic> data =
-          await HttpHelper.postJson(authUrl, data: {
+      final body = <String, String>{
         'code': code,
         'grant_type': 'authorization_code',
         'redirect_uri': _redirectUri,
         'code_verifier': _codeChallenge,
-        'client_id': _clientId,
-        'client_secret': _clientSecret,
-      });
+      };
+      final Map<String, dynamic> data = await HttpHelper.postForm(
+        tokenUrl,
+        body: body,
+        basicAuthUser: _clientId,
+        basicAuthPass: _clientSecret,
+      );
       await _save(data);
       return null;
     } catch (e) {
@@ -93,15 +97,18 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   }
 
   Future _refreshAuth() async {
-    const url = 'https://api.dropbox.com/oauth2/token';
+    final body = <String, dynamic>{
+      'refresh_token': _auth.refreshToken,
+      'grant_type': 'refresh_token',
+      'redirect_uri': _redirectUri,
+      'client_id': _clientId,
+      'client_secret': _clientSecret,
+    };
     try {
-      final Map<String, dynamic> data = await HttpHelper.postJson(url, data: {
-        'refresh_token': _auth.refreshToken,
-        'grant_type': 'refresh_token',
-        'redirect_uri': _redirectUri,
-        'client_id': _clientId,
-        'client_secret': _clientSecret,
-      });
+      final Map<String, dynamic> data = await HttpHelper.postJson(
+        tokenUrl,
+        body: body,
+      );
       await _save(data);
     } catch (e) {
       debugPrint('Refreshing dropbox auth error: $e');
