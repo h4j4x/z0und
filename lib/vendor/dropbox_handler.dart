@@ -12,20 +12,20 @@ import 'openid_handler.dart';
 /// Dropbox integration.
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
-class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
+class DropboxHandler with ChangeNotifier implements OpenidHandler {
   static const _authKey = 'dropbox_auth';
 
-  static DropboxOpenidHandler of(BuildContext context, {bool listen = true}) {
-    return Provider.of<DropboxOpenidHandler>(context, listen: listen);
+  static DropboxHandler of(BuildContext context, {bool listen = true}) {
+    return Provider.of<DropboxHandler>(context, listen: listen);
   }
 
-  static Future<DropboxOpenidHandler> create() async {
+  static Future<DropboxHandler> create() async {
     final authJson = await StorageService().read(_authKey);
     final data = <String, dynamic>{};
     if (authJson != null) {
       data.addAll(jsonDecode(authJson));
     }
-    return DropboxOpenidHandler._(
+    return DropboxHandler._(
       data: data,
       clientId: Z0undConfig.dropboxClientId ?? '-',
       clientSecret: Z0undConfig.dropboxClientSecret ?? '-',
@@ -39,7 +39,7 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   final String _codeChallenge = generateRandomString(45);
   final DropboxAuth _auth;
 
-  DropboxOpenidHandler._({
+  DropboxHandler._({
     required Map<String, dynamic> data,
     required this.clientId,
     required this.clientSecret,
@@ -75,7 +75,6 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
     final uri = Uri.parse(url);
     final code = uri.queryParameters['code'].toString();
     try {
-      debugPrint('Processing dropbox auth url with code: $code');
       final body = <String, String>{
         'code': code,
         'grant_type': 'authorization_code',
@@ -113,7 +112,6 @@ class DropboxOpenidHandler with ChangeNotifier implements OpenidHandler {
   }
 
   Future _save(Map<String, dynamic> data) async {
-    debugPrint('Saving dropbox auth data: $data');
     _auth.putAll(data);
     notifyListeners();
     await StorageService().write(_authKey, jsonEncode(_auth.map));

@@ -8,7 +8,7 @@ import 'z0und.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  final dropboxOpenidHandler = await DropboxOpenidHandler.create();
+  final dropboxOpenidHandler = await DropboxHandler.create();
   runApp(
     MultiProvider(
       providers: [
