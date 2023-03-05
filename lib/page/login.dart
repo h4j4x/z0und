@@ -8,6 +8,12 @@ class LoginPage extends StatefulWidget {
 
   @override
   State<LoginPage> createState() => _LoginPageState();
+
+  static Future<dynamic> pushRouteTo(BuildContext context) {
+    return Navigator.of(context).push(MaterialPageRoute<dynamic>(
+      builder: (context) => const LoginPage(),
+    ));
+  }
 }
 
 class _LoginPageState extends State<LoginPage> {

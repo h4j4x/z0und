@@ -8,3 +8,11 @@ z0und Flutter project.
 
 Copy `.env_sample` file to `.env` and edit properties values, `.env` file must not be committed to
 version control.
+
+### Generate code
+
+Run script:
+
+```
+sh ./script/generate_code.sh
+```

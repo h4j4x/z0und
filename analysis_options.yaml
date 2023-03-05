@@ -4,5 +4,5 @@ include: package:flutter_lints/flutter.yaml
 # https://dart.dev/guides/language/analysis-options
 linter:
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
+    prefer_relative_imports: true
     prefer_single_quotes: true

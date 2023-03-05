@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../handler/openid_handler.dart';
+import '../widget/message_options.dart';
 import '../widget/web_browser.dart';
 
 class OpenidLoginPage extends StatefulWidget {
@@ -49,17 +50,10 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
 
   Widget body() {
     if (error != null) {
-      return ListView(
-        padding: const EdgeInsets.all(8.0),
-        children: [
-          Text(
-            error!,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-            ),
-            textScaleFactor: 1.6,
-          ),
+      return MessageOptionsWidget(
+        message: error!,
+        messageColor: Theme.of(context).colorScheme.error,
+        options: [
           ListTile(
             leading: const Icon(Icons.arrow_back_sharp),
             title: const Text('EXIT TODO'),

@@ -1,4 +1,4 @@
-import 'package:z0und/service/http.dart';
+import '../service/http.dart';
 
 extension UriExtension on Uri {
   Future<dynamic> postJson({

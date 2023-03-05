@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
-import 'package:z0und/model/music_source.dart';
 
+import '../model/music_source.dart';
 import 'music_source_handler.dart';
 
 class DeviceMusicSourceHandler implements MusicSourceHandler {
