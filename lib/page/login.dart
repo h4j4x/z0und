@@ -19,11 +19,9 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     Future.delayed(Duration.zero, () async {
       setState(() {
-        dropboxEnabled = DropboxHandler.of(context, listen: false).isEnabled;
+        dropboxEnabled = DropboxHandler().isEnabled;
       });
-      if (dropboxEnabled) {
-        updateDropboxLinked();
-      }
+      updateDropboxLinked();
     });
   }
 
@@ -84,18 +82,18 @@ class _LoginPageState extends State<LoginPage> {
       await OpenidLoginPage.pushRouteTo(
         context,
         title: title,
-        authUrl: DropboxHandler.of(context, listen: false).authUrl(),
-        handlerGetter: (context) => DropboxHandler.of(context, listen: false),
+        handler: DropboxHandler(),
       );
     }
     updateDropboxLinked();
   }
 
   void updateDropboxLinked() async {
-    final dropboxToken =
-        await DropboxHandler.of(context, listen: false).authToken;
-    setState(() {
-      dropboxLinked = dropboxToken != null;
-    });
+    if (dropboxEnabled) {
+      final dropboxToken = await DropboxHandler().authToken;
+      setState(() {
+        dropboxLinked = dropboxToken != null;
+      });
+    }
   }
 }

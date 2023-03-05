@@ -3,18 +3,14 @@ import 'package:flutter/material.dart';
 import '../vendor/openid_handler.dart';
 import '../widget/web_browser.dart';
 
-typedef OpenidHandlerGetter = OpenidHandler Function(BuildContext context);
-
 class OpenidLoginPage extends StatefulWidget {
   final String title;
-  final String authUrl;
-  final OpenidHandlerGetter handlerGetter;
+  final OpenidHandler handler;
 
   const OpenidLoginPage({
     super.key,
     required this.title,
-    required this.authUrl,
-    required this.handlerGetter,
+    required this.handler,
   });
 
   @override
@@ -23,14 +19,12 @@ class OpenidLoginPage extends StatefulWidget {
   static Future<dynamic> pushRouteTo(
     BuildContext context, {
     required String title,
-    required String authUrl,
-    required OpenidHandlerGetter handlerGetter,
+    required OpenidHandler handler,
   }) {
     return Navigator.of(context).push(MaterialPageRoute<dynamic>(
       builder: (context) => OpenidLoginPage(
         title: title,
-        authUrl: authUrl,
-        handlerGetter: handlerGetter,
+        handler: handler,
       ),
     ));
   }
@@ -82,19 +76,18 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
       );
     }
     return WebBrowser(
-      initialUrl: widget.authUrl,
+      initialUrl: widget.handler.authUrl(),
       listener: this,
     );
   }
 
   @override
   void onLoadedUrl(String url) async {
-    final handler = widget.handlerGetter(context);
-    if (handler.canProcessUrl(url)) {
+    if (widget.handler.canProcessUrl(url)) {
       setState(() {
         processing = true;
       });
-      final error = await handler.processUrl(url);
+      final error = await widget.handler.processUrl(url);
       setState(() {
         this.error = error;
         processing = false;

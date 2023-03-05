@@ -1,12 +1,18 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
-import 'string.dart';
+import '../helper/string.dart';
 
-extension UriExtension on Uri {
-  Future<dynamic> postJson({
+class HttpService {
+  HttpService.create();
+
+  factory HttpService() => GetIt.I<HttpService>();
+
+  Future<dynamic> postJson(
+    Uri uri, {
     Map<String, String> headers = const {},
     Map<String, dynamic> body = const {},
   }) async {
@@ -16,7 +22,7 @@ extension UriExtension on Uri {
     };
     headersMap.addAll(headers);
     final bodyJson = jsonEncode(body);
-    final response = await http.post(this, headers: headersMap, body: bodyJson);
+    final response = await http.post(uri, headers: headersMap, body: bodyJson);
     final responseJson = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseJson;
@@ -26,13 +32,14 @@ extension UriExtension on Uri {
     throw Exception('Failed TODO'); // todo
   }
 
-  Future<dynamic> postForm({
+  Future<dynamic> postForm(
+    Uri uri, {
     Map<String, String> headers = const {},
     Map<String, String> body = const {},
     String? basicAuthUser,
     String? basicAuthPass,
   }) async {
-    final request = http.MultipartRequest('POST', this);
+    final request = http.MultipartRequest('POST', uri);
     request.fields.addAll(body);
     request.headers.addAll(headers);
     if (basicAuthUser != null && basicAuthPass != null) {

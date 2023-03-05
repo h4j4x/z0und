@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
-import '../helper/http.dart';
 import '../helper/string.dart';
+import '../helper/uri.dart';
 import '../service/storage.dart';
 import '../z0und.dart';
 import 'openid_handler.dart';
@@ -12,12 +12,8 @@ import 'openid_handler.dart';
 /// Dropbox integration.
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
-class DropboxHandler with ChangeNotifier implements OpenidHandler {
+class DropboxHandler implements OpenidHandler {
   static const _authKey = 'dropbox_auth';
-
-  static DropboxHandler of(BuildContext context, {bool listen = true}) {
-    return Provider.of<DropboxHandler>(context, listen: listen);
-  }
 
   static Future<DropboxHandler> create() async {
     final authJson = await StorageService().read(_authKey);
@@ -32,6 +28,8 @@ class DropboxHandler with ChangeNotifier implements OpenidHandler {
       redirectUri: Z0undConfig.dropboxRedirectUri ?? '-',
     );
   }
+
+  factory DropboxHandler() => GetIt.I<DropboxHandler>();
 
   final String clientId;
   final String clientSecret;
@@ -113,7 +111,6 @@ class DropboxHandler with ChangeNotifier implements OpenidHandler {
 
   Future _save(Map<String, dynamic> data) async {
     _auth.putAll(data);
-    notifyListeners();
     await StorageService().write(_authKey, jsonEncode(_auth.map));
   }
 }

@@ -19,6 +19,8 @@ class Z0undApp extends StatelessWidget {
 class Z0undConfig {
   Z0undConfig._();
 
+  static Future load() => dotenv.load(fileName: '.env');
+
   static String? get dropboxClientId => _read('DROPBOX_CLIENT_ID');
 
   static String? get dropboxClientSecret => _read('DROPBOX_CLIENT_SECRET');
