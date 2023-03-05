@@ -6,11 +6,30 @@ import 'package:http/http.dart' as http;
 
 import '../helper/string.dart';
 
-class HttpService {
-  HttpService.create();
+abstract class HttpService {
+  static HttpService create() => FlutterHttpService._();
 
   factory HttpService() => GetIt.I<HttpService>();
 
+  Future<dynamic> postJson(
+    Uri uri, {
+    Map<String, String> headers = const {},
+    Map<String, dynamic> body = const {},
+  });
+
+  Future<dynamic> postForm(
+    Uri uri, {
+    Map<String, String> headers = const {},
+    Map<String, String> body = const {},
+    String? basicAuthUser,
+    String? basicAuthPass,
+  });
+}
+
+class FlutterHttpService implements HttpService {
+  FlutterHttpService._();
+
+  @override
   Future<dynamic> postJson(
     Uri uri, {
     Map<String, String> headers = const {},
@@ -32,6 +51,7 @@ class HttpService {
     throw Exception('Failed TODO'); // todo
   }
 
+  @override
   Future<dynamic> postForm(
     Uri uri, {
     Map<String, String> headers = const {},

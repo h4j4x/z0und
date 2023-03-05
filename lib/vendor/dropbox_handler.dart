@@ -15,6 +15,8 @@ import 'openid_handler.dart';
 class DropboxHandler implements OpenidHandler {
   static const authKey = 'dropbox_auth';
 
+  static final tokenUri = Uri.parse('https://api.dropbox.com/oauth2/token');
+
   static Future<DropboxHandler> create() async {
     final authJson = await StorageService().read(authKey);
     final data = <String, dynamic>{};
@@ -56,8 +58,6 @@ class DropboxHandler implements OpenidHandler {
     }
     return null;
   }
-
-  Uri get tokenUri => Uri.parse('https://api.dropbox.com/oauth2/token');
 
   @override
   String authUrl() => 'https://www.dropbox.com/oauth2/authorize'

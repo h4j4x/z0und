@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:z0und/config.dart';
 import 'package:z0und/service/config.dart';
+import 'package:z0und/service/http.dart';
 import 'package:z0und/service/storage.dart';
 import 'package:z0und/vendor/dropbox_handler.dart';
 
@@ -61,7 +62,7 @@ void main() {
       verify(storageService.read(DropboxHandler.authKey));
     });
 
-    test('.authToken not expired parsed from storage and returned', () async {
+    test('.authToken not expired parsed and returned', () async {
       final configService = ConfigService();
       when(configService.read(Z0undConfig.dropboxClientIdKey))
           .thenReturn(Z0undConfig.dropboxClientIdKey);
@@ -89,6 +90,59 @@ void main() {
         configService.read(Z0undConfig.dropboxRedirectUriKey),
       ]);
       verify(storageService.read(DropboxHandler.authKey));
+    });
+
+    test('.authToken expired parsed and refreshed', () async {
+      final configService = ConfigService();
+      when(configService.read(Z0undConfig.dropboxClientIdKey))
+          .thenReturn(Z0undConfig.dropboxClientIdKey);
+      when(configService.read(Z0undConfig.dropboxClientSecretKey))
+          .thenReturn(Z0undConfig.dropboxClientSecretKey);
+      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
+          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      final storageService = StorageService();
+      const refreshToken = 'refresh_token';
+      when(storageService.read(DropboxHandler.authKey))
+          .thenAnswer((_) => Future.value(jsonEncode(<String, dynamic>{
+                DropboxAuth.accessTokenKey: 'access_token',
+                DropboxAuth.refreshTokenKey: refreshToken,
+                DropboxAuth.expiresInKey: 1,
+                DropboxAuth.updatedAtKey: DateTime.now()
+                    .add(const Duration(seconds: -10))
+                    .millisecondsSinceEpoch,
+              })));
+      when(storageService.write(DropboxHandler.authKey, any))
+          .thenAnswer((_) => Future.value(null));
+      final httpService = HttpService();
+      const accessToken = 'refreshed_access_token';
+      final refreshBody = <String, dynamic>{
+        'refresh_token': refreshToken,
+        'grant_type': 'refresh_token',
+        'redirect_uri': Z0undConfig.dropboxRedirectUriKey,
+        'client_id': Z0undConfig.dropboxClientIdKey,
+        'client_secret': Z0undConfig.dropboxClientSecretKey,
+      };
+      when(httpService.postJson(DropboxHandler.tokenUri, body: refreshBody))
+          .thenAnswer((_) => Future.value(<String, dynamic>{
+                DropboxAuth.accessTokenKey: accessToken,
+                DropboxAuth.refreshTokenKey: refreshToken,
+                DropboxAuth.expiresInKey: 1,
+                DropboxAuth.updatedAtKey: DateTime.now().millisecondsSinceEpoch,
+              }));
+
+      final handler = await DropboxHandler.create();
+      expect(handler.isEnabled, isTrue);
+      final authToken = await handler.authToken;
+      expect(authToken, equals(accessToken));
+
+      verifyInOrder([
+        configService.read(Z0undConfig.dropboxClientIdKey),
+        configService.read(Z0undConfig.dropboxClientSecretKey),
+        configService.read(Z0undConfig.dropboxRedirectUriKey),
+      ]);
+      verify(storageService.read(DropboxHandler.authKey));
+      verify(storageService.write(DropboxHandler.authKey, any));
+      verify(httpService.postJson(DropboxHandler.tokenUri, body: refreshBody));
     });
   });
 

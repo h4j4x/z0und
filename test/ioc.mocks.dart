@@ -3,11 +3,12 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i3;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:z0und/service/config.dart' as _i2;
-import 'package:z0und/service/storage.dart' as _i3;
+import 'package:z0und/service/config.dart' as _i4;
+import 'package:z0und/service/http.dart' as _i2;
+import 'package:z0und/service/storage.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -20,10 +21,58 @@ import 'package:z0und/service/storage.dart' as _i3;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
+/// A class which mocks [HttpService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockHttpService extends _i1.Mock implements _i2.HttpService {
+  MockHttpService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<dynamic> postJson(
+    Uri? uri, {
+    Map<String, String>? headers = const {},
+    Map<String, dynamic>? body = const {},
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #postJson,
+          [uri],
+          {
+            #headers: headers,
+            #body: body,
+          },
+        ),
+        returnValue: _i3.Future<dynamic>.value(),
+      ) as _i3.Future<dynamic>);
+  @override
+  _i3.Future<dynamic> postForm(
+    Uri? uri, {
+    Map<String, String>? headers = const {},
+    Map<String, String>? body = const {},
+    String? basicAuthUser,
+    String? basicAuthPass,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #postForm,
+          [uri],
+          {
+            #headers: headers,
+            #body: body,
+            #basicAuthUser: basicAuthUser,
+            #basicAuthPass: basicAuthPass,
+          },
+        ),
+        returnValue: _i3.Future<dynamic>.value(),
+      ) as _i3.Future<dynamic>);
+}
+
 /// A class which mocks [ConfigService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockConfigService extends _i1.Mock implements _i2.ConfigService {
+class MockConfigService extends _i1.Mock implements _i4.ConfigService {
   MockConfigService() {
     _i1.throwOnMissingStub(this);
   }
@@ -38,21 +87,21 @@ class MockConfigService extends _i1.Mock implements _i2.ConfigService {
 /// A class which mocks [StorageService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockStorageService extends _i1.Mock implements _i3.StorageService {
+class MockStorageService extends _i1.Mock implements _i5.StorageService {
   MockStorageService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<String?> read(String? key) => (super.noSuchMethod(
+  _i3.Future<String?> read(String? key) => (super.noSuchMethod(
         Invocation.method(
           #read,
           [key],
         ),
-        returnValue: _i4.Future<String?>.value(),
-      ) as _i4.Future<String?>);
+        returnValue: _i3.Future<String?>.value(),
+      ) as _i3.Future<String?>);
   @override
-  _i4.Future<dynamic> write(
+  _i3.Future<dynamic> write(
     String? key,
     String? value,
   ) =>
@@ -64,6 +113,6 @@ class MockStorageService extends _i1.Mock implements _i3.StorageService {
             value,
           ],
         ),
-        returnValue: _i4.Future<dynamic>.value(),
-      ) as _i4.Future<dynamic>);
+        returnValue: _i3.Future<dynamic>.value(),
+      ) as _i3.Future<dynamic>);
 }
