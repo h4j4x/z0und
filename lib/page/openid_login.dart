@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../vendor/openid_handler.dart';
+import '../handler/openid_handler.dart';
 import '../widget/web_browser.dart';
 
 class OpenidLoginPage extends StatefulWidget {
@@ -76,7 +76,7 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
       );
     }
     return WebBrowser(
-      initialUrl: widget.handler.authUrl(),
+      initialUrl: widget.handler.authUrl,
       listener: this,
     );
   }

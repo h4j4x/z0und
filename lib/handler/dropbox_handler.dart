@@ -6,13 +6,16 @@ import 'package:get_it/get_it.dart';
 import '../config.dart';
 import '../helper/string.dart';
 import '../helper/uri.dart';
+import '../model/music_source.dart';
 import '../service/storage.dart';
+import 'music_source_handler.dart';
 import 'openid_handler.dart';
 
 /// Dropbox integration.
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
-class DropboxHandler implements OpenidHandler {
+class DropboxHandler implements OpenidHandler, MusicSourceHandler {
+  static const id = 'dropbox';
   static const authKey = 'dropbox_auth';
 
   static final tokenUri = Uri.parse('https://api.dropbox.com/oauth2/token');
@@ -60,7 +63,7 @@ class DropboxHandler implements OpenidHandler {
   }
 
   @override
-  String authUrl() => 'https://www.dropbox.com/oauth2/authorize'
+  String get authUrl => 'https://www.dropbox.com/oauth2/authorize'
       '?client_id=$clientId'
       '&response_type=code'
       '&token_access_type=offline'
@@ -115,6 +118,21 @@ class DropboxHandler implements OpenidHandler {
   Future _save(Map<String, dynamic> data) async {
     _auth.putAll(data);
     await StorageService().write(authKey, jsonEncode(_auth.map));
+  }
+
+  @override
+  String get handlerId => id;
+
+  @override
+  Future<bool> get handlerIsEnabled async {
+    final token = await authToken;
+    return token != null;
+  }
+
+  @override
+  Future<List<MusicSource>> listSources() {
+    // TODO: implement listSources
+    throw UnimplementedError();
   }
 }
 

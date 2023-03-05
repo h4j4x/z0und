@@ -1,7 +1,7 @@
 /// Handles openid authentication urls.
 abstract class OpenidHandler {
   /// The initial url to start authentication.
-  String authUrl();
+  String get authUrl;
 
   /// If given [url] can be processed to obtain authenticated user.
   bool canProcessUrl(String url);
