@@ -1,7 +1,97 @@
+import 'dart:convert';
+
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+import 'package:z0und/config.dart';
+import 'package:z0und/service/config.dart';
+import 'package:z0und/service/storage.dart';
 import 'package:z0und/vendor/dropbox_handler.dart';
 
+import '../ioc.dart';
+
 void main() {
+  group('DropboxHandler', () {
+    setupTestIoc();
+
+    test('.create() reads from ConfigService and StorageService', () async {
+      final configService = ConfigService();
+      when(configService.read(Z0undConfig.dropboxClientIdKey))
+          .thenReturn(Z0undConfig.dropboxClientIdKey);
+      when(configService.read(Z0undConfig.dropboxClientSecretKey))
+          .thenReturn(Z0undConfig.dropboxClientSecretKey);
+      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
+          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      final storageService = StorageService();
+      when(storageService.read(DropboxHandler.authKey))
+          .thenAnswer((_) => Future.value(null));
+
+      final handler = await DropboxHandler.create();
+      expect(handler.isEnabled, isTrue);
+      expect(handler.clientId, equals(Z0undConfig.dropboxClientIdKey));
+      expect(handler.clientSecret, equals(Z0undConfig.dropboxClientSecretKey));
+      expect(handler.redirectUri, equals(Z0undConfig.dropboxRedirectUriKey));
+
+      verifyInOrder([
+        configService.read(Z0undConfig.dropboxClientIdKey),
+        configService.read(Z0undConfig.dropboxClientSecretKey),
+        configService.read(Z0undConfig.dropboxRedirectUriKey),
+      ]);
+      verify(storageService.read(DropboxHandler.authKey));
+    });
+
+    test('.isEnabled is `false` if no configured', () async {
+      final configService = ConfigService();
+      when(configService.read(Z0undConfig.dropboxClientIdKey)).thenReturn(null);
+      when(configService.read(Z0undConfig.dropboxClientSecretKey))
+          .thenReturn(null);
+      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
+          .thenReturn(null);
+      final storageService = StorageService();
+      when(storageService.read(DropboxHandler.authKey))
+          .thenAnswer((_) => Future.value(null));
+
+      final handler = await DropboxHandler.create();
+      expect(handler.isEnabled, isFalse);
+
+      verifyInOrder([
+        configService.read(Z0undConfig.dropboxClientIdKey),
+        configService.read(Z0undConfig.dropboxClientSecretKey),
+        configService.read(Z0undConfig.dropboxRedirectUriKey),
+      ]);
+      verify(storageService.read(DropboxHandler.authKey));
+    });
+
+    test('.authToken not expired parsed from storage and returned', () async {
+      final configService = ConfigService();
+      when(configService.read(Z0undConfig.dropboxClientIdKey))
+          .thenReturn(Z0undConfig.dropboxClientIdKey);
+      when(configService.read(Z0undConfig.dropboxClientSecretKey))
+          .thenReturn(Z0undConfig.dropboxClientSecretKey);
+      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
+          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      final storageService = StorageService();
+      const accessToken = 'access_token';
+      when(storageService.read(DropboxHandler.authKey))
+          .thenAnswer((_) => Future.value(jsonEncode(<String, dynamic>{
+                DropboxAuth.accessTokenKey: accessToken,
+                DropboxAuth.expiresInKey: 10,
+                DropboxAuth.updatedAtKey: DateTime.now().millisecondsSinceEpoch,
+              })));
+
+      final handler = await DropboxHandler.create();
+      expect(handler.isEnabled, isTrue);
+      final authToken = await handler.authToken;
+      expect(authToken, equals(accessToken));
+
+      verifyInOrder([
+        configService.read(Z0undConfig.dropboxClientIdKey),
+        configService.read(Z0undConfig.dropboxClientSecretKey),
+        configService.read(Z0undConfig.dropboxRedirectUriKey),
+      ]);
+      verify(storageService.read(DropboxHandler.authKey));
+    });
+  });
+
   group('DropboxAuth', () {
     test('.fromMap() copies all data', () {
       final updatedAt = DateTime.now()

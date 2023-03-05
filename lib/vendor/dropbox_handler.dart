@@ -3,20 +3,20 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../config.dart';
 import '../helper/string.dart';
 import '../helper/uri.dart';
 import '../service/storage.dart';
-import '../z0und.dart';
 import 'openid_handler.dart';
 
 /// Dropbox integration.
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
 class DropboxHandler implements OpenidHandler {
-  static const _authKey = 'dropbox_auth';
+  static const authKey = 'dropbox_auth';
 
   static Future<DropboxHandler> create() async {
-    final authJson = await StorageService().read(_authKey);
+    final authJson = await StorageService().read(authKey);
     final data = <String, dynamic>{};
     if (authJson != null) {
       data.addAll(jsonDecode(authJson));
@@ -48,10 +48,13 @@ class DropboxHandler implements OpenidHandler {
       clientId.length > 1 && clientSecret.length > 1 && redirectUri.length > 1;
 
   Future<String?> get authToken async {
-    if (_auth.accessToken != null && _auth.isExpired) {
-      await _refreshAuth();
+    if (isEnabled) {
+      if (_auth.accessToken != null && _auth.isExpired) {
+        await _refreshAuth();
+      }
+      return _auth.accessToken;
     }
-    return _auth.accessToken;
+    return null;
   }
 
   Uri get tokenUri => Uri.parse('https://api.dropbox.com/oauth2/token');
@@ -111,7 +114,7 @@ class DropboxHandler implements OpenidHandler {
 
   Future _save(Map<String, dynamic> data) async {
     _auth.putAll(data);
-    await StorageService().write(_authKey, jsonEncode(_auth.map));
+    await StorageService().write(authKey, jsonEncode(_auth.map));
   }
 }
 
