@@ -76,7 +76,8 @@ class FlutterHttpService implements HttpService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseJson;
     }
-    debugPrint(' http POST MULTIPART ${uri.toString()}: ${response.statusCode}');
+    debugPrint(
+        ' http POST MULTIPART ${uri.toString()}: ${response.statusCode}');
     debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }

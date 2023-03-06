@@ -138,12 +138,12 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
     final uri = _apiBaseUri('/files/search_v2');
     final token = await authToken;
     final body = <String, dynamic>{
-      'options': {
+      /*'options': {
         'filename_only': true,
         'file_categories': ['audio'],
         'max_results': 1000,
         'path': '/z0und',
-      },
+      },*/
       'query': 'a',
     };
     try {
@@ -158,6 +158,11 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
       // todo: handle
     }
     return [];
+  }
+
+  Future removeAuth() {
+    _auth.clear();
+    return _save({});
   }
 }
 
@@ -189,9 +194,9 @@ class DropboxAuth {
   }
 
   void putAll(Map<String, dynamic> data) {
-    accessToken = data[accessTokenKey] as String?;
-    refreshToken = data[refreshTokenKey] as String?;
-    expiresInSeconds = data[expiresInKey] as int?;
+    accessToken = (data[accessTokenKey] as String?) ?? accessToken;
+    refreshToken = (data[refreshTokenKey] as String?) ?? refreshToken;
+    expiresInSeconds = (data[expiresInKey] as int?) ?? expiresInSeconds;
     if (data.containsKey(updatedAtKey)) {
       final millis = data[updatedAtKey] as int;
       updatedAt = DateTime.fromMillisecondsSinceEpoch(millis);
@@ -206,4 +211,11 @@ class DropboxAuth {
         expiresInKey: expiresInSeconds,
         updatedAtKey: updatedAt.millisecondsSinceEpoch,
       };
+
+  void clear() {
+    accessToken = null;
+    refreshToken = null;
+    expiresInSeconds = null;
+    updatedAt = DateTime.now();
+  }
 }

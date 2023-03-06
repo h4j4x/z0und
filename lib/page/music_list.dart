@@ -21,13 +21,15 @@ class _MusicListPageState extends State<MusicListPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () async {
-      int handlersCount = await MusicSourceHandler.countEnabledHandlers();
-      setState(() {
-        enabledHandlersCount = handlersCount;
-      });
-      loadMusicSources();
+    Future.delayed(Duration.zero, updateHandlersCount);
+  }
+
+  void updateHandlersCount() async {
+    int handlersCount = await MusicSourceHandler.countEnabledHandlers();
+    setState(() {
+      enabledHandlersCount = handlersCount;
     });
+    loadMusicSources();
   }
 
   @override
@@ -37,8 +39,8 @@ class _MusicListPageState extends State<MusicListPage> {
         title: const Text('MUSIC TODO'),
         actions: [
           IconButton(
-            onPressed: !loading ? scanMusicSources : null,
-            icon: const Icon(Icons.manage_search_sharp),
+            onPressed: !loading ? navigateLogin : null,
+            icon: const Icon(Icons.settings_sharp),
           ),
           IconButton(
             onPressed: !loading ? loadMusicSources : null,
@@ -62,9 +64,7 @@ class _MusicListPageState extends State<MusicListPage> {
           ListTile(
             title: const Text('LOGIN TODO'),
             trailing: const Icon(Icons.arrow_forward_sharp),
-            onTap: () {
-              LoginPage.pushRouteTo(context);
-            },
+            onTap: navigateLogin,
           ),
         ],
       );
@@ -86,14 +86,17 @@ class _MusicListPageState extends State<MusicListPage> {
           ListTile(
             title: const Text('ADD LOGIN TODO'),
             trailing: const Icon(Icons.arrow_forward_sharp),
-            onTap: () {
-              LoginPage.pushRouteTo(context);
-            },
+            onTap: navigateLogin,
           ),
         ],
       );
     }
     return Container(); // todo: list
+  }
+
+  void navigateLogin() async {
+    await LoginPage.pushRouteTo(context);
+    updateHandlersCount();
   }
 
   void loadMusicSources() async {

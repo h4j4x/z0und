@@ -214,5 +214,12 @@ void main() {
       auth.putAll({});
       expect(auth.updatedAt.millisecondsSinceEpoch, isNot(updatedAtMillis));
     });
+
+    test('.putAll() without `refreshToken` keeps current `refreshToken`', () {
+      const refreshToken = 'refresh_token';
+      final auth = DropboxAuth()..refreshToken = refreshToken;
+      auth.putAll({});
+      expect(auth.refreshToken, equals(refreshToken));
+    });
   });
 }

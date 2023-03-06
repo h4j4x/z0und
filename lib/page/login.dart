@@ -82,9 +82,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void onDropbox(String title) async {
     if (dropboxLinked == true) {
-      // todo: remove dropbox authentication with confirm dialog
-    }
-    if (dropboxLinked == false) {
+      await confirmUnlinkDropbox();
+    } else if (dropboxLinked == false) {
       await OpenidLoginPage.pushRouteTo(
         context,
         title: title,
@@ -93,6 +92,30 @@ class _LoginPageState extends State<LoginPage> {
     }
     updateDropboxLinked();
   }
+
+  Future confirmUnlinkDropbox() => showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Please Confirm TODO'),
+          content: const Text('Are you sure to unlink dropbox TODO?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                DropboxHandler().removeAuth();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes TODO'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No TODO'),
+            )
+          ],
+        );
+      });
 
   void updateDropboxLinked() async {
     if (dropboxEnabled) {
