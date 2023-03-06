@@ -47,17 +47,17 @@ class IsarDataService implements DataService {
 
   @override
   Future<List<MusicSource>> allMusicSources({bool enabled = true}) {
-    return isar.musicSourceDatas.filter().isEnabledEqualTo(enabled).findAll();
+    return isar.musics.filter().isEnabledEqualTo(enabled).findAll();
   }
 
   Future<Id> _saveMusicSource(MusicSource source) async {
-    var sourceIsar = await isar.musicSourceDatas
+    var sourceIsar = await isar.musics
         .filter()
         .sourceNameEqualTo(source.sourceName)
         .and()
         .handlerIdEqualTo(source.handlerId)
         .findFirst();
-    sourceIsar ??= MusicSourceIsar();
+    sourceIsar ??= MusicSourceData();
     sourceIsar
       ..sourceNameValue = source.sourceName
       ..handlerIdValue = source.handlerId
@@ -65,13 +65,13 @@ class IsarDataService implements DataService {
       ..songName = source.songName
       ..durationInSeconds = source.durationInSeconds;
     await isar.writeTxn(() async {
-      await isar.musicSourceDatas.put(sourceIsar!);
+      await isar.musics.put(sourceIsar!);
     });
     return sourceIsar.id;
   }
 
   Future _removeMusicSources({required List<int> excludeIds}) {
-    return isar.musicSourceDatas
+    return isar.musics
         .filter()
         .not()
         .anyOf(excludeIds, (q, id) => q.idEqualTo(id))

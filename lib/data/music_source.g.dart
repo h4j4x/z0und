@@ -10,7 +10,7 @@ part of 'music_source.dart';
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
 
 extension GetMusicSourceDataCollection on Isar {
-  IsarCollection<MusicSourceIsar> get musicSourceDatas => this.collection();
+  IsarCollection<MusicSourceData> get musics => this.collection();
 }
 
 const MusicSourceDataSchema = CollectionSchema(
@@ -73,7 +73,34 @@ const MusicSourceDataSchema = CollectionSchema(
   deserialize: _musicSourceDataDeserialize,
   deserializeProp: _musicSourceDataDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'sourceNameValue': IndexSchema(
+      id: 8940342964744239937,
+      name: r'sourceNameValue',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'sourceNameValue',
+          type: IndexType.hash,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'handlerIdValue': IndexSchema(
+      id: -2984818347813308568,
+      name: r'handlerIdValue',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'handlerIdValue',
+          type: IndexType.hash,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _musicSourceDataGetId,
@@ -83,7 +110,7 @@ const MusicSourceDataSchema = CollectionSchema(
 );
 
 int _musicSourceDataEstimateSize(
-  MusicSourceIsar object,
+  MusicSourceData object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -112,7 +139,7 @@ int _musicSourceDataEstimateSize(
 }
 
 void _musicSourceDataSerialize(
-  MusicSourceIsar object,
+  MusicSourceData object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
@@ -129,13 +156,13 @@ void _musicSourceDataSerialize(
   writer.writeLong(offsets[9], object.updatedAtMillis);
 }
 
-MusicSourceIsar _musicSourceDataDeserialize(
+MusicSourceData _musicSourceDataDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = MusicSourceIsar();
+  final object = MusicSourceData();
   object.durationInSeconds = reader.readLongOrNull(offsets[0]);
   object.handlerIdValue = reader.readStringOrNull(offsets[3]);
   object.id = id;
@@ -178,22 +205,22 @@ P _musicSourceDataDeserializeProp<P>(
   }
 }
 
-Id _musicSourceDataGetId(MusicSourceIsar object) {
+Id _musicSourceDataGetId(MusicSourceData object) {
   return object.id;
 }
 
-List<IsarLinkBase<dynamic>> _musicSourceDataGetLinks(MusicSourceIsar object) {
+List<IsarLinkBase<dynamic>> _musicSourceDataGetLinks(MusicSourceData object) {
   return [];
 }
 
 void _musicSourceDataAttach(
-    IsarCollection<dynamic> col, Id id, MusicSourceIsar object) {
+    IsarCollection<dynamic> col, Id id, MusicSourceData object) {
   object.id = id;
 }
 
 extension MusicSourceDataQueryWhereSort
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QWhere> {
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterWhere> anyId() {
+    on QueryBuilder<MusicSourceData, MusicSourceData, QWhere> {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
@@ -201,8 +228,8 @@ extension MusicSourceDataQueryWhereSort
 }
 
 extension MusicSourceDataQueryWhere
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QWhereClause> {
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterWhereClause> idEqualTo(
+    on QueryBuilder<MusicSourceData, MusicSourceData, QWhereClause> {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause> idEqualTo(
       Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
@@ -212,7 +239,7 @@ extension MusicSourceDataQueryWhere
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterWhereClause>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
       idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
@@ -235,7 +262,7 @@ extension MusicSourceDataQueryWhere
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterWhereClause>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
       idGreaterThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -244,7 +271,7 @@ extension MusicSourceDataQueryWhere
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterWhereClause> idLessThan(
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause> idLessThan(
       Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
@@ -254,7 +281,7 @@ extension MusicSourceDataQueryWhere
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterWhereClause> idBetween(
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause> idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
@@ -269,11 +296,145 @@ extension MusicSourceDataQueryWhere
       ));
     });
   }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      sourceNameValueIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'sourceNameValue',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      sourceNameValueIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'sourceNameValue',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      sourceNameValueEqualTo(String? sourceNameValue) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'sourceNameValue',
+        value: [sourceNameValue],
+      ));
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      sourceNameValueNotEqualTo(String? sourceNameValue) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'sourceNameValue',
+              lower: [],
+              upper: [sourceNameValue],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'sourceNameValue',
+              lower: [sourceNameValue],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'sourceNameValue',
+              lower: [sourceNameValue],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'sourceNameValue',
+              lower: [],
+              upper: [sourceNameValue],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      handlerIdValueIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'handlerIdValue',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      handlerIdValueIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'handlerIdValue',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      handlerIdValueEqualTo(String? handlerIdValue) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'handlerIdValue',
+        value: [handlerIdValue],
+      ));
+    });
+  }
+
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterWhereClause>
+      handlerIdValueNotEqualTo(String? handlerIdValue) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'handlerIdValue',
+              lower: [],
+              upper: [handlerIdValue],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'handlerIdValue',
+              lower: [handlerIdValue],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'handlerIdValue',
+              lower: [handlerIdValue],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'handlerIdValue',
+              lower: [],
+              upper: [handlerIdValue],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
 }
 
 extension MusicSourceDataQueryFilter
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QFilterCondition> {
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+    on QueryBuilder<MusicSourceData, MusicSourceData, QFilterCondition> {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       durationInSecondsIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -282,7 +443,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       durationInSecondsIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -291,7 +452,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       durationInSecondsEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -301,7 +462,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       durationInSecondsGreaterThan(
     int? value, {
     bool include = false,
@@ -315,7 +476,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       durationInSecondsLessThan(
     int? value, {
     bool include = false,
@@ -329,7 +490,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       durationInSecondsBetween(
     int? lower,
     int? upper, {
@@ -347,7 +508,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       enabledEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -357,7 +518,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -371,7 +532,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdGreaterThan(
     String value, {
     bool include = false,
@@ -387,7 +548,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdLessThan(
     String value, {
     bool include = false,
@@ -403,7 +564,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdBetween(
     String lower,
     String upper, {
@@ -423,7 +584,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -437,7 +598,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -451,7 +612,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -462,7 +623,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -473,7 +634,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -483,7 +644,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -493,7 +654,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -502,7 +663,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -511,7 +672,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueEqualTo(
     String? value, {
     bool caseSensitive = true,
@@ -525,7 +686,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueGreaterThan(
     String? value, {
     bool include = false,
@@ -541,7 +702,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueLessThan(
     String? value, {
     bool include = false,
@@ -557,7 +718,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueBetween(
     String? lower,
     String? upper, {
@@ -577,7 +738,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -591,7 +752,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -605,7 +766,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -616,7 +777,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -627,7 +788,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -637,7 +798,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       handlerIdValueIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -647,7 +808,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -657,7 +818,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       idGreaterThan(
     Id value, {
     bool include = false,
@@ -671,7 +832,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       idLessThan(
     Id value, {
     bool include = false,
@@ -685,7 +846,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       idBetween(
     Id lower,
     Id upper, {
@@ -703,7 +864,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       isEnabledIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -712,7 +873,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       isEnabledIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -721,7 +882,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       isEnabledEqualTo(bool? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -731,7 +892,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -740,7 +901,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -749,7 +910,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameEqualTo(
     String? value, {
     bool caseSensitive = true,
@@ -763,7 +924,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameGreaterThan(
     String? value, {
     bool include = false,
@@ -779,7 +940,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameLessThan(
     String? value, {
     bool include = false,
@@ -795,7 +956,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameBetween(
     String? lower,
     String? upper, {
@@ -815,7 +976,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -829,7 +990,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -843,7 +1004,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -854,7 +1015,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -865,7 +1026,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -875,7 +1036,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       songNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -885,7 +1046,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -899,7 +1060,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameGreaterThan(
     String value, {
     bool include = false,
@@ -915,7 +1076,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameLessThan(
     String value, {
     bool include = false,
@@ -931,7 +1092,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameBetween(
     String lower,
     String upper, {
@@ -951,7 +1112,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -965,7 +1126,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -979,7 +1140,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -990,7 +1151,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -1001,7 +1162,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1011,7 +1172,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -1021,7 +1182,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1030,7 +1191,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -1039,7 +1200,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueEqualTo(
     String? value, {
     bool caseSensitive = true,
@@ -1053,7 +1214,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueGreaterThan(
     String? value, {
     bool include = false,
@@ -1069,7 +1230,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueLessThan(
     String? value, {
     bool include = false,
@@ -1085,7 +1246,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueBetween(
     String? lower,
     String? upper, {
@@ -1105,7 +1266,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1119,7 +1280,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -1133,7 +1294,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -1144,7 +1305,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -1155,7 +1316,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1165,7 +1326,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       sourceNameValueIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -1175,7 +1336,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1185,7 +1346,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtGreaterThan(
     DateTime value, {
     bool include = false,
@@ -1199,7 +1360,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtLessThan(
     DateTime value, {
     bool include = false,
@@ -1213,7 +1374,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtBetween(
     DateTime lower,
     DateTime upper, {
@@ -1231,7 +1392,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtMillisIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1240,7 +1401,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtMillisIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -1249,7 +1410,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtMillisEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1259,7 +1420,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtMillisGreaterThan(
     int? value, {
     bool include = false,
@@ -1273,7 +1434,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtMillisLessThan(
     int? value, {
     bool include = false,
@@ -1287,7 +1448,7 @@ extension MusicSourceDataQueryFilter
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterFilterCondition>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
       updatedAtMillisBetween(
     int? lower,
     int? upper, {
@@ -1307,146 +1468,146 @@ extension MusicSourceDataQueryFilter
 }
 
 extension MusicSourceDataQueryObject
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QFilterCondition> {}
+    on QueryBuilder<MusicSourceData, MusicSourceData, QFilterCondition> {}
 
 extension MusicSourceDataQueryLinks
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QFilterCondition> {}
+    on QueryBuilder<MusicSourceData, MusicSourceData, QFilterCondition> {}
 
 extension MusicSourceDataQuerySortBy
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QSortBy> {
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+    on QueryBuilder<MusicSourceData, MusicSourceData, QSortBy> {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByDurationInSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'durationInSeconds', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByDurationInSecondsDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'durationInSeconds', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy> sortByEnabled() {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy> sortByEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enabled', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByEnabledDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enabled', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByHandlerId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerId', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByHandlerIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerId', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByHandlerIdValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerIdValue', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByHandlerIdValueDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerIdValue', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isEnabled', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByIsEnabledDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isEnabled', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortBySongName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'songName', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortBySongNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'songName', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortBySourceName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceName', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortBySourceNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceName', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortBySourceNameValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceNameValue', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortBySourceNameValueDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceNameValue', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByUpdatedAtMillis() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAtMillis', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       sortByUpdatedAtMillisDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAtMillis', Sort.desc);
@@ -1455,152 +1616,152 @@ extension MusicSourceDataQuerySortBy
 }
 
 extension MusicSourceDataQuerySortThenBy
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QSortThenBy> {
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+    on QueryBuilder<MusicSourceData, MusicSourceData, QSortThenBy> {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByDurationInSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'durationInSeconds', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByDurationInSecondsDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'durationInSeconds', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy> thenByEnabled() {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy> thenByEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enabled', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByEnabledDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enabled', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByHandlerId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerId', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByHandlerIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerId', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByHandlerIdValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerIdValue', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByHandlerIdValueDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'handlerIdValue', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy> thenById() {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isEnabled', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByIsEnabledDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isEnabled', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenBySongName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'songName', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenBySongNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'songName', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenBySourceName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceName', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenBySourceNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceName', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenBySourceNameValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceNameValue', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenBySourceNameValueDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceNameValue', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByUpdatedAtMillis() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAtMillis', Sort.asc);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QAfterSortBy>
+  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
       thenByUpdatedAtMillisDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAtMillis', Sort.desc);
@@ -1609,29 +1770,29 @@ extension MusicSourceDataQuerySortThenBy
 }
 
 extension MusicSourceDataQueryWhereDistinct
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct> {
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+    on QueryBuilder<MusicSourceData, MusicSourceData, QDistinct> {
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctByDurationInSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'durationInSeconds');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctByEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'enabled');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct> distinctByHandlerId(
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct> distinctByHandlerId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'handlerId', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctByHandlerIdValue({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'handlerIdValue',
@@ -1639,28 +1800,28 @@ extension MusicSourceDataQueryWhereDistinct
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isEnabled');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct> distinctBySongName(
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct> distinctBySongName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'songName', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctBySourceName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'sourceName', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctBySourceNameValue({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'sourceNameValue',
@@ -1668,14 +1829,14 @@ extension MusicSourceDataQueryWhereDistinct
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'updatedAt');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, MusicSourceIsar, QDistinct>
+  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
       distinctByUpdatedAtMillis() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'updatedAtMillis');
@@ -1684,72 +1845,72 @@ extension MusicSourceDataQueryWhereDistinct
 }
 
 extension MusicSourceDataQueryProperty
-    on QueryBuilder<MusicSourceIsar, MusicSourceIsar, QQueryProperty> {
-  QueryBuilder<MusicSourceIsar, int, QQueryOperations> idProperty() {
+    on QueryBuilder<MusicSourceData, MusicSourceData, QQueryProperty> {
+  QueryBuilder<MusicSourceData, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, int?, QQueryOperations>
+  QueryBuilder<MusicSourceData, int?, QQueryOperations>
       durationInSecondsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'durationInSeconds');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, bool, QQueryOperations> enabledProperty() {
+  QueryBuilder<MusicSourceData, bool, QQueryOperations> enabledProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'enabled');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, String, QQueryOperations> handlerIdProperty() {
+  QueryBuilder<MusicSourceData, String, QQueryOperations> handlerIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'handlerId');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, String?, QQueryOperations>
+  QueryBuilder<MusicSourceData, String?, QQueryOperations>
       handlerIdValueProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'handlerIdValue');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, bool?, QQueryOperations> isEnabledProperty() {
+  QueryBuilder<MusicSourceData, bool?, QQueryOperations> isEnabledProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isEnabled');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, String?, QQueryOperations> songNameProperty() {
+  QueryBuilder<MusicSourceData, String?, QQueryOperations> songNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'songName');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, String, QQueryOperations> sourceNameProperty() {
+  QueryBuilder<MusicSourceData, String, QQueryOperations> sourceNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sourceName');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, String?, QQueryOperations>
+  QueryBuilder<MusicSourceData, String?, QQueryOperations>
       sourceNameValueProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sourceNameValue');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, DateTime, QQueryOperations>
+  QueryBuilder<MusicSourceData, DateTime, QQueryOperations>
       updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
     });
   }
 
-  QueryBuilder<MusicSourceIsar, int?, QQueryOperations>
+  QueryBuilder<MusicSourceData, int?, QQueryOperations>
       updatedAtMillisProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAtMillis');

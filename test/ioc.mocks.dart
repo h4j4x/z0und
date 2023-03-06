@@ -32,6 +32,7 @@ class MockHttpService extends _i1.Mock implements _i2.HttpService {
   @override
   _i3.Future<dynamic> postJson(
     Uri? uri, {
+    String? authBearer,
     Map<String, String>? headers = const {},
     Map<String, dynamic>? body = const {},
   }) =>
@@ -40,6 +41,7 @@ class MockHttpService extends _i1.Mock implements _i2.HttpService {
           #postJson,
           [uri],
           {
+            #authBearer: authBearer,
             #headers: headers,
             #body: body,
           },

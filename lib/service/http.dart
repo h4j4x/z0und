@@ -13,6 +13,7 @@ abstract class HttpService {
 
   Future<dynamic> postJson(
     Uri uri, {
+    String? authBearer,
     Map<String, String> headers = const {},
     Map<String, dynamic> body = const {},
   });
@@ -32,6 +33,7 @@ class FlutterHttpService implements HttpService {
   @override
   Future<dynamic> postJson(
     Uri uri, {
+    String? authBearer,
     Map<String, String> headers = const {},
     Map<String, dynamic> body = const {},
   }) async {
@@ -39,6 +41,9 @@ class FlutterHttpService implements HttpService {
       'Content-Type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
     };
+    if (authBearer != null) {
+      headersMap['Authorization'] = 'Bearer $authBearer';
+    }
     headersMap.addAll(headers);
     final bodyJson = jsonEncode(body);
     final response = await http.post(uri, headers: headersMap, body: bodyJson);
@@ -46,7 +51,7 @@ class FlutterHttpService implements HttpService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseJson;
     }
-    debugPrint('http POST ${toString()}: ${response.statusCode}');
+    debugPrint('http POST ${uri.toString()}: ${response.statusCode}');
     debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }
@@ -71,7 +76,7 @@ class FlutterHttpService implements HttpService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseJson;
     }
-    debugPrint(' http POST MULTIPART ${toString()}: ${response.statusCode}');
+    debugPrint(' http POST MULTIPART ${uri.toString()}: ${response.statusCode}');
     debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }

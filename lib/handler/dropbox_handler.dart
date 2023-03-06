@@ -99,15 +99,16 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
   }
 
   Future _refreshAuth() async {
-    final body = <String, dynamic>{
-      'refresh_token': _auth.refreshToken,
+    final body = <String, String>{
+      'refresh_token': _auth.refreshToken ?? '',
       'grant_type': 'refresh_token',
-      'redirect_uri': redirectUri,
-      'client_id': clientId,
-      'client_secret': clientSecret,
     };
     try {
-      final Map<String, dynamic> data = await tokenUri.postJson(body: body);
+      final Map<String, dynamic> data = await tokenUri.postForm(
+        body: body,
+        basicAuthUser: clientId,
+        basicAuthPass: clientSecret,
+      );
       await _save(data);
     } catch (e) {
       debugPrint('Refreshing dropbox auth error: $e');
@@ -129,10 +130,34 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
     return token != null;
   }
 
+  Uri _apiBaseUri(String endpoint) =>
+      Uri.parse('https://api.dropboxapi.com/2$endpoint');
+
   @override
-  Future<List<MusicSource>> listSources() {
-    // TODO: implement listSources
-    throw UnimplementedError();
+  Future<List<MusicSource>> listSources() async {
+    final uri = _apiBaseUri('/files/search_v2');
+    final token = await authToken;
+    final body = <String, dynamic>{
+      'options': {
+        'filename_only': true,
+        'file_categories': ['audio'],
+        'max_results': 1000,
+        'path': '/z0und',
+      },
+      'query': 'a',
+    };
+    try {
+      final Map<String, dynamic> data = await uri.postJson(
+        authBearer: token,
+        body: body,
+      );
+      debugPrint('music listSources = $data');
+      // todo: parse
+    } catch (e) {
+      debugPrint('List sources dropbox error: $e');
+      // todo: handle
+    }
+    return [];
   }
 }
 

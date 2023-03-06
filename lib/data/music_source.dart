@@ -4,8 +4,8 @@ import '../model/music_source.dart';
 
 part 'music_source.g.dart';
 
-@collection
-class MusicSourceIsar implements MusicSource {
+@Collection(accessor: 'musics')
+class MusicSourceData implements MusicSource {
   Id id = Isar.autoIncrement;
 
   @Index(caseSensitive: false)
