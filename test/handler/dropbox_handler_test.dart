@@ -115,20 +115,21 @@ void main() {
           .thenAnswer((_) => Future.value(null));
       final httpService = HttpService();
       const accessToken = 'refreshed_access_token';
-      final refreshBody = <String, dynamic>{
+      final refreshBody = <String, String>{
         'refresh_token': refreshToken,
         'grant_type': 'refresh_token',
-        'redirect_uri': Z0undConfig.dropboxRedirectUriKey,
-        'client_id': Z0undConfig.dropboxClientIdKey,
-        'client_secret': Z0undConfig.dropboxClientSecretKey,
       };
-      when(httpService.postJson(DropboxHandler.tokenUri, body: refreshBody))
-          .thenAnswer((_) => Future.value(<String, dynamic>{
-                DropboxAuth.accessTokenKey: accessToken,
-                DropboxAuth.refreshTokenKey: refreshToken,
-                DropboxAuth.expiresInKey: 1,
-                DropboxAuth.updatedAtKey: DateTime.now().millisecondsSinceEpoch,
-              }));
+      when(httpService.postForm(
+        DropboxHandler.tokenUri,
+        body: refreshBody,
+        basicAuthUser: Z0undConfig.dropboxClientIdKey,
+        basicAuthPass: Z0undConfig.dropboxClientSecretKey,
+      )).thenAnswer((_) => Future.value(<String, dynamic>{
+            DropboxAuth.accessTokenKey: accessToken,
+            DropboxAuth.refreshTokenKey: refreshToken,
+            DropboxAuth.expiresInKey: 1,
+            DropboxAuth.updatedAtKey: DateTime.now().millisecondsSinceEpoch,
+          }));
 
       final handler = await DropboxHandler.create();
       expect(handler.isEnabled, isTrue);
@@ -142,7 +143,12 @@ void main() {
       ]);
       verify(storageService.read(DropboxHandler.authKey));
       verify(storageService.write(DropboxHandler.authKey, any));
-      verify(httpService.postJson(DropboxHandler.tokenUri, body: refreshBody));
+      verify(httpService.postForm(
+        DropboxHandler.tokenUri,
+        body: refreshBody,
+        basicAuthUser: Z0undConfig.dropboxClientIdKey,
+        basicAuthPass: Z0undConfig.dropboxClientSecretKey,
+      ));
     });
   });
 
