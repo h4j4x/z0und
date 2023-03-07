@@ -20,16 +20,6 @@ class MusicSourceData implements MusicSource {
   @override
   String get handlerId => handlerIdValue ?? '';
 
-  int? updatedAtMillis;
-
-  @override
-  DateTime get updatedAt {
-    if (updatedAtMillis != null) {
-      return DateTime.fromMillisecondsSinceEpoch(updatedAtMillis!);
-    }
-    return DateTime.now();
-  }
-
   @override
   String? songName;
 

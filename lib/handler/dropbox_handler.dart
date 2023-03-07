@@ -116,11 +116,6 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
     }
   }
 
-  Future _save(Map<String, dynamic> data) async {
-    _auth.putAll(data);
-    await StorageService().write(authKey, jsonEncode(_auth.map));
-  }
-
   @override
   String get handlerId => id;
 
@@ -135,24 +130,24 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
 
   @override
   Future<List<MusicSource>> listSources() async {
-    final uri = _apiBaseUri('/files/search_v2');
+    final uri = _apiBaseUri('/files/list_folder');
     final token = await authToken;
     final body = <String, dynamic>{
-      /*'options': {
-        'filename_only': true,
-        'file_categories': ['audio'],
-        'max_results': 1000,
-        'path': '/z0und',
-      },*/
-      'query': 'a',
+      'recursive': true,
+      'path': '',
+      'include_mounted_folders': true,
+      'include_media_info': true,
     };
     try {
       final Map<String, dynamic> data = await uri.postJson(
         authBearer: token,
         body: body,
       );
-      debugPrint('music listSources = $data');
-      // todo: parse
+      final files = (data['entries'] as List?) ?? [];
+      return files
+          .where((entry) => DropboxMusicSource.canParse(entry))
+          .map<MusicSource>((entry) => DropboxMusicSource.fromMap(entry))
+          .toList();
     } catch (e) {
       debugPrint('List sources dropbox error: $e');
       // todo: handle
@@ -163,6 +158,11 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
   Future removeAuth() {
     _auth.clear();
     return _save({});
+  }
+
+  Future _save(Map<String, dynamic> data) async {
+    _auth.putAll(data);
+    await StorageService().write(authKey, jsonEncode(_auth.map));
   }
 }
 
@@ -205,12 +205,12 @@ class DropboxAuth {
     }
   }
 
-  get map => <String, dynamic>{
+  Map<String, dynamic> get map => <String, dynamic>{
         accessTokenKey: accessToken,
         refreshTokenKey: refreshToken,
         expiresInKey: expiresInSeconds,
         updatedAtKey: updatedAt.millisecondsSinceEpoch,
-      };
+      }..removeWhere((_, value) => value == null);
 
   void clear() {
     accessToken = null;
@@ -218,4 +218,32 @@ class DropboxAuth {
     expiresInSeconds = null;
     updatedAt = DateTime.now();
   }
+}
+
+class DropboxMusicSource implements MusicSource {
+  static bool canParse(entry) =>
+      entry is Map &&
+      entry.containsKey('name') &&
+      entry['name'] is String &&
+      entry['name'].toString().endsWith('.mp3');
+
+  static MusicSource fromMap(Map map) =>
+      DropboxMusicSource(map['name'].toString());
+
+  @override
+  String sourceName;
+
+  @override
+  String handlerId;
+
+  @override
+  String? songName;
+
+  @override
+  int? durationInSeconds;
+
+  @override
+  bool get enabled => true;
+
+  DropboxMusicSource(this.sourceName) : handlerId = DropboxHandler.id;
 }

@@ -43,6 +43,10 @@ class _MusicListPageState extends State<MusicListPage> {
             icon: const Icon(Icons.settings_sharp),
           ),
           IconButton(
+            onPressed: !loading ? updateHandlersCount : null,
+            icon: const Icon(Icons.manage_search_sharp),
+          ),
+          IconButton(
             onPressed: !loading ? loadMusicSources : null,
             icon: const Icon(Icons.refresh_sharp),
           ),
@@ -91,8 +95,17 @@ class _MusicListPageState extends State<MusicListPage> {
         ],
       );
     }
-    return Container(); // todo: list
+    return list();
   }
+
+  Widget list() => ListView.builder(
+        padding: const EdgeInsets.all(8.0),
+        itemCount: musicSources.length,
+        itemBuilder: (context, index) => ListTile(
+          title: Text(musicSources[index].sourceName),
+          subtitle: Text(musicSources[index].handlerId),
+        ),
+      );
 
   void navigateLogin() async {
     await LoginPage.pushRouteTo(context);

@@ -3,8 +3,6 @@ abstract class MusicSource {
 
   String get handlerId;
 
-  DateTime get updatedAt;
-
   String? get songName;
 
   int? get durationInSeconds;

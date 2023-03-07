@@ -61,9 +61,9 @@ class IsarDataService implements DataService {
     sourceIsar
       ..sourceNameValue = source.sourceName
       ..handlerIdValue = source.handlerId
-      ..updatedAtMillis = source.updatedAt.millisecondsSinceEpoch
       ..songName = source.songName
       ..durationInSeconds = source.durationInSeconds;
+    sourceIsar.isEnabled ??= true;
     await isar.writeTxn(() async {
       await isar.musics.put(sourceIsar!);
     });

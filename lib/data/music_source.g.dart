@@ -56,16 +56,6 @@ const MusicSourceDataSchema = CollectionSchema(
       id: 7,
       name: r'sourceNameValue',
       type: IsarType.string,
-    ),
-    r'updatedAt': PropertySchema(
-      id: 8,
-      name: r'updatedAt',
-      type: IsarType.dateTime,
-    ),
-    r'updatedAtMillis': PropertySchema(
-      id: 9,
-      name: r'updatedAtMillis',
-      type: IsarType.long,
     )
   },
   estimateSize: _musicSourceDataEstimateSize,
@@ -152,8 +142,6 @@ void _musicSourceDataSerialize(
   writer.writeString(offsets[5], object.songName);
   writer.writeString(offsets[6], object.sourceName);
   writer.writeString(offsets[7], object.sourceNameValue);
-  writer.writeDateTime(offsets[8], object.updatedAt);
-  writer.writeLong(offsets[9], object.updatedAtMillis);
 }
 
 MusicSourceData _musicSourceDataDeserialize(
@@ -169,7 +157,6 @@ MusicSourceData _musicSourceDataDeserialize(
   object.isEnabled = reader.readBoolOrNull(offsets[4]);
   object.songName = reader.readStringOrNull(offsets[5]);
   object.sourceNameValue = reader.readStringOrNull(offsets[7]);
-  object.updatedAtMillis = reader.readLongOrNull(offsets[9]);
   return object;
 }
 
@@ -196,10 +183,6 @@ P _musicSourceDataDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 7:
       return (reader.readStringOrNull(offset)) as P;
-    case 8:
-      return (reader.readDateTime(offset)) as P;
-    case 9:
-      return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1335,136 +1318,6 @@ extension MusicSourceDataQueryFilter
       ));
     });
   }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtEqualTo(DateTime value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'updatedAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtGreaterThan(
-    DateTime value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'updatedAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtLessThan(
-    DateTime value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'updatedAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtBetween(
-    DateTime lower,
-    DateTime upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'updatedAt',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtMillisIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'updatedAtMillis',
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtMillisIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'updatedAtMillis',
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtMillisEqualTo(int? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'updatedAtMillis',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtMillisGreaterThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'updatedAtMillis',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtMillisLessThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'updatedAtMillis',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterFilterCondition>
-      updatedAtMillisBetween(
-    int? lower,
-    int? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'updatedAtMillis',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
 }
 
 extension MusicSourceDataQueryObject
@@ -1583,34 +1436,6 @@ extension MusicSourceDataQuerySortBy
       sortBySourceNameValueDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceNameValue', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      sortByUpdatedAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAt', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      sortByUpdatedAtDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      sortByUpdatedAtMillis() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAtMillis', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      sortByUpdatedAtMillisDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAtMillis', Sort.desc);
     });
   }
 }
@@ -1739,34 +1564,6 @@ extension MusicSourceDataQuerySortThenBy
       return query.addSortBy(r'sourceNameValue', Sort.desc);
     });
   }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      thenByUpdatedAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAt', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      thenByUpdatedAtDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      thenByUpdatedAtMillis() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAtMillis', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QAfterSortBy>
-      thenByUpdatedAtMillisDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'updatedAtMillis', Sort.desc);
-    });
-  }
 }
 
 extension MusicSourceDataQueryWhereDistinct
@@ -1828,20 +1625,6 @@ extension MusicSourceDataQueryWhereDistinct
           caseSensitive: caseSensitive);
     });
   }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
-      distinctByUpdatedAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'updatedAt');
-    });
-  }
-
-  QueryBuilder<MusicSourceData, MusicSourceData, QDistinct>
-      distinctByUpdatedAtMillis() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'updatedAtMillis');
-    });
-  }
 }
 
 extension MusicSourceDataQueryProperty
@@ -1900,20 +1683,6 @@ extension MusicSourceDataQueryProperty
       sourceNameValueProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sourceNameValue');
-    });
-  }
-
-  QueryBuilder<MusicSourceData, DateTime, QQueryOperations>
-      updatedAtProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'updatedAt');
-    });
-  }
-
-  QueryBuilder<MusicSourceData, int?, QQueryOperations>
-      updatedAtMillisProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'updatedAtMillis');
     });
   }
 }

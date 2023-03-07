@@ -14,7 +14,7 @@ class DeviceMusicSourceHandler implements MusicSourceHandler {
   String get handlerId => 'device';
 
   @override
-  Future<bool> get handlerIsEnabled => Future.value(true);
+  Future<bool> get handlerIsEnabled => Future.value(false); // todo
 
   @override
   Future<List<MusicSource>> listSources() {
