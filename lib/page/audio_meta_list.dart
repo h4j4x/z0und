@@ -102,7 +102,7 @@ class _AudioMetaListPageState extends State<AudioMetaListPage> {
         padding: const EdgeInsets.all(8.0),
         itemCount: audiosMetas.length,
         itemBuilder: (context, index) => ListTile(
-          title: Text(audiosMetas[index].fileName),
+          title: Text(audiosMetas[index].name),
           subtitle: Text(audiosMetas[index].handlerId),
         ),
       );

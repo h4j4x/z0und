@@ -9,16 +9,21 @@ class AudioMetaData implements AudioMeta {
   Id id = Isar.autoIncrement;
 
   @Index(caseSensitive: false)
-  String? fileNameValue;
+  String? nameValue;
 
   @override
-  String get fileName => fileNameValue ?? '';
+  String get name => nameValue ?? '';
 
   @Index(caseSensitive: false)
   String? handlerIdValue;
 
   @override
   String get handlerId => handlerIdValue ?? '';
+
+  String? codeValue;
+
+  @override
+  String get code => codeValue ?? '';
 
   @override
   String? audioName;

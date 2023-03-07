@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import '../../model/audio_meta.dart';
+import '../../model/audio_source.dart';
 import '../audio_meta_handler.dart';
 
 class DeviceAudioMetaHandler implements AudioMetaHandler {
@@ -20,5 +21,11 @@ class DeviceAudioMetaHandler implements AudioMetaHandler {
   Future<List<AudioMeta>> listAudiosMetas() {
     // todo
     return Future.value([]);
+  }
+
+  @override
+  Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta) {
+    // TODO: implement fetchAudioSource
+    throw UnimplementedError();
   }
 }

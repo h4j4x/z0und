@@ -7,6 +7,7 @@ import '../../config.dart';
 import '../../helper/string.dart';
 import '../../helper/uri.dart';
 import '../../model/audio_meta.dart';
+import '../../model/audio_source.dart';
 import '../../service/storage.dart';
 import '../audio_meta_handler.dart';
 import '../openid_handler.dart';
@@ -155,6 +156,28 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
     return [];
   }
 
+  @override
+  Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta) async {
+    final uri = _apiBaseUri('/files/get_temporary_link');
+    final token = await authToken;
+    final body = <String, dynamic>{
+      'path': audioMeta.code,
+    };
+    try {
+      final Map<String, dynamic> data = await uri.postJson(
+        authBearer: token,
+        body: body,
+      );
+      if (data.containsKey('link') && data['link'] is String) {
+        return DropboxAudioSource(data['link'].toString());
+      }
+    } catch (e) {
+      debugPrint('fetch audio source dropbox error: $e');
+      // todo: handle
+    }
+    return null;
+  }
+
   Future removeAuth() {
     _auth.clear();
     return _save({});
@@ -225,15 +248,22 @@ class DropboxAudioMeta implements AudioMeta {
       entry is Map &&
       entry.containsKey('name') &&
       entry['name'] is String &&
+      entry['path_lower'] is String &&
       entry['name'].toString().endsWith('.mp3');
 
-  static AudioMeta fromMap(Map map) => DropboxAudioMeta(map['name'].toString());
+  static AudioMeta fromMap(Map map) => DropboxAudioMeta(
+        name: map['name'].toString(),
+        code: map['path_lower'].toString(),
+      );
 
   @override
-  String fileName;
+  final String name;
 
   @override
-  String handlerId;
+  final String handlerId;
+
+  @override
+  final String code;
 
   @override
   String? audioName;
@@ -244,5 +274,18 @@ class DropboxAudioMeta implements AudioMeta {
   @override
   bool get enabled => true;
 
-  DropboxAudioMeta(this.fileName) : handlerId = DropboxHandler.id;
+  DropboxAudioMeta({
+    required this.name,
+    required this.code,
+  }) : handlerId = DropboxHandler.id;
+}
+
+class DropboxAudioSource implements AudioSource {
+  @override
+  final AudioSourceType sourceType;
+
+  @override
+  final String source;
+
+  DropboxAudioSource(this.source) : sourceType = AudioSourceType.url;
 }

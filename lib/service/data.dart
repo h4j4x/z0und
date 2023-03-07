@@ -53,14 +53,15 @@ class IsarDataService implements DataService {
   Future<Id> _saveAudioMeta(AudioMeta source) async {
     var sourceIsar = await isar.audios_metas
         .filter()
-        .fileNameEqualTo(source.fileName)
+        .codeEqualTo(source.code)
         .and()
         .handlerIdEqualTo(source.handlerId)
         .findFirst();
     sourceIsar ??= AudioMetaData();
     sourceIsar
-      ..fileNameValue = source.fileName
+      ..nameValue = source.name
       ..handlerIdValue = source.handlerId
+      ..codeValue = source.code
       ..audioName = source.audioName
       ..durationInSeconds = source.durationInSeconds;
     sourceIsar.isEnabled ??= true;

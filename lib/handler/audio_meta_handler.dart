@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import '../model/audio_meta.dart';
+import '../model/audio_source.dart';
 import 'impl/device_handler.dart';
 import 'impl/dropbox_handler.dart';
 
@@ -8,13 +9,8 @@ import 'impl/dropbox_handler.dart';
 abstract class AudioMetaHandler {
   /// Gets all enabled handlers.
   static Future<List<AudioMetaHandler>> enabledHandlers() async {
-    // todo: obtains by interface
-    final allHandlers = <AudioMetaHandler>[
-      GetIt.I<DropboxHandler>(),
-      GetIt.I<DeviceAudioMetaHandler>(),
-    ];
     final enabledHandlers = <AudioMetaHandler>[];
-    await Future.forEach(allHandlers, (handler) async {
+    await Future.forEach(_handlers, (handler) async {
       if (await handler.handlerIsEnabled) {
         enabledHandlers.add(handler);
       }
@@ -24,19 +20,29 @@ abstract class AudioMetaHandler {
 
   /// Counts all enabled handlers.
   static Future<int> countEnabledHandlers() async {
-    // todo: obtains by interface
-    final allHandlers = <AudioMetaHandler>[
-      GetIt.I<DropboxHandler>(),
-      GetIt.I<DeviceAudioMetaHandler>(),
-    ];
     int count = 0;
-    await Future.forEach(allHandlers, (handler) async {
+    await Future.forEach(_handlers, (handler) async {
       if (await handler.handlerIsEnabled) {
         count++;
       }
     });
     return count;
   }
+
+  /// Fetch `AudioSource` for given [audioMeta].
+  static Future<AudioSource?> fetchSource(AudioMeta audioMeta) {
+    for (final handler in _handlers) {
+      if (handler.handlerId == audioMeta.handlerId) {
+        return handler.fetchAudioSource(audioMeta);
+      }
+    }
+    return Future.value(null);
+  }
+
+  static List<AudioMetaHandler> get _handlers => <AudioMetaHandler>[
+        GetIt.I<DeviceAudioMetaHandler>(),
+        GetIt.I<DropboxHandler>(),
+      ];
 
   /// Gets a handler by [id].
   ///
@@ -56,4 +62,7 @@ abstract class AudioMetaHandler {
 
   /// Fetch available audios metas.
   Future<List<AudioMeta>> listAudiosMetas();
+
+  /// Fetch `AudioSource` for given [audioMeta].
+  Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta);
 }

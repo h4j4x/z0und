@@ -1,11 +1,11 @@
 import 'package:get_it/get_it.dart';
 
-import '../handler/impl/device_handler.dart';
-import '../handler/impl/dropbox_handler.dart';
-import 'config.dart';
-import 'data.dart';
-import 'http.dart';
-import 'storage.dart';
+import 'handler/impl/device_handler.dart';
+import 'handler/impl/dropbox_handler.dart';
+import 'service/config.dart';
+import 'service/data.dart';
+import 'service/http.dart';
+import 'service/storage.dart';
 
 Future setupIoc() async {
   GetIt.I.registerSingleton<StorageService>(StorageService.create());
