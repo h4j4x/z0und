@@ -1,5 +1,4 @@
-import 'package:get_it/get_it.dart';
-
+import '../../ioc.dart';
 import '../../model/audio_meta.dart';
 import '../../model/audio_source.dart';
 import '../audio_meta_handler.dart';
@@ -7,7 +6,7 @@ import '../audio_meta_handler.dart';
 class DeviceAudioMetaHandler implements AudioMetaHandler {
   factory DeviceAudioMetaHandler.create() => DeviceAudioMetaHandler._();
 
-  factory DeviceAudioMetaHandler() => GetIt.I<DeviceAudioMetaHandler>();
+  factory DeviceAudioMetaHandler() => Ioc.get<DeviceAudioMetaHandler>();
 
   DeviceAudioMetaHandler._();
 

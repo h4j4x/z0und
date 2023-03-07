@@ -1,5 +1,4 @@
-import 'package:get_it/get_it.dart';
-
+import '../ioc.dart';
 import '../model/audio_meta.dart';
 import '../model/audio_source.dart';
 import 'impl/device_handler.dart';
@@ -40,8 +39,8 @@ abstract class AudioMetaHandler {
   }
 
   static List<AudioMetaHandler> get _handlers => <AudioMetaHandler>[
-        GetIt.I<DeviceAudioMetaHandler>(),
-        GetIt.I<DropboxHandler>(),
+        Ioc.get<DeviceAudioMetaHandler>(),
+        Ioc.get<DropboxHandler>(),
       ];
 
   /// Gets a handler by [id].
@@ -49,9 +48,9 @@ abstract class AudioMetaHandler {
   /// Defaults to [DeviceAudioMetaHandler] if not found any matching handler.
   factory AudioMetaHandler.get(String id) {
     if (id == DropboxHandler.id) {
-      return GetIt.I<DropboxHandler>();
+      return Ioc.get<DropboxHandler>();
     }
-    return GetIt.I<DeviceAudioMetaHandler>();
+    return Ioc.get<DeviceAudioMetaHandler>();
   }
 
   /// This handler unique id.

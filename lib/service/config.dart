@@ -1,10 +1,11 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get_it/get_it.dart';
+
+import '../ioc.dart';
 
 abstract class ConfigService {
   static Future<ConfigService> create() => DotenvConfigService._create();
 
-  factory ConfigService() => GetIt.I<ConfigService>();
+  factory ConfigService() => Ioc.get<ConfigService>();
 
   String? read(String key);
 }

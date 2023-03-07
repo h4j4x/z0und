@@ -16,3 +16,9 @@ Future setupIoc() async {
   GetIt.I.registerSingleton<DeviceAudioMetaHandler>(
       DeviceAudioMetaHandler.create());
 }
+
+class Ioc {
+  Ioc._();
+
+  static T get<T extends Object>() => GetIt.I<T>();
+}

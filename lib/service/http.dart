@@ -1,15 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 import '../helper/string.dart';
+import '../ioc.dart';
 
 abstract class HttpService {
   static HttpService create() => FlutterHttpService._();
 
-  factory HttpService() => GetIt.I<HttpService>();
+  factory HttpService() => Ioc.get<HttpService>();
 
   Future<dynamic> postJson(
     Uri uri, {

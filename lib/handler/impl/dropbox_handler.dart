@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import '../../config.dart';
 import '../../helper/string.dart';
 import '../../helper/uri.dart';
+import '../../ioc.dart';
 import '../../model/audio_meta.dart';
 import '../../model/audio_source.dart';
 import '../../service/storage.dart';
@@ -35,7 +35,7 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
     );
   }
 
-  factory DropboxHandler() => GetIt.I<DropboxHandler>();
+  factory DropboxHandler() => Ioc.get<DropboxHandler>();
 
   final String clientId;
   final String clientSecret;

@@ -1,14 +1,14 @@
-import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
 
 import '../data/audio_meta_data.dart';
 import '../handler/audio_meta_handler.dart';
+import '../ioc.dart';
 import '../model/audio_meta.dart';
 
 abstract class DataService {
   static Future<DataService> create() => IsarDataService._create();
 
-  factory DataService() => GetIt.I<DataService>();
+  factory DataService() => Ioc.get<DataService>();
 
   /// Scans for audios metas and saves it.
   Future<List<AudioMeta>> scanAudiosMetas();

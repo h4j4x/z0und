@@ -1,10 +1,11 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get_it/get_it.dart';
+
+import '../ioc.dart';
 
 abstract class StorageService {
   static StorageService create() => SecureStorageService._();
 
-  factory StorageService() => GetIt.I<StorageService>();
+  factory StorageService() => Ioc.get<StorageService>();
 
   Future<String?> read(String key);
 
