@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../handler/dropbox_handler.dart';
+import '../handler/impl/dropbox_handler.dart';
 import 'openid_login.dart';
 
 class LoginPage extends StatefulWidget {

@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:z0und/config.dart';
-import 'package:z0und/handler/dropbox_handler.dart';
+import 'package:z0und/handler/impl/dropbox_handler.dart';
 import 'package:z0und/service/config.dart';
 import 'package:z0und/service/http.dart';
 import 'package:z0und/service/storage.dart';
 
-import '../ioc.dart';
+import '../../ioc.dart';
 
 void main() {
   group('DropboxHandler', () {

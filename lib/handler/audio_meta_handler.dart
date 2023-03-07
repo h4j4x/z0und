@@ -1,18 +1,19 @@
 import 'package:get_it/get_it.dart';
 
-import '../model/music_source.dart';
-import 'device_handler.dart';
-import 'dropbox_handler.dart';
+import '../model/audio_meta.dart';
+import 'impl/device_handler.dart';
+import 'impl/dropbox_handler.dart';
 
-/// Handles music sources.
-abstract class MusicSourceHandler {
+/// Handles audios metas.
+abstract class AudioMetaHandler {
   /// Gets all enabled handlers.
-  static Future<List<MusicSourceHandler>> enabledHandlers() async {
-    final allHandlers = <MusicSourceHandler>[
+  static Future<List<AudioMetaHandler>> enabledHandlers() async {
+    // todo: obtains by interface
+    final allHandlers = <AudioMetaHandler>[
       GetIt.I<DropboxHandler>(),
-      GetIt.I<DeviceMusicSourceHandler>(),
+      GetIt.I<DeviceAudioMetaHandler>(),
     ];
-    final enabledHandlers = <MusicSourceHandler>[];
+    final enabledHandlers = <AudioMetaHandler>[];
     await Future.forEach(allHandlers, (handler) async {
       if (await handler.handlerIsEnabled) {
         enabledHandlers.add(handler);
@@ -23,9 +24,10 @@ abstract class MusicSourceHandler {
 
   /// Counts all enabled handlers.
   static Future<int> countEnabledHandlers() async {
-    final allHandlers = <MusicSourceHandler>[
+    // todo: obtains by interface
+    final allHandlers = <AudioMetaHandler>[
       GetIt.I<DropboxHandler>(),
-      GetIt.I<DeviceMusicSourceHandler>(),
+      GetIt.I<DeviceAudioMetaHandler>(),
     ];
     int count = 0;
     await Future.forEach(allHandlers, (handler) async {
@@ -38,12 +40,12 @@ abstract class MusicSourceHandler {
 
   /// Gets a handler by [id].
   ///
-  /// Defaults to [DeviceMusicSourceHandler] if not found any matching handler.
-  factory MusicSourceHandler.get(String id) {
+  /// Defaults to [DeviceAudioMetaHandler] if not found any matching handler.
+  factory AudioMetaHandler.get(String id) {
     if (id == DropboxHandler.id) {
       return GetIt.I<DropboxHandler>();
     }
-    return GetIt.I<DeviceMusicSourceHandler>();
+    return GetIt.I<DeviceAudioMetaHandler>();
   }
 
   /// This handler unique id.
@@ -52,6 +54,6 @@ abstract class MusicSourceHandler {
   /// If this handler is enabled.
   Future<bool> get handlerIsEnabled;
 
-  /// Fetch available music sources.
-  Future<List<MusicSource>> listSources();
+  /// Fetch available audios metas.
+  Future<List<AudioMeta>> listAudiosMetas();
 }

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../handler/music_source_handler.dart';
-import '../model/music_source.dart';
+import '../handler/audio_meta_handler.dart';
+import '../model/audio_meta.dart';
 import '../service/data.dart';
 import '../widget/message_options.dart';
 import 'login.dart';
 
-class MusicListPage extends StatefulWidget {
-  const MusicListPage({super.key});
+class AudioMetaListPage extends StatefulWidget {
+  const AudioMetaListPage({super.key});
 
   @override
-  State<MusicListPage> createState() => _MusicListPageState();
+  State<AudioMetaListPage> createState() => _AudioMetaListPageState();
 }
 
-class _MusicListPageState extends State<MusicListPage> {
+class _AudioMetaListPageState extends State<AudioMetaListPage> {
   int? enabledHandlersCount;
   bool loading = false;
-  final musicSources = <MusicSource>[];
+  final audiosMetas = <AudioMeta>[];
 
   @override
   void initState() {
@@ -25,18 +25,18 @@ class _MusicListPageState extends State<MusicListPage> {
   }
 
   void updateHandlersCount() async {
-    int handlersCount = await MusicSourceHandler.countEnabledHandlers();
+    int handlersCount = await AudioMetaHandler.countEnabledHandlers();
     setState(() {
       enabledHandlersCount = handlersCount;
     });
-    loadMusicSources();
+    loadAudiosMetas();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MUSIC TODO'),
+        title: const Text('AUDIOS TODO'),
         actions: [
           IconButton(
             onPressed: !loading ? navigateLogin : null,
@@ -47,7 +47,7 @@ class _MusicListPageState extends State<MusicListPage> {
             icon: const Icon(Icons.manage_search_sharp),
           ),
           IconButton(
-            onPressed: !loading ? loadMusicSources : null,
+            onPressed: !loading ? loadAudiosMetas : null,
             icon: const Icon(Icons.refresh_sharp),
           ),
         ],
@@ -73,19 +73,19 @@ class _MusicListPageState extends State<MusicListPage> {
         ],
       );
     }
-    if (musicSources.isEmpty) {
+    if (audiosMetas.isEmpty) {
       return MessageOptionsWidget(
-        message: 'NO MUSIC YET TODO',
+        message: 'NO AUDIO YET TODO',
         options: [
           ListTile(
             title: const Text('SCAN TODO'),
             trailing: const Icon(Icons.manage_search_sharp),
-            onTap: !loading ? scanMusicSources : null,
+            onTap: !loading ? scanAudiosMetas : null,
           ),
           ListTile(
             title: const Text('RELOAD TODO'),
             trailing: const Icon(Icons.refresh_sharp),
-            onTap: !loading ? loadMusicSources : null,
+            onTap: !loading ? loadAudiosMetas : null,
           ),
           ListTile(
             title: const Text('ADD LOGIN TODO'),
@@ -100,10 +100,10 @@ class _MusicListPageState extends State<MusicListPage> {
 
   Widget list() => ListView.builder(
         padding: const EdgeInsets.all(8.0),
-        itemCount: musicSources.length,
+        itemCount: audiosMetas.length,
         itemBuilder: (context, index) => ListTile(
-          title: Text(musicSources[index].sourceName),
-          subtitle: Text(musicSources[index].handlerId),
+          title: Text(audiosMetas[index].fileName),
+          subtitle: Text(audiosMetas[index].handlerId),
         ),
       );
 
@@ -112,31 +112,31 @@ class _MusicListPageState extends State<MusicListPage> {
     updateHandlersCount();
   }
 
-  void loadMusicSources() async {
+  void loadAudiosMetas() async {
     if (enabledHandlersCount == 0 || loading) {
       return;
     }
     setState(() {
       loading = true;
     });
-    final sources = await DataService().allMusicSources();
-    musicSources.clear();
-    musicSources.addAll(sources);
+    final sources = await DataService().allAudiosMetas();
+    audiosMetas.clear();
+    audiosMetas.addAll(sources);
     setState(() {
       loading = false;
     });
   }
 
-  void scanMusicSources() async {
+  void scanAudiosMetas() async {
     if (enabledHandlersCount == 0 || loading) {
       return;
     }
     setState(() {
       loading = true;
     });
-    final sources = await DataService().scanMusicSources();
-    musicSources.clear();
-    musicSources.addAll(sources);
+    final sources = await DataService().scanAudiosMetas();
+    audiosMetas.clear();
+    audiosMetas.addAll(sources);
     setState(() {
       loading = false;
     });

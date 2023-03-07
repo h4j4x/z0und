@@ -3,18 +3,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import '../config.dart';
-import '../helper/string.dart';
-import '../helper/uri.dart';
-import '../model/music_source.dart';
-import '../service/storage.dart';
-import 'music_source_handler.dart';
-import 'openid_handler.dart';
+import '../../config.dart';
+import '../../helper/string.dart';
+import '../../helper/uri.dart';
+import '../../model/audio_meta.dart';
+import '../../service/storage.dart';
+import '../audio_meta_handler.dart';
+import '../openid_handler.dart';
 
 /// Dropbox integration.
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
-class DropboxHandler implements OpenidHandler, MusicSourceHandler {
+class DropboxHandler implements OpenidHandler, AudioMetaHandler {
   static const id = 'dropbox';
   static const authKey = 'dropbox_auth';
 
@@ -129,7 +129,7 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
       Uri.parse('https://api.dropboxapi.com/2$endpoint');
 
   @override
-  Future<List<MusicSource>> listSources() async {
+  Future<List<AudioMeta>> listAudiosMetas() async {
     final uri = _apiBaseUri('/files/list_folder');
     final token = await authToken;
     final body = <String, dynamic>{
@@ -145,8 +145,8 @@ class DropboxHandler implements OpenidHandler, MusicSourceHandler {
       );
       final files = (data['entries'] as List?) ?? [];
       return files
-          .where((entry) => DropboxMusicSource.canParse(entry))
-          .map<MusicSource>((entry) => DropboxMusicSource.fromMap(entry))
+          .where((entry) => DropboxAudioMeta.canParse(entry))
+          .map<AudioMeta>((entry) => DropboxAudioMeta.fromMap(entry))
           .toList();
     } catch (e) {
       debugPrint('List sources dropbox error: $e');
@@ -220,24 +220,23 @@ class DropboxAuth {
   }
 }
 
-class DropboxMusicSource implements MusicSource {
+class DropboxAudioMeta implements AudioMeta {
   static bool canParse(entry) =>
       entry is Map &&
       entry.containsKey('name') &&
       entry['name'] is String &&
       entry['name'].toString().endsWith('.mp3');
 
-  static MusicSource fromMap(Map map) =>
-      DropboxMusicSource(map['name'].toString());
+  static AudioMeta fromMap(Map map) => DropboxAudioMeta(map['name'].toString());
 
   @override
-  String sourceName;
+  String fileName;
 
   @override
   String handlerId;
 
   @override
-  String? songName;
+  String? audioName;
 
   @override
   int? durationInSeconds;
@@ -245,5 +244,5 @@ class DropboxMusicSource implements MusicSource {
   @override
   bool get enabled => true;
 
-  DropboxMusicSource(this.sourceName) : handlerId = DropboxHandler.id;
+  DropboxAudioMeta(this.fileName) : handlerId = DropboxHandler.id;
 }

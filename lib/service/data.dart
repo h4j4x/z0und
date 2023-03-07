@@ -1,20 +1,20 @@
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
 
-import '../data/music_source.dart';
-import '../handler/music_source_handler.dart';
-import '../model/music_source.dart';
+import '../data/audio_meta_data.dart';
+import '../handler/audio_meta_handler.dart';
+import '../model/audio_meta.dart';
 
 abstract class DataService {
   static Future<DataService> create() => IsarDataService._create();
 
   factory DataService() => GetIt.I<DataService>();
 
-  /// Scans for music sources and saves it.
-  Future<List<MusicSource>> scanMusicSources();
+  /// Scans for audios metas and saves it.
+  Future<List<AudioMeta>> scanAudiosMetas();
 
-  /// Fetch music sources.
-  Future<List<MusicSource>> allMusicSources({bool enabled = true});
+  /// Fetch audios metas.
+  Future<List<AudioMeta>> allAudiosMetas({bool enabled = true});
 }
 
 /// Isar integration.
@@ -26,52 +26,52 @@ class IsarDataService implements DataService {
   IsarDataService._(this.isar);
 
   static Future<DataService> _create() async {
-    final isar = await Isar.open([MusicSourceDataSchema]);
+    final isar = await Isar.open([AudioMetaDataSchema]);
     return IsarDataService._(isar);
   }
 
   @override
-  Future<List<MusicSource>> scanMusicSources() async {
-    final handlers = await MusicSourceHandler.enabledHandlers();
+  Future<List<AudioMeta>> scanAudiosMetas() async {
+    final handlers = await AudioMetaHandler.enabledHandlers();
     final ids = <Id>[];
     for (final handler in handlers) {
-      final sources = await handler.listSources();
+      final sources = await handler.listAudiosMetas();
       for (final source in sources) {
-        final id = await _saveMusicSource(source);
+        final id = await _saveAudioMeta(source);
         ids.add(id);
       }
     }
-    await _removeMusicSources(excludeIds: ids);
-    return allMusicSources();
+    await _removeAudiosMetas(excludeIds: ids);
+    return allAudiosMetas();
   }
 
   @override
-  Future<List<MusicSource>> allMusicSources({bool enabled = true}) {
-    return isar.musics.filter().isEnabledEqualTo(enabled).findAll();
+  Future<List<AudioMeta>> allAudiosMetas({bool enabled = true}) {
+    return isar.audios_metas.filter().isEnabledEqualTo(enabled).findAll();
   }
 
-  Future<Id> _saveMusicSource(MusicSource source) async {
-    var sourceIsar = await isar.musics
+  Future<Id> _saveAudioMeta(AudioMeta source) async {
+    var sourceIsar = await isar.audios_metas
         .filter()
-        .sourceNameEqualTo(source.sourceName)
+        .fileNameEqualTo(source.fileName)
         .and()
         .handlerIdEqualTo(source.handlerId)
         .findFirst();
-    sourceIsar ??= MusicSourceData();
+    sourceIsar ??= AudioMetaData();
     sourceIsar
-      ..sourceNameValue = source.sourceName
+      ..fileNameValue = source.fileName
       ..handlerIdValue = source.handlerId
-      ..songName = source.songName
+      ..audioName = source.audioName
       ..durationInSeconds = source.durationInSeconds;
     sourceIsar.isEnabled ??= true;
     await isar.writeTxn(() async {
-      await isar.musics.put(sourceIsar!);
+      await isar.audios_metas.put(sourceIsar!);
     });
     return sourceIsar.id;
   }
 
-  Future _removeMusicSources({required List<int> excludeIds}) {
-    return isar.musics
+  Future _removeAudiosMetas({required List<int> excludeIds}) {
+    return isar.audios_metas
         .filter()
         .not()
         .anyOf(excludeIds, (q, id) => q.idEqualTo(id))

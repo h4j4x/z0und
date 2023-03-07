@@ -1,18 +1,18 @@
 import 'package:isar/isar.dart';
 
-import '../model/music_source.dart';
+import '../model/audio_meta.dart';
 
-part 'music_source.g.dart';
+part 'audio_meta_data.g.dart';
 
-@Collection(accessor: 'musics')
-class MusicSourceData implements MusicSource {
+@Collection(accessor: 'audios_metas')
+class AudioMetaData implements AudioMeta {
   Id id = Isar.autoIncrement;
 
   @Index(caseSensitive: false)
-  String? sourceNameValue;
+  String? fileNameValue;
 
   @override
-  String get sourceName => sourceNameValue ?? '';
+  String get fileName => fileNameValue ?? '';
 
   @Index(caseSensitive: false)
   String? handlerIdValue;
@@ -21,7 +21,7 @@ class MusicSourceData implements MusicSource {
   String get handlerId => handlerIdValue ?? '';
 
   @override
-  String? songName;
+  String? audioName;
 
   @override
   int? durationInSeconds;
