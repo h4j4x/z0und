@@ -21,9 +21,9 @@ abstract class DataService {
 ///
 /// * [Isar documentation](https://isar.dev/tutorials/quickstart.html)
 class IsarDataService implements DataService {
-  final Isar isar;
+  final Isar _isar;
 
-  IsarDataService._(this.isar);
+  IsarDataService._(this._isar);
 
   static Future<DataService> _create() async {
     final isar = await Isar.open([AudioMetaDataSchema]);
@@ -47,11 +47,11 @@ class IsarDataService implements DataService {
 
   @override
   Future<List<AudioMeta>> allAudiosMetas({bool enabled = true}) {
-    return isar.audios_metas.filter().isEnabledEqualTo(enabled).findAll();
+    return _isar.audios_metas.filter().isEnabledEqualTo(enabled).findAll();
   }
 
   Future<Id> _saveAudioMeta(AudioMeta source) async {
-    var sourceIsar = await isar.audios_metas
+    var sourceIsar = await _isar.audios_metas
         .filter()
         .codeEqualTo(source.code)
         .and()
@@ -65,14 +65,14 @@ class IsarDataService implements DataService {
       ..audioName = source.audioName
       ..durationInSeconds = source.durationInSeconds;
     sourceIsar.isEnabled ??= true;
-    await isar.writeTxn(() async {
-      await isar.audios_metas.put(sourceIsar!);
+    await _isar.writeTxn(() async {
+      await _isar.audios_metas.put(sourceIsar!);
     });
     return sourceIsar.id;
   }
 
   Future _removeAudiosMetas({required List<int> excludeIds}) {
-    return isar.audios_metas
+    return _isar.audios_metas
         .filter()
         .not()
         .anyOf(excludeIds, (q, id) => q.idEqualTo(id))

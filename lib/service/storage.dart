@@ -13,18 +13,18 @@ abstract class StorageService {
 }
 
 class SecureStorageService implements StorageService {
-  final FlutterSecureStorage _secureStorage;
+  final FlutterSecureStorage _storage;
 
-  SecureStorageService._() : _secureStorage = const FlutterSecureStorage();
+  SecureStorageService._() : _storage = const FlutterSecureStorage();
 
   @override
-  Future<String?> read(String key) => _secureStorage.read(key: key);
+  Future<String?> read(String key) => _storage.read(key: key);
 
   @override
   Future write(String key, String? value) {
     if (value == null) {
-      return _secureStorage.delete(key: key);
+      return _storage.delete(key: key);
     }
-    return _secureStorage.write(key: key, value: value);
+    return _storage.write(key: key, value: value);
   }
 }

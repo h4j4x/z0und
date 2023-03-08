@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "com.h4j4x.z0und"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -52,7 +52,7 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add signing config for the release build.
+            // https://docs.flutter.dev/deployment/android
             signingConfig signingConfigs.debug
         }
     }
