@@ -19,6 +19,12 @@ abstract class AudioPlayer implements ChangeNotifier {
 
   /// Pause active [playingNow].
   Future pause();
+
+  /// Stop active [playingNow].
+  Future stop();
+
+  /// Plays next audio in playlist.
+  Future playNext();
 }
 
 /// Just audio integration.
@@ -43,6 +49,20 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
 
   @override
   Future pause() {
+    // todo
+    return Future.value(null);
+  }
+
+  @override
+  Future stop() {
+    // todo
+    _playingNow = null;
+    notifyListeners();
+    return Future.value(null);
+  }
+
+  @override
+  Future playNext() {
     // todo
     return Future.value(null);
   }

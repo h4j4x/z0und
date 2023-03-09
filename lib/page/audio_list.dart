@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../handler/audio_meta_handler.dart';
 import '../model/audio_meta.dart';
-import '../service/audio_player.dart';
 import '../service/data.dart';
+import '../widget/audio_list_item.dart';
 import '../widget/message_options.dart';
+import '../widget/playing_now.dart';
 import 'login.dart';
 
 class AudioListPage extends StatefulWidget {
@@ -58,6 +59,7 @@ class _AudioListPageState extends State<AudioListPage> {
               child: CircularProgressIndicator.adaptive(),
             )
           : body(),
+      bottomNavigationBar: const PlayingNowWidget(),
     );
   }
 
@@ -100,33 +102,12 @@ class _AudioListPageState extends State<AudioListPage> {
   }
 
   Widget list() {
-    final audioPlayer = AudioPlayer.of(context);
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),
       itemCount: audiosMetas.length,
-      itemBuilder: (context, index) {
-        final audioMeta = audiosMetas[index];
-        final isPlaying = audioPlayer.playingNow == audioMeta;
-        return ListTile(
-          leading:
-              isPlaying ? const Icon(Icons.notifications_active_sharp) : null,
-          title: Text(audioMeta.name),
-          subtitle: Text(audioMeta.handlerId),
-          trailing: IconButton(
-            onPressed: () async {
-              final player = AudioPlayer.of(context, listen: false);
-              if (isPlaying) {
-                await player.pause();
-              } else {
-                await player.play(audioMeta);
-              }
-            },
-            icon: Icon(isPlaying
-                ? Icons.pause_circle_filled_sharp
-                : Icons.play_circle_fill_sharp),
-          ),
-        );
-      },
+      itemBuilder: (context, index) => AudioListItemWidget(
+        audioMeta: audiosMetas[index],
+      ),
     );
   }
 
