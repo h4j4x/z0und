@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../service/audio_player.dart';
 
@@ -32,9 +33,12 @@ class PlayingNowWidget extends StatelessWidget {
                     subtitle: Text(audioPlayer.playingNow!.handlerId),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(right: 8.0),
-                  child: Icon(Icons.notifications_active_sharp),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    color: Theme.of(context).primaryColor,
+                    size: 18.0,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_next_sharp),

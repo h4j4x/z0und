@@ -19,6 +19,7 @@ dependencies:
   isar: ^3.0.5
   isar_flutter_libs: ^3.0.5
   just_audio: ^0.9.31
+  loading_animation_widget: ^1.2.0+4
   provider: ^6.0.5
 
 dev_dependencies:
