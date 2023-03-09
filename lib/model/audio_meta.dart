@@ -12,5 +12,7 @@ abstract class AudioMeta {
 
   int? get durationInSeconds;
 
+  set durationInSeconds(int? value);
+
   bool get enabled;
 }

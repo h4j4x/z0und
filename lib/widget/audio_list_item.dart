@@ -15,6 +15,7 @@ class AudioListItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final audioPlayer = AudioPlayer.of(context);
     final isPlaying = audioPlayer.playingNow == audioMeta;
+    final isLoading = audioPlayer.loadingNow == audioMeta;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -33,6 +34,11 @@ class AudioListItemWidget extends StatelessWidget {
               padding: EdgeInsets.only(left: 8.0),
               child: Icon(Icons.notifications_active_sharp),
             ),
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.only(left: 8.0),
+              child: CircularProgressIndicator.adaptive(),
+            ),
           Expanded(
             child: ListTile(
               title: Text(audioMeta.name),
@@ -40,7 +46,7 @@ class AudioListItemWidget extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: !isPlaying
+            onPressed: (!isPlaying && audioPlayer.loadingNow == null)
                 ? () {
                     final player = AudioPlayer.of(context, listen: false);
                     player.play(audioMeta);
