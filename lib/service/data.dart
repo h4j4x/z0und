@@ -34,7 +34,10 @@ class IsarDataService implements DataService {
   IsarDataService._(this._isar);
 
   static Future<DataService> _create() async {
-    final isar = await Isar.open([AudioMetaDataSchema]);
+    final isar = await Isar.open([
+      AudioMetaDataSchema,
+      AudioSourceDataSchema,
+    ]);
     return IsarDataService._(isar);
   }
 

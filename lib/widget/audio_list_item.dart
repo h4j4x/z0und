@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import '../helper/duration.dart';
 import '../model/audio_meta.dart';
 import '../service/audio_player.dart';
+
+const iconPadding = 2.0;
 
 class AudioListItemWidget extends StatelessWidget {
   final AudioMeta audioMeta;
@@ -20,6 +23,7 @@ class AudioListItemWidget extends StatelessWidget {
     final isLoading = isActive && playerIsLoading;
     final isPlaying = isActive && playingAudio?.isPlaying == true;
     final isPaused = isActive && playingAudio?.isPaused == true;
+    const iconWidth = 10.0;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -35,25 +39,29 @@ class AudioListItemWidget extends StatelessWidget {
         children: [
           if (isLoading)
             _leadingIcon(const SizedBox(
-              width: 16.0,
-              height: 16.0,
+              width: iconWidth,
+              height: iconWidth,
               child: CircularProgressIndicator.adaptive(),
             )),
           if (isPlaying)
             _leadingIcon(LoadingAnimationWidget.staggeredDotsWave(
               color: Theme.of(context).primaryColor,
-              size: 16.0,
+              size: iconWidth,
             )),
           if (isPaused)
             _leadingIcon(LoadingAnimationWidget.waveDots(
               color: Theme.of(context).primaryColor,
-              size: 16.0,
+              size: iconWidth,
             )),
-          if (!isActive) Container(width: 26.0),
+          if (!isActive) Container(width: iconWidth + iconPadding * 2),
           Expanded(
             child: ListTile(
               title: Text(audioMeta.name),
               subtitle: Text(audioMeta.handlerId),
+              trailing: (audioMeta.durationInSeconds != null)
+                  ? Text(Duration(seconds: audioMeta.durationInSeconds!)
+                      .minutesFormatted())
+                  : null,
             ),
           ),
           IconButton(
@@ -77,7 +85,7 @@ class AudioListItemWidget extends StatelessWidget {
   }
 
   Widget _leadingIcon(Widget icon) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        padding: const EdgeInsets.symmetric(horizontal: iconPadding),
         child: icon,
       );
 }

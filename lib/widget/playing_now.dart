@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import '../helper/duration.dart';
 import '../model/playing_audio.dart';
 import '../service/audio_player.dart';
 
@@ -13,21 +14,16 @@ class PlayingNowWidget extends StatelessWidget {
     if (audioPlayer.playingNow == null) {
       return Container(height: .0);
     }
-    double? position;
     final playingNow = audioPlayer.playingNow!;
-    if (playingNow.audioMeta.durationInSeconds != null &&
-        audioPlayer.playingPosition != null) {
-      position = audioPlayer.playingPosition!.inSeconds.toDouble() /
-          playingNow.audioMeta.durationInSeconds!.toDouble();
-    }
     final isLoading = playingNow.isLoading;
     return Material(
       elevation: 8.0,
-      child: Stack(
-        children: [
-          Container(
-            color: Theme.of(context).dialogBackgroundColor,
-            child: Row(
+      child: Container(
+        color: Theme.of(context).dialogBackgroundColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
@@ -96,10 +92,42 @@ class PlayingNowWidget extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          if (position != null) LinearProgressIndicator(value: position),
-        ],
+            if (audioPlayer.playingPosition != null &&
+                playingNow.audioMeta.durationInSeconds != null)
+              ..._positionIndicator(
+                audioPlayer.playingPosition!,
+                Duration(seconds: playingNow.audioMeta.durationInSeconds!),
+              ),
+          ],
+        ),
       ),
     );
+  }
+
+  List<Widget> _positionIndicator(Duration position, Duration duration) {
+    final positionPercent =
+        position.inSeconds.toDouble() / duration.inSeconds.toDouble();
+    return [
+      LinearProgressIndicator(value: positionPercent),
+      Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 2.0,
+          horizontal: 4.0,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              position.minutesFormatted(),
+              textScaleFactor: 0.65,
+            ),
+            Text(
+              duration.minutesFormatted(),
+              textScaleFactor: 0.65,
+            ),
+          ],
+        ),
+      ),
+    ];
   }
 }
