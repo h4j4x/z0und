@@ -79,8 +79,8 @@ class IsarDataService implements DataService {
     final handler = AudioMetaHandler.get(audioMeta.handlerId);
     final source = await handler.fetchAudioSource(audioMeta);
     if (source != null) {
-      _saveAudioSource(source, audioMetaId);
-      return audioSource;
+      await _saveAudioSource(source, audioMetaId);
+      return source;
     }
     return null;
   }
@@ -111,7 +111,7 @@ class IsarDataService implements DataService {
     return _isar.audios_metas
         .filter()
         .not()
-        .anyOf(excludeIds, (q, id) => q.idEqualTo(id))
+        .anyOf(excludeIds, (query, id) => query.idEqualTo(id))
         .deleteAll();
   }
 
