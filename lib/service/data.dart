@@ -1,9 +1,11 @@
 import 'package:isar/isar.dart';
 
 import '../data/audio_meta_data.dart';
+import '../data/audio_source_data.dart';
 import '../handler/audio_meta_handler.dart';
 import '../ioc.dart';
 import '../model/audio_meta.dart';
+import '../model/audio_source.dart';
 
 abstract class DataService {
   static Future<DataService> create() => IsarDataService._create();
@@ -15,6 +17,9 @@ abstract class DataService {
 
   /// Fetch audios metas.
   Future<List<AudioMeta>> allAudiosMetas({bool enabled = true});
+
+  /// Fetch audio source of audio meta.
+  Future<AudioSource?> audioSourceOf(AudioMeta audioMeta);
 }
 
 /// Isar integration.
@@ -50,25 +55,47 @@ class IsarDataService implements DataService {
     return _isar.audios_metas.filter().isEnabledEqualTo(enabled).findAll();
   }
 
-  Future<Id> _saveAudioMeta(AudioMeta source) async {
-    var sourceIsar = await _isar.audios_metas
+  @override
+  Future<AudioSource?> audioSourceOf(AudioMeta audioMeta) async {
+    final audioMetaId = await _saveAudioMeta(audioMeta);
+    final audioSource = await _isar.audios_sources
         .filter()
-        .codeEqualTo(source.code)
+        .audioMetaIdEqualTo(audioMetaId)
         .and()
-        .handlerIdEqualTo(source.handlerId)
+        .expiresAtGreaterThan(DateTime.now())
         .findFirst();
-    sourceIsar ??= AudioMetaData();
-    sourceIsar
-      ..nameValue = source.name
-      ..handlerIdValue = source.handlerId
-      ..codeValue = source.code
-      ..audioName = source.audioName
-      ..durationInSeconds = source.durationInSeconds;
-    sourceIsar.isEnabled ??= true;
+    if (audioSource != null) {
+      return audioSource;
+    }
+
+    final handler = AudioMetaHandler.get(audioMeta.handlerId);
+    final source = await handler.fetchAudioSource(audioMeta);
+    if (source != null) {
+      _saveAudioSource(source, audioMetaId);
+      return audioSource;
+    }
+    return null;
+  }
+
+  Future<Id> _saveAudioMeta(AudioMeta audioMeta) async {
+    var audioMetaIsar = await _isar.audios_metas
+        .filter()
+        .codeEqualTo(audioMeta.code)
+        .and()
+        .handlerIdEqualTo(audioMeta.handlerId)
+        .findFirst();
+    audioMetaIsar ??= AudioMetaData();
+    audioMetaIsar
+      ..nameValue = audioMeta.name
+      ..handlerIdValue = audioMeta.handlerId
+      ..codeValue = audioMeta.code
+      ..audioName = audioMeta.audioName
+      ..durationInSeconds = audioMeta.durationInSeconds;
+    audioMetaIsar.isEnabled ??= true;
     await _isar.writeTxn(() async {
-      await _isar.audios_metas.put(sourceIsar!);
+      await _isar.audios_metas.put(audioMetaIsar!);
     });
-    return sourceIsar.id;
+    return audioMetaIsar.id;
   }
 
   Future _removeAudiosMetas({required List<int> excludeIds}) {
@@ -77,5 +104,22 @@ class IsarDataService implements DataService {
         .not()
         .anyOf(excludeIds, (q, id) => q.idEqualTo(id))
         .deleteAll();
+  }
+
+  Future<Id> _saveAudioSource(AudioSource audioSource, int audioMetaId) async {
+    var sourceIsar = await _isar.audios_sources
+        .filter()
+        .audioMetaIdEqualTo(audioMetaId)
+        .findFirst();
+    sourceIsar ??= AudioSourceData();
+    sourceIsar
+      ..audioMetaId = audioMetaId
+      ..sourceTypeValue = audioSource.sourceType
+      ..sourceValue = audioSource.source
+      ..expiresAtMillis = audioSource.expiresAt.millisecondsSinceEpoch;
+    await _isar.writeTxn(() async {
+      await _isar.audios_sources.put(sourceIsar!);
+    });
+    return sourceIsar.id;
   }
 }

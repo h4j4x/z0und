@@ -52,18 +52,23 @@ const AudioMetaDataSchema = CollectionSchema(
       name: r'handlerIdValue',
       type: IsarType.string,
     ),
-    r'isEnabled': PropertySchema(
+    r'hashCode': PropertySchema(
       id: 7,
+      name: r'hashCode',
+      type: IsarType.long,
+    ),
+    r'isEnabled': PropertySchema(
+      id: 8,
       name: r'isEnabled',
       type: IsarType.bool,
     ),
     r'name': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'name',
       type: IsarType.string,
     ),
     r'nameValue': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'nameValue',
       type: IsarType.string,
     )
@@ -158,9 +163,10 @@ void _audioMetaDataSerialize(
   writer.writeBool(offsets[4], object.enabled);
   writer.writeString(offsets[5], object.handlerId);
   writer.writeString(offsets[6], object.handlerIdValue);
-  writer.writeBool(offsets[7], object.isEnabled);
-  writer.writeString(offsets[8], object.name);
-  writer.writeString(offsets[9], object.nameValue);
+  writer.writeLong(offsets[7], object.hashCode);
+  writer.writeBool(offsets[8], object.isEnabled);
+  writer.writeString(offsets[9], object.name);
+  writer.writeString(offsets[10], object.nameValue);
 }
 
 AudioMetaData _audioMetaDataDeserialize(
@@ -175,8 +181,8 @@ AudioMetaData _audioMetaDataDeserialize(
   object.durationInSeconds = reader.readLongOrNull(offsets[3]);
   object.handlerIdValue = reader.readStringOrNull(offsets[6]);
   object.id = id;
-  object.isEnabled = reader.readBoolOrNull(offsets[7]);
-  object.nameValue = reader.readStringOrNull(offsets[9]);
+  object.isEnabled = reader.readBoolOrNull(offsets[8]);
+  object.nameValue = reader.readStringOrNull(offsets[10]);
   return object;
 }
 
@@ -202,10 +208,12 @@ P _audioMetaDataDeserializeProp<P>(
     case 6:
       return (reader.readStringOrNull(offset)) as P;
     case 7:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 8:
-      return (reader.readString(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 9:
+      return (reader.readString(offset)) as P;
+    case 10:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1259,6 +1267,62 @@ extension AudioMetaDataQueryFilter
     });
   }
 
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterFilterCondition>
+      hashCodeEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hashCode',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterFilterCondition>
+      hashCodeGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'hashCode',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterFilterCondition>
+      hashCodeLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'hashCode',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterFilterCondition>
+      hashCodeBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'hashCode',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<AudioMetaData, AudioMetaData, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -1730,6 +1794,19 @@ extension AudioMetaDataQuerySortBy
     });
   }
 
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterSortBy> sortByHashCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterSortBy>
+      sortByHashCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.desc);
+    });
+  }
+
   QueryBuilder<AudioMetaData, AudioMetaData, QAfterSortBy> sortByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isEnabled', Sort.asc);
@@ -1862,6 +1939,19 @@ extension AudioMetaDataQuerySortThenBy
     });
   }
 
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterSortBy> thenByHashCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AudioMetaData, AudioMetaData, QAfterSortBy>
+      thenByHashCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.desc);
+    });
+  }
+
   QueryBuilder<AudioMetaData, AudioMetaData, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1964,6 +2054,12 @@ extension AudioMetaDataQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AudioMetaData, AudioMetaData, QDistinct> distinctByHashCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hashCode');
+    });
+  }
+
   QueryBuilder<AudioMetaData, AudioMetaData, QDistinct> distinctByIsEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isEnabled');
@@ -2034,6 +2130,12 @@ extension AudioMetaDataQueryProperty
       handlerIdValueProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'handlerIdValue');
+    });
+  }
+
+  QueryBuilder<AudioMetaData, int, QQueryOperations> hashCodeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hashCode');
     });
   }
 

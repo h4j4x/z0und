@@ -3,6 +3,8 @@ abstract class AudioSource {
   AudioSourceType get sourceType;
 
   String get source;
+
+  DateTime get expiresAt;
 }
 
 enum AudioSourceType {

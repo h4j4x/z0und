@@ -28,19 +28,6 @@ abstract class AudioMetaHandler {
     return count;
   }
 
-  /// Fetch `AudioSource` for given [audioMeta].
-  static Future<AudioSource?> fetchSource(AudioMeta audioMeta) async {
-    // todo: search in audioSources cache, if not expired, return from cache
-    for (final handler in _handlers) {
-      if (handler.handlerId == audioMeta.handlerId) {
-        final audioSource = await handler.fetchAudioSource(audioMeta);
-        // todo: stores in audioSources cache
-        return audioSource;
-      }
-    }
-    return Future.value(null);
-  }
-
   static List<AudioMetaHandler> get _handlers => <AudioMetaHandler>[
         Ioc.get<DeviceAudioMetaHandler>(),
         Ioc.get<DropboxHandler>(),

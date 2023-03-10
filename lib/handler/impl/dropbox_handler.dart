@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../config.dart';
@@ -157,9 +156,11 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
     return [];
   }
 
+  /// https://www.dropbox.com/developers/documentation/http/documentation#files-get_temporary_link
   @override
   Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta) async {
     final uri = _apiBaseUri('/files/get_temporary_link');
+    const expiresInHours = 4;
     final token = await authToken;
     final body = <String, dynamic>{
       'path': audioMeta.code,
@@ -170,7 +171,10 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
         body: body,
       );
       if (data.containsKey('link') && data['link'] is String) {
-        return DropboxAudioSource(data['link'].toString());
+        return DropboxAudioSource(
+          data['link'].toString(),
+          expiresInHours: expiresInHours,
+        );
       }
     } catch (e) {
       debugPrint('fetch audio source dropbox error: $e');
@@ -244,7 +248,7 @@ class DropboxAuth {
   }
 }
 
-class DropboxAudioMeta with EquatableMixin implements AudioMeta {
+class DropboxAudioMeta implements AudioMeta {
   static bool canParse(entry) =>
       entry is Map &&
       entry.containsKey('name') &&
@@ -279,9 +283,6 @@ class DropboxAudioMeta with EquatableMixin implements AudioMeta {
     required this.name,
     required this.code,
   }) : handlerId = DropboxHandler.id;
-
-  @override
-  List<Object?> get props => [code, handlerId];
 }
 
 class DropboxAudioSource implements AudioSource {
@@ -291,5 +292,10 @@ class DropboxAudioSource implements AudioSource {
   @override
   final String source;
 
-  DropboxAudioSource(this.source) : sourceType = AudioSourceType.url;
+  @override
+  final DateTime expiresAt;
+
+  DropboxAudioSource(this.source, {required int expiresInHours})
+      : sourceType = AudioSourceType.url,
+        expiresAt = DateTime.now().add(Duration(hours: expiresInHours));
 }

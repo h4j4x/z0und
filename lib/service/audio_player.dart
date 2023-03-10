@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:provider/provider.dart';
 
-import '../handler/audio_meta_handler.dart';
 import '../model/audio_meta.dart';
 import '../model/audio_source.dart';
 import '../model/playing_audio.dart';
+import 'data.dart';
 
 /// Audio player.
 abstract class AudioPlayer implements ChangeNotifier {
@@ -80,7 +80,7 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       _playingNow = PlayingAudio(audioMeta);
       notifyListeners();
 
-      final audioSource = await AudioMetaHandler.fetchSource(audioMeta);
+      final audioSource = await DataService().audioSourceOf(audioMeta);
       // todo: exception if audioSource == null
       if (audioSource != null) {
         final duration = await _loadAudioSource(audioSource);

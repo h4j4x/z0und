@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:isar/isar.dart';
 
 import '../model/audio_meta.dart';
@@ -6,7 +5,7 @@ import '../model/audio_meta.dart';
 part 'audio_meta_data.g.dart';
 
 @Collection(accessor: 'audios_metas')
-class AudioMetaData with EquatableMixin implements AudioMeta {
+class AudioMetaData implements AudioMeta {
   Id id = Isar.autoIncrement;
 
   @Index(caseSensitive: false)
@@ -38,5 +37,18 @@ class AudioMetaData with EquatableMixin implements AudioMeta {
   bool get enabled => isEnabled ?? true;
 
   @override
-  List<Object?> get props => [codeValue, handlerIdValue];
+  bool operator ==(Object other) {
+    if (other is AudioMeta) {
+      return other.code == codeValue && other.handlerId == handlerIdValue;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode {
+    if (codeValue != null && handlerIdValue != null) {
+      return codeValue!.hashCode ^ handlerIdValue!.hashCode;
+    }
+    return 0;
+  }
 }
