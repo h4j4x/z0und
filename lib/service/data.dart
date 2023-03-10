@@ -20,6 +20,9 @@ abstract class DataService {
 
   /// Fetch audio source of audio meta.
   Future<AudioSource?> audioSourceOf(AudioMeta audioMeta);
+
+  /// Saves audio meta.
+  Future<Id> saveAudioMeta(AudioMeta audioMeta);
 }
 
 /// Isar integration.
@@ -42,7 +45,7 @@ class IsarDataService implements DataService {
     for (final handler in handlers) {
       final sources = await handler.listAudiosMetas();
       for (final source in sources) {
-        final id = await _saveAudioMeta(source);
+        final id = await saveAudioMeta(source);
         ids.add(id);
       }
     }
@@ -57,7 +60,9 @@ class IsarDataService implements DataService {
 
   @override
   Future<AudioSource?> audioSourceOf(AudioMeta audioMeta) async {
-    final audioMetaId = await _saveAudioMeta(audioMeta);
+    final audioMetaId = (audioMeta is AudioMetaData)
+        ? audioMeta.id
+        : await saveAudioMeta(audioMeta);
     final audioSource = await _isar.audios_sources
         .filter()
         .audioMetaIdEqualTo(audioMetaId)
@@ -77,7 +82,8 @@ class IsarDataService implements DataService {
     return null;
   }
 
-  Future<Id> _saveAudioMeta(AudioMeta audioMeta) async {
+  @override
+  Future<Id> saveAudioMeta(AudioMeta audioMeta) async {
     var audioMetaIsar = await _isar.audios_metas
         .filter()
         .codeEqualTo(audioMeta.code)

@@ -86,9 +86,11 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
         final duration = await _loadAudioSource(audioSource);
         // todo: exception if duration == null
         if (duration != null) {
+          if (audioMeta.durationInSeconds != duration.inSeconds) {
+            audioMeta.durationInSeconds = duration.inSeconds;
+            await DataService().saveAudioMeta(audioMeta);
+          }
           await _player.stop();
-          audioMeta.durationInSeconds = duration.inSeconds;
-          // todo: update audioMeta in database
           return _player.play();
         }
       }
