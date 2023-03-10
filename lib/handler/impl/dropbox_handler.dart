@@ -27,12 +27,14 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
     if (authJson != null) {
       data.addAll(jsonDecode(authJson));
     }
-    return DropboxHandler._(
+    final handler = DropboxHandler._(
       data: data,
       clientId: Z0undConfig.dropboxClientId ?? '-',
       clientSecret: Z0undConfig.dropboxClientSecret ?? '-',
       redirectUri: Z0undConfig.dropboxRedirectUri ?? '-',
     );
+    AudioMetaHandler.registerHandler(handler);
+    return handler;
   }
 
   factory DropboxHandler() => Ioc.get<DropboxHandler>();

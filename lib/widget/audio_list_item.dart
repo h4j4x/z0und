@@ -17,10 +17,10 @@ class AudioListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playingAudio = AudioPlayer.of(context).playingNow;
-    final playerIsLoading = playingAudio?.isLoading == true;
+    final audioPlayer = AudioPlayer.of(context);
+    final playingAudio = audioPlayer.playingNow;
     final isActive = playingAudio?.audioMeta == audioMeta;
-    final isLoading = isActive && playerIsLoading;
+    final isLoading = audioPlayer.loadingAudio == audioMeta;
     final isPlaying = isActive && playingAudio?.isPlaying == true;
     final isPaused = isActive && playingAudio?.isPaused == true;
     const iconWidth = 10.0;
@@ -65,7 +65,7 @@ class AudioListItemWidget extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: !playerIsLoading
+            onPressed: audioPlayer.loadingAudio == null
                 ? () {
                     final player = AudioPlayer.of(context, listen: false);
                     if (isPlaying) {

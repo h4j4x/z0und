@@ -4,7 +4,11 @@ import '../../model/audio_source.dart';
 import '../audio_meta_handler.dart';
 
 class DeviceAudioMetaHandler implements AudioMetaHandler {
-  factory DeviceAudioMetaHandler.create() => DeviceAudioMetaHandler._();
+  factory DeviceAudioMetaHandler.create() {
+    final handler = DeviceAudioMetaHandler._();
+    AudioMetaHandler.registerHandler(handler);
+    return handler;
+  }
 
   factory DeviceAudioMetaHandler() => Ioc.get<DeviceAudioMetaHandler>();
 

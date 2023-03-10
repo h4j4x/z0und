@@ -17,6 +17,9 @@ abstract class AudioPlayer implements ChangeNotifier {
   }) =>
       Provider.of<AudioPlayer>(context, listen: listen);
 
+  /// Gets loading audio.
+  AudioMeta? get loadingAudio;
+
   /// Gets playing now audio.
   PlayingAudio? get playingNow;
 
@@ -44,6 +47,7 @@ abstract class AudioPlayer implements ChangeNotifier {
 /// * [Just audio documentation](https://pub.dev/packages/just_audio#tutorials)
 class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   final just_audio.AudioPlayer _player;
+  AudioMeta? _loadingAudio;
   PlayingAudio? _playingNow;
   Duration? _playingPosition;
 
@@ -59,12 +63,13 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       } else if (isReady ||
           state.processingState == just_audio.ProcessingState.completed) {
         _playingNow?.state = PlayingState.paused;
-      } else {
-        _playingNow?.state = PlayingState.loading;
       }
       notifyListeners();
     });
   }
+
+  @override
+  AudioMeta? get loadingAudio => _loadingAudio;
 
   @override
   PlayingAudio? get playingNow => _playingNow;
@@ -74,24 +79,32 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
 
   @override
   Future play(AudioMeta audioMeta) async {
+    if (_loadingAudio != null) {
+      return Future.value(null);
+    }
     if (_playingNow?.audioMeta == audioMeta) {
       return _player.play();
-    } else if (_playingNow?.state != PlayingState.loading) {
-      final audioSource = await DataService().audioSourceOf(audioMeta);
-      // todo: exception if audioSource == null
-      if (audioSource != null) {
-        await _player.stop();
-        final duration = await _loadAudioSource(audioSource);
-        // todo: exception if duration == null
-        if (duration != null) {
-          _playingNow = PlayingAudio(audioMeta);
-          notifyListeners();
-          if (audioMeta.durationInSeconds != duration.inSeconds) {
-            audioMeta.durationInSeconds = duration.inSeconds;
-            await DataService().saveAudioMeta(audioMeta);
-          }
-          return _player.play();
+    }
+
+    _loadingAudio = audioMeta;
+    notifyListeners();
+
+    final audioSource = await DataService().audioSourceOf(audioMeta);
+    // todo: exception if audioSource == null
+    if (audioSource != null) {
+      final duration = await _loadAudioSource(audioSource);
+      // todo: exception if duration == null
+      if (duration != null) {
+        if (audioMeta.durationInSeconds != duration.inSeconds) {
+          audioMeta.durationInSeconds = duration.inSeconds;
+          await DataService().saveAudioMeta(audioMeta);
         }
+        _loadingAudio = null;
+        _playingNow = PlayingAudio(audioMeta);
+        notifyListeners();
+
+        await _player.stop();
+        return _player.play();
       }
     }
     return Future.value(null);

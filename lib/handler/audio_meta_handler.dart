@@ -1,11 +1,15 @@
-import '../ioc.dart';
 import '../model/audio_meta.dart';
 import '../model/audio_source.dart';
-import 'impl/device_handler.dart';
-import 'impl/dropbox_handler.dart';
 
 /// Handles audios metas.
 abstract class AudioMetaHandler {
+  static final _handlers = <AudioMetaHandler>{};
+
+  /// Gets all enabled handlers.
+  static void registerHandler(AudioMetaHandler handler) async {
+    _handlers.add(handler);
+  }
+
   /// Gets all enabled handlers.
   static Future<List<AudioMetaHandler>> enabledHandlers() async {
     final enabledHandlers = <AudioMetaHandler>[];
@@ -28,19 +32,15 @@ abstract class AudioMetaHandler {
     return count;
   }
 
-  static List<AudioMetaHandler> get _handlers => <AudioMetaHandler>[
-        Ioc.get<DeviceAudioMetaHandler>(),
-        Ioc.get<DropboxHandler>(),
-      ];
-
-  /// Gets a handler by [id].
-  ///
-  /// Defaults to [DeviceAudioMetaHandler] if not found any matching handler.
-  factory AudioMetaHandler.get(String id) {
-    if (id == DropboxHandler.id) {
-      return Ioc.get<DropboxHandler>();
+  /// Gets a handler by [id] or `null` if not found any matching handler.
+  static Future<AudioMetaHandler?> getHandler(String id) async {
+    final handlers = await enabledHandlers();
+    for (final handler in handlers) {
+      if (id == handler.handlerId) {
+        return handler;
+      }
     }
-    return Ioc.get<DeviceAudioMetaHandler>();
+    return null;
   }
 
   /// This handler unique id.

@@ -15,7 +15,7 @@ class PlayingNowWidget extends StatelessWidget {
       return Container(height: .0);
     }
     final playingNow = audioPlayer.playingNow!;
-    final isLoading = playingNow.isLoading;
+    final isLoading = audioPlayer.loadingAudio != null;
     return Material(
       elevation: 8.0,
       child: Container(
@@ -32,28 +32,18 @@ class PlayingNowWidget extends StatelessWidget {
                     subtitle: Text(playingNow.audioMeta.handlerId),
                   ),
                 ),
-                if (isLoading)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: SizedBox(
-                      width: 18.0,
-                      height: 18.0,
-                      child: CircularProgressIndicator.adaptive(),
-                    ),
-                  ),
-                if (!isLoading)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: playingNow.state == PlayingState.playing
-                        ? LoadingAnimationWidget.staggeredDotsWave(
-                            color: Theme.of(context).primaryColor,
-                            size: 18.0,
-                          )
-                        : LoadingAnimationWidget.waveDots(
-                            color: Theme.of(context).primaryColor,
-                            size: 18.0,
-                          ),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: playingNow.state == PlayingState.playing
+                      ? LoadingAnimationWidget.staggeredDotsWave(
+                          color: Theme.of(context).primaryColor,
+                          size: 18.0,
+                        )
+                      : LoadingAnimationWidget.waveDots(
+                          color: Theme.of(context).primaryColor,
+                          size: 18.0,
+                        ),
+                ),
                 IconButton(
                   icon: playingNow.state == PlayingState.playing
                       ? const Icon(Icons.pause_circle_filled_sharp)

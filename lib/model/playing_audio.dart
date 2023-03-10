@@ -1,7 +1,7 @@
 import 'audio_meta.dart';
 
 enum PlayingState {
-  loading,
+  none,
   playing,
   paused,
 }
@@ -12,12 +12,10 @@ class PlayingAudio {
 
   PlayingAudio(
     this.audioMeta, {
-    this.state = PlayingState.loading,
+    this.state = PlayingState.none,
   });
 
   bool get isPlaying => state == PlayingState.playing;
 
-  bool get isLoading => state == PlayingState.loading;
-
-  get isPaused => state == PlayingState.paused;
+  bool get isPaused => state == PlayingState.paused;
 }

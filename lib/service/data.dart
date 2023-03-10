@@ -75,12 +75,17 @@ class IsarDataService implements DataService {
     if (audioSource != null) {
       return audioSource;
     }
+    return _fetchSource(audioMeta, audioMetaId);
+  }
 
-    final handler = AudioMetaHandler.get(audioMeta.handlerId);
-    final source = await handler.fetchAudioSource(audioMeta);
-    if (source != null) {
-      await _saveAudioSource(source, audioMetaId);
-      return source;
+  Future<AudioSource?> _fetchSource(AudioMeta audioMeta, int metaId) async {
+    final handler = await AudioMetaHandler.getHandler(audioMeta.handlerId);
+    if (handler != null) {
+      final audioSource = await handler.fetchAudioSource(audioMeta);
+      if (audioSource != null) {
+        await _saveAudioSource(audioSource, metaId);
+        return audioSource;
+      }
     }
     return null;
   }
