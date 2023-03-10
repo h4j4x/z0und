@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../config.dart';
@@ -243,7 +244,7 @@ class DropboxAuth {
   }
 }
 
-class DropboxAudioMeta implements AudioMeta {
+class DropboxAudioMeta with EquatableMixin implements AudioMeta {
   static bool canParse(entry) =>
       entry is Map &&
       entry.containsKey('name') &&
@@ -278,6 +279,9 @@ class DropboxAudioMeta implements AudioMeta {
     required this.name,
     required this.code,
   }) : handlerId = DropboxHandler.id;
+
+  @override
+  List<Object?> get props => [code, handlerId];
 }
 
 class DropboxAudioSource implements AudioSource {

@@ -14,9 +14,12 @@ class AudioListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = AudioPlayer.of(context);
-    final isPlaying = audioPlayer.playingNow == audioMeta;
-    final isLoading = audioPlayer.loadingNow == audioMeta;
+    final playingAudio = AudioPlayer.of(context).playingNow;
+    final playerIsLoading = playingAudio?.isLoading == true;
+    final isActive = playingAudio?.audioMeta == audioMeta;
+    final isLoading = isActive && playerIsLoading;
+    final isPlaying = isActive && playingAudio?.isPlaying == true;
+    final isPaused = isActive && playingAudio?.isPaused == true;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -30,19 +33,23 @@ class AudioListItemWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (isPlaying)
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: LoadingAnimationWidget.stretchedDots(
-                color: Theme.of(context).primaryColor,
-                size: 18.0,
-              ),
-            ),
           if (isLoading)
-            const Padding(
-              padding: EdgeInsets.only(left: 8.0),
+            _leadingIcon(const SizedBox(
+              width: 16.0,
+              height: 16.0,
               child: CircularProgressIndicator.adaptive(),
-            ),
+            )),
+          if (isPlaying)
+            _leadingIcon(LoadingAnimationWidget.staggeredDotsWave(
+              color: Theme.of(context).primaryColor,
+              size: 16.0,
+            )),
+          if (isPaused)
+            _leadingIcon(LoadingAnimationWidget.waveDots(
+              color: Theme.of(context).primaryColor,
+              size: 16.0,
+            )),
+          if (!isActive) Container(width: 26.0),
           Expanded(
             child: ListTile(
               title: Text(audioMeta.name),
@@ -50,16 +57,27 @@ class AudioListItemWidget extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: (!isPlaying && audioPlayer.loadingNow == null)
+            onPressed: !playerIsLoading
                 ? () {
                     final player = AudioPlayer.of(context, listen: false);
-                    player.play(audioMeta);
+                    if (isPlaying) {
+                      player.pause();
+                    } else {
+                      player.play(audioMeta);
+                    }
                   }
                 : null,
-            icon: const Icon(Icons.play_circle_fill_sharp),
+            icon: isPlaying
+                ? const Icon(Icons.pause_circle_filled_sharp)
+                : const Icon(Icons.play_circle_fill_sharp),
           ),
         ],
       ),
     );
   }
+
+  Widget _leadingIcon(Widget icon) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: icon,
+      );
 }

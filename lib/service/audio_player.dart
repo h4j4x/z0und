@@ -5,30 +5,34 @@ import 'package:provider/provider.dart';
 import '../handler/audio_meta_handler.dart';
 import '../model/audio_meta.dart';
 import '../model/audio_source.dart';
+import '../model/playing_audio.dart';
 
 /// Audio player.
 abstract class AudioPlayer implements ChangeNotifier {
   static AudioPlayer create() => JustAudioPlayer._();
 
-  static AudioPlayer of(BuildContext context, {bool listen = true}) =>
+  static AudioPlayer of(
+    BuildContext context, {
+    bool listen = true,
+  }) =>
       Provider.of<AudioPlayer>(context, listen: listen);
 
   /// Gets playing now audio.
-  AudioMeta? get playingNow;
+  PlayingAudio? get playingNow;
 
-  /// Gets playing now position.
-  Duration? get playingNowPosition;
-
-  /// Gets loading now audio.
-  AudioMeta? get loadingNow;
+  /// Gets playing position.
+  Duration? get playingPosition;
 
   /// Plays given [audioMeta].
   Future play(AudioMeta audioMeta);
 
-  /// Pause active [playingNow].
+  /// Pauses active [playingNow].
   Future pause();
 
-  /// Stop active [playingNow].
+  /// Resumes active [playingNow].
+  Future resume();
+
+  /// Stops active [playingNow].
   Future stop();
 
   /// Plays next audio in playlist.
@@ -40,30 +44,40 @@ abstract class AudioPlayer implements ChangeNotifier {
 /// * [Just audio documentation](https://pub.dev/packages/just_audio#tutorials)
 class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   final just_audio.AudioPlayer _player;
-  AudioMeta? _playingNow;
-  AudioMeta? _loadingNow;
-  Duration? _playingNowPosition;
+  PlayingAudio? _playingNow;
+  Duration? _playingPosition;
 
   JustAudioPlayer._() : _player = just_audio.AudioPlayer() {
     _player.positionStream.listen((position) {
-      _playingNowPosition = position;
+      _playingPosition = position;
+      notifyListeners();
+    });
+    _player.playerStateStream.listen((state) {
+      final isReady = state.processingState == just_audio.ProcessingState.ready;
+      if (isReady && state.playing) {
+        _playingNow?.state = PlayingState.playing;
+      } else if (isReady ||
+          state.processingState == just_audio.ProcessingState.completed) {
+        _playingNow?.state = PlayingState.paused;
+      } else {
+        _playingNow?.state = PlayingState.loading;
+      }
       notifyListeners();
     });
   }
 
   @override
-  AudioMeta? get playingNow => _playingNow;
+  PlayingAudio? get playingNow => _playingNow;
 
   @override
-  Duration? get playingNowPosition => _playingNowPosition;
-
-  @override
-  AudioMeta? get loadingNow => _loadingNow;
+  Duration? get playingPosition => _playingPosition;
 
   @override
   Future play(AudioMeta audioMeta) async {
-    if (_loadingNow == null) {
-      _loadingNow = audioMeta;
+    if (_playingNow?.audioMeta == audioMeta) {
+      return _player.play();
+    } else if (_playingNow?.state != PlayingState.loading) {
+      _playingNow = PlayingAudio(audioMeta);
       notifyListeners();
 
       final audioSource = await AudioMetaHandler.fetchSource(audioMeta);
@@ -75,10 +89,7 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
           await _player.stop();
           audioMeta.durationInSeconds = duration.inSeconds;
           // todo: update audioMeta in database
-          _playingNow = audioMeta;
-          _loadingNow = null;
-          _player.play();
-          notifyListeners();
+          return _player.play();
         }
       }
     }
@@ -95,6 +106,14 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
 
   @override
   Future pause() => _player.pause();
+
+  @override
+  Future resume() async {
+    if (_player.processingState == just_audio.ProcessingState.completed) {
+      await _player.seek(Duration.zero);
+    }
+    return _player.play();
+  }
 
   @override
   Future stop() async {
