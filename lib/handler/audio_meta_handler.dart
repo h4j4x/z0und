@@ -5,7 +5,7 @@ import '../model/audio_source.dart';
 abstract class AudioMetaHandler {
   static final _handlers = <AudioMetaHandler>{};
 
-  /// Gets all enabled handlers.
+  /// Registers given [handler].
   static void registerHandler(AudioMetaHandler handler) async {
     _handlers.add(handler);
   }
@@ -43,13 +43,13 @@ abstract class AudioMetaHandler {
     return null;
   }
 
-  /// This handler unique id.
+  /// Handler unique id.
   String get handlerId;
 
   /// If this handler is enabled.
   Future<bool> get handlerIsEnabled;
 
-  /// Fetch available audios metas.
+  /// Fetch available audios.
   Future<List<AudioMeta>> listAudiosMetas();
 
   /// Fetch `AudioSource` for given [audioMeta].

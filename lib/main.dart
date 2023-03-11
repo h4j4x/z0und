@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'app.dart';
 import 'ioc.dart';
-import 'service/audio_player.dart';
-import 'z0und.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setupIoc();
+  await Ioc.createServices();
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AudioPlayer.create()),
-      ],
-      child: const Z0undApp(),
+      providers: Ioc.createProviders(),
+      child: const App(),
     ),
   );
 }

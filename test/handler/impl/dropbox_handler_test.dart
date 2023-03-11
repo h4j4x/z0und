@@ -12,40 +12,40 @@ import '../../ioc.dart';
 
 void main() {
   group('DropboxHandler', () {
-    setupTestIoc();
+    createTestServices();
 
     test('.create() reads from ConfigService and StorageService', () async {
       final configService = ConfigService();
-      when(configService.read(Z0undConfig.dropboxClientIdKey))
-          .thenReturn(Z0undConfig.dropboxClientIdKey);
-      when(configService.read(Z0undConfig.dropboxClientSecretKey))
-          .thenReturn(Z0undConfig.dropboxClientSecretKey);
-      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
-          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      when(configService.read(AppConfig.dropboxClientIdKey))
+          .thenReturn(AppConfig.dropboxClientIdKey);
+      when(configService.read(AppConfig.dropboxClientSecretKey))
+          .thenReturn(AppConfig.dropboxClientSecretKey);
+      when(configService.read(AppConfig.dropboxRedirectUriKey))
+          .thenReturn(AppConfig.dropboxRedirectUriKey);
       final storageService = StorageService();
       when(storageService.read(DropboxHandler.authKey))
           .thenAnswer((_) => Future.value(null));
 
       final handler = await DropboxHandler.create();
       expect(handler.isEnabled, isTrue);
-      expect(handler.clientId, equals(Z0undConfig.dropboxClientIdKey));
-      expect(handler.clientSecret, equals(Z0undConfig.dropboxClientSecretKey));
-      expect(handler.redirectUri, equals(Z0undConfig.dropboxRedirectUriKey));
+      expect(handler.clientId, equals(AppConfig.dropboxClientIdKey));
+      expect(handler.clientSecret, equals(AppConfig.dropboxClientSecretKey));
+      expect(handler.redirectUri, equals(AppConfig.dropboxRedirectUriKey));
 
       verifyInOrder([
-        configService.read(Z0undConfig.dropboxClientIdKey),
-        configService.read(Z0undConfig.dropboxClientSecretKey),
-        configService.read(Z0undConfig.dropboxRedirectUriKey),
+        configService.read(AppConfig.dropboxClientIdKey),
+        configService.read(AppConfig.dropboxClientSecretKey),
+        configService.read(AppConfig.dropboxRedirectUriKey),
       ]);
       verify(storageService.read(DropboxHandler.authKey));
     });
 
     test('.isEnabled is `false` if no configured', () async {
       final configService = ConfigService();
-      when(configService.read(Z0undConfig.dropboxClientIdKey)).thenReturn(null);
-      when(configService.read(Z0undConfig.dropboxClientSecretKey))
+      when(configService.read(AppConfig.dropboxClientIdKey)).thenReturn(null);
+      when(configService.read(AppConfig.dropboxClientSecretKey))
           .thenReturn(null);
-      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
+      when(configService.read(AppConfig.dropboxRedirectUriKey))
           .thenReturn(null);
       final storageService = StorageService();
       when(storageService.read(DropboxHandler.authKey))
@@ -55,21 +55,21 @@ void main() {
       expect(handler.isEnabled, isFalse);
 
       verifyInOrder([
-        configService.read(Z0undConfig.dropboxClientIdKey),
-        configService.read(Z0undConfig.dropboxClientSecretKey),
-        configService.read(Z0undConfig.dropboxRedirectUriKey),
+        configService.read(AppConfig.dropboxClientIdKey),
+        configService.read(AppConfig.dropboxClientSecretKey),
+        configService.read(AppConfig.dropboxRedirectUriKey),
       ]);
       verify(storageService.read(DropboxHandler.authKey));
     });
 
     test('.authToken not expired parsed and returned', () async {
       final configService = ConfigService();
-      when(configService.read(Z0undConfig.dropboxClientIdKey))
-          .thenReturn(Z0undConfig.dropboxClientIdKey);
-      when(configService.read(Z0undConfig.dropboxClientSecretKey))
-          .thenReturn(Z0undConfig.dropboxClientSecretKey);
-      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
-          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      when(configService.read(AppConfig.dropboxClientIdKey))
+          .thenReturn(AppConfig.dropboxClientIdKey);
+      when(configService.read(AppConfig.dropboxClientSecretKey))
+          .thenReturn(AppConfig.dropboxClientSecretKey);
+      when(configService.read(AppConfig.dropboxRedirectUriKey))
+          .thenReturn(AppConfig.dropboxRedirectUriKey);
       final storageService = StorageService();
       const accessToken = 'access_token';
       when(storageService.read(DropboxHandler.authKey))
@@ -85,21 +85,21 @@ void main() {
       expect(authToken, equals(accessToken));
 
       verifyInOrder([
-        configService.read(Z0undConfig.dropboxClientIdKey),
-        configService.read(Z0undConfig.dropboxClientSecretKey),
-        configService.read(Z0undConfig.dropboxRedirectUriKey),
+        configService.read(AppConfig.dropboxClientIdKey),
+        configService.read(AppConfig.dropboxClientSecretKey),
+        configService.read(AppConfig.dropboxRedirectUriKey),
       ]);
       verify(storageService.read(DropboxHandler.authKey));
     });
 
     test('.authToken expired parsed and refreshed', () async {
       final configService = ConfigService();
-      when(configService.read(Z0undConfig.dropboxClientIdKey))
-          .thenReturn(Z0undConfig.dropboxClientIdKey);
-      when(configService.read(Z0undConfig.dropboxClientSecretKey))
-          .thenReturn(Z0undConfig.dropboxClientSecretKey);
-      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
-          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      when(configService.read(AppConfig.dropboxClientIdKey))
+          .thenReturn(AppConfig.dropboxClientIdKey);
+      when(configService.read(AppConfig.dropboxClientSecretKey))
+          .thenReturn(AppConfig.dropboxClientSecretKey);
+      when(configService.read(AppConfig.dropboxRedirectUriKey))
+          .thenReturn(AppConfig.dropboxRedirectUriKey);
       final storageService = StorageService();
       const refreshToken = 'refresh_token';
       when(storageService.read(DropboxHandler.authKey))
@@ -122,8 +122,8 @@ void main() {
       when(httpService.postForm(
         DropboxHandler.tokenUri,
         body: refreshBody,
-        basicAuthUser: Z0undConfig.dropboxClientIdKey,
-        basicAuthPass: Z0undConfig.dropboxClientSecretKey,
+        basicAuthUser: AppConfig.dropboxClientIdKey,
+        basicAuthPass: AppConfig.dropboxClientSecretKey,
       )).thenAnswer((_) => Future.value(<String, dynamic>{
             DropboxAuth.accessTokenKey: accessToken,
             DropboxAuth.refreshTokenKey: refreshToken,
@@ -137,28 +137,28 @@ void main() {
       expect(authToken, equals(accessToken));
 
       verifyInOrder([
-        configService.read(Z0undConfig.dropboxClientIdKey),
-        configService.read(Z0undConfig.dropboxClientSecretKey),
-        configService.read(Z0undConfig.dropboxRedirectUriKey),
+        configService.read(AppConfig.dropboxClientIdKey),
+        configService.read(AppConfig.dropboxClientSecretKey),
+        configService.read(AppConfig.dropboxRedirectUriKey),
       ]);
       verify(storageService.read(DropboxHandler.authKey));
       verify(storageService.write(DropboxHandler.authKey, any));
       verify(httpService.postForm(
         DropboxHandler.tokenUri,
         body: refreshBody,
-        basicAuthUser: Z0undConfig.dropboxClientIdKey,
-        basicAuthPass: Z0undConfig.dropboxClientSecretKey,
+        basicAuthUser: AppConfig.dropboxClientIdKey,
+        basicAuthPass: AppConfig.dropboxClientSecretKey,
       ));
     });
 
     test('.removeAuth() removes auth data', () async {
       final configService = ConfigService();
-      when(configService.read(Z0undConfig.dropboxClientIdKey))
-          .thenReturn(Z0undConfig.dropboxClientIdKey);
-      when(configService.read(Z0undConfig.dropboxClientSecretKey))
-          .thenReturn(Z0undConfig.dropboxClientSecretKey);
-      when(configService.read(Z0undConfig.dropboxRedirectUriKey))
-          .thenReturn(Z0undConfig.dropboxRedirectUriKey);
+      when(configService.read(AppConfig.dropboxClientIdKey))
+          .thenReturn(AppConfig.dropboxClientIdKey);
+      when(configService.read(AppConfig.dropboxClientSecretKey))
+          .thenReturn(AppConfig.dropboxClientSecretKey);
+      when(configService.read(AppConfig.dropboxRedirectUriKey))
+          .thenReturn(AppConfig.dropboxRedirectUriKey);
       final storageService = StorageService();
       when(storageService.read(DropboxHandler.authKey))
           .thenAnswer((_) => Future.value(jsonEncode(<String, dynamic>{
@@ -181,9 +181,9 @@ void main() {
       expect(authToken, isNull);
 
       verifyInOrder([
-        configService.read(Z0undConfig.dropboxClientIdKey),
-        configService.read(Z0undConfig.dropboxClientSecretKey),
-        configService.read(Z0undConfig.dropboxRedirectUriKey),
+        configService.read(AppConfig.dropboxClientIdKey),
+        configService.read(AppConfig.dropboxClientSecretKey),
+        configService.read(AppConfig.dropboxRedirectUriKey),
       ]);
       verify(storageService.read(DropboxHandler.authKey));
       verify(storageService.write(DropboxHandler.authKey, any));

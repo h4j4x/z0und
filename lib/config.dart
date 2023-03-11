@@ -1,7 +1,7 @@
 import 'service/config.dart';
 
-class Z0undConfig {
-  Z0undConfig._();
+class AppConfig {
+  AppConfig._();
 
   static const dropboxClientIdKey = 'DROPBOX_CLIENT_ID';
 

@@ -29,9 +29,9 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
     }
     final handler = DropboxHandler._(
       data: data,
-      clientId: Z0undConfig.dropboxClientId ?? '-',
-      clientSecret: Z0undConfig.dropboxClientSecret ?? '-',
-      redirectUri: Z0undConfig.dropboxRedirectUri ?? '-',
+      clientId: AppConfig.dropboxClientId ?? '-',
+      clientSecret: AppConfig.dropboxClientSecret ?? '-',
+      redirectUri: AppConfig.dropboxRedirectUri ?? '-',
     );
     AudioMetaHandler.registerHandler(handler);
     return handler;
