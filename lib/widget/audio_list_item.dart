@@ -5,7 +5,7 @@ import '../helper/duration.dart';
 import '../model/audio_meta.dart';
 import '../service/audio_player.dart';
 
-const iconPadding = 2.0;
+const iconPadding = 3.0;
 
 class AudioListItemWidget extends StatelessWidget {
   final AudioMeta audioMeta;
@@ -21,10 +21,12 @@ class AudioListItemWidget extends StatelessWidget {
     final playingAudio = audioPlayer.playingNow;
     final isActive = playingAudio?.audioMeta == audioMeta;
     final isLoading = audioPlayer.loadingAudio == audioMeta;
-    final isPlaying = isActive && playingAudio?.isPlaying == true;
-    final isPaused = isActive && playingAudio?.isPaused == true;
+    final isPlaying = isActive && !isLoading && playingAudio?.isPlaying == true;
+    final isPaused = isActive && !isLoading && playingAudio?.isPaused == true;
+    final isEmpty = !isLoading && !isPlaying && !isPaused;
     const iconWidth = 10.0;
     return Container(
+      padding: const EdgeInsets.symmetric(vertical: 3.0),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -38,32 +40,53 @@ class AudioListItemWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           if (isLoading)
-            _leadingIcon(const SizedBox(
-              width: iconWidth,
-              height: iconWidth,
-              child: CircularProgressIndicator.adaptive(),
-            )),
+            _leadingIcon(
+              LoadingAnimationWidget.dotsTriangle(
+                color: Theme.of(context).primaryColor,
+                size: iconWidth,
+              ),
+            ),
           if (isPlaying)
-            _leadingIcon(LoadingAnimationWidget.staggeredDotsWave(
-              color: Theme.of(context).primaryColor,
-              size: iconWidth,
-            )),
+            _leadingIcon(
+              LoadingAnimationWidget.staggeredDotsWave(
+                color: Theme.of(context).primaryColor,
+                size: iconWidth,
+              ),
+            ),
           if (isPaused)
-            _leadingIcon(LoadingAnimationWidget.waveDots(
-              color: Theme.of(context).primaryColor,
-              size: iconWidth,
-            )),
-          if (!isActive) Container(width: iconWidth + iconPadding * 2),
+            _leadingIcon(
+              LoadingAnimationWidget.waveDots(
+                color: Theme.of(context).primaryColor,
+                size: iconWidth,
+              ),
+            ),
+          if (isEmpty) Container(width: iconWidth + (iconPadding * 3)),
           Expanded(
-            child: ListTile(
-              title: Text(audioMeta.name),
-              subtitle: Text(audioMeta.handlerId),
-              trailing: (audioMeta.durationInSeconds != null)
-                  ? Text(Duration(seconds: audioMeta.durationInSeconds!)
-                      .minutesFormatted())
-                  : null,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  audioMeta.name,
+                  textScaleFactor: 1.1,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: iconPadding),
+                  child: Text(
+                    audioMeta.handlerId,
+                    textScaleFactor: 0.7,
+                  ),
+                ),
+              ],
             ),
           ),
+          if (audioMeta.durationInSeconds != null)
+            Text(
+              Duration(seconds: audioMeta.durationInSeconds!)
+                  .minutesFormatted(),
+              textScaleFactor: 0.8,
+            ),
           IconButton(
             onPressed: audioPlayer.loadingAudio == null
                 ? () {
@@ -85,7 +108,10 @@ class AudioListItemWidget extends StatelessWidget {
   }
 
   Widget _leadingIcon(Widget icon) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: iconPadding),
+        padding: const EdgeInsets.only(
+          left: iconPadding,
+          right: iconPadding * 2,
+        ),
         child: icon,
       );
 }
