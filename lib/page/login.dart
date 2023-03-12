@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../handler/impl/dropbox_handler.dart';
+import '../handler/impl/google_handler.dart';
 import 'openid_login.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,14 +21,19 @@ class _LoginPageState extends State<LoginPage> {
   bool dropboxEnabled = false;
   bool? dropboxLinked;
 
+  bool googleEnabled = false;
+  bool? googleLinked;
+
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
       setState(() {
         dropboxEnabled = DropboxHandler().isEnabled;
+        googleEnabled = GoogleHandler().isEnabled;
       });
       updateDropboxLinked();
+      updateGoogleLinked();
     });
   }
 
@@ -40,65 +46,69 @@ class _LoginPageState extends State<LoginPage> {
       body: ListView(
         padding: const EdgeInsets.all(8.0),
         children: [
-          if (dropboxEnabled) dropboxButton(),
+          if (dropboxEnabled)
+            authButton(
+              title: 'DROPBOX TODO',
+              linked: dropboxLinked,
+              onAction: onDropbox,
+            ),
+          if (googleEnabled)
+            authButton(
+              title: 'GOOGLE TODO',
+              linked: googleLinked,
+              onAction: onGoogle,
+            ),
         ],
       ),
     );
   }
 
-  Widget dropboxButton() {
-    const title = 'DROPBOX TODO';
-    Widget leading;
-    Widget? trailing;
-    if (dropboxLinked == null) {
-      leading = const SizedBox(
-        width: 20.0,
-        height: 20.0,
-        child: CircularProgressIndicator.adaptive(),
-      );
-    } else if (dropboxLinked == true) {
-      leading = Icon(
-        Icons.check_circle_sharp,
-        color: Theme.of(context).colorScheme.primary, // todo .success
-      );
-      trailing = Icon(
-        Icons.delete_sharp,
-        color: Theme.of(context).colorScheme.error,
-      );
-    } else {
-      leading = Icon(
-        Icons.cancel_sharp,
-        color: Theme.of(context).colorScheme.error,
-      );
-      trailing = const Icon(Icons.arrow_forward_sharp);
-    }
-    return ListTile(
-      leading: leading,
-      title: const Text(title),
-      trailing: trailing,
-      onTap: (dropboxLinked != null) ? () => onDropbox(title) : null,
-    );
-  }
-
-  void onDropbox(String title) async {
+  void onDropbox() async {
     if (dropboxLinked == true) {
-      await confirmUnlinkDropbox();
+      await confirmUnlink('Are you sure to unlink Dropbox TODO?');
     } else if (dropboxLinked == false) {
       await OpenidLoginPage.pushRouteTo(
         context,
-        title: title,
+        title: 'DROPBOX TODO',
         handler: DropboxHandler(),
       );
     }
     updateDropboxLinked();
   }
 
-  Future confirmUnlinkDropbox() => showDialog(
+  void updateDropboxLinked() async {
+    if (dropboxEnabled) {
+      final dropboxToken = await DropboxHandler().authToken;
+      setState(() {
+        dropboxLinked = dropboxToken != null;
+      });
+    }
+  }
+
+  void onGoogle() async {
+    if (googleLinked == true) {
+      await confirmUnlink('Are you sure to unlink Google TODO?');
+    } else if (googleLinked == false) {
+      await GoogleHandler().auth();
+    }
+    updateGoogleLinked();
+  }
+
+  void updateGoogleLinked() async {
+    if (googleEnabled) {
+      final hasAccount = await GoogleHandler().hasAccount;
+      setState(() {
+        googleLinked = hasAccount;
+      });
+    }
+  }
+
+  Future confirmUnlink(String description) => showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Please Confirm TODO'),
-          content: const Text('Are you sure to unlink dropbox TODO?'),
+          content: Text(description),
           actions: [
             TextButton(
               onPressed: () {
@@ -117,12 +127,40 @@ class _LoginPageState extends State<LoginPage> {
         );
       });
 
-  void updateDropboxLinked() async {
-    if (dropboxEnabled) {
-      final dropboxToken = await DropboxHandler().authToken;
-      setState(() {
-        dropboxLinked = dropboxToken != null;
-      });
+  Widget authButton({
+    required String title,
+    required bool? linked,
+    required VoidCallback onAction,
+  }) {
+    Widget leading;
+    Widget? trailing;
+    if (linked == null) {
+      leading = const SizedBox(
+        width: 20.0,
+        height: 20.0,
+        child: CircularProgressIndicator.adaptive(),
+      );
+    } else if (linked == true) {
+      leading = Icon(
+        Icons.check_circle_sharp,
+        color: Theme.of(context).colorScheme.primary, // todo .success
+      );
+      trailing = Icon(
+        Icons.delete_sharp,
+        color: Theme.of(context).colorScheme.error,
+      );
+    } else {
+      leading = Icon(
+        Icons.cancel_sharp,
+        color: Theme.of(context).colorScheme.error,
+      );
+      trailing = const Icon(Icons.arrow_forward_sharp);
     }
+    return ListTile(
+      leading: leading,
+      title: Text(title),
+      trailing: trailing,
+      onTap: (linked != null) ? onAction : null,
+    );
   }
 }

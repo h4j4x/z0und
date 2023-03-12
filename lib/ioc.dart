@@ -4,6 +4,7 @@ import 'package:provider/single_child_widget.dart';
 
 import 'handler/impl/device_handler.dart';
 import 'handler/impl/dropbox_handler.dart';
+import 'handler/impl/google_handler.dart';
 import 'service/audio_player.dart';
 import 'service/config.dart';
 import 'service/data.dart';
@@ -35,6 +36,9 @@ class Ioc {
     );
     GetIt.I.registerSingleton<DropboxHandler>(
       await DropboxHandler.create(),
+    );
+    GetIt.I.registerSingleton<GoogleHandler>(
+      await GoogleHandler.create(),
     );
     GetIt.I.registerSingleton<DeviceAudioMetaHandler>(
       DeviceAudioMetaHandler.create(),

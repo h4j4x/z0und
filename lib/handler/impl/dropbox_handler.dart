@@ -16,7 +16,7 @@ import '../openid_handler.dart';
 ///
 /// * [Dropbox documentation](https://www.dropbox.com/developers/documentation/http/documentation)
 class DropboxHandler implements OpenidHandler, AudioMetaHandler {
-  static const id = 'dropbox';
+  static const _id = 'dropbox';
   static const authKey = 'dropbox_auth';
 
   static final tokenUri = Uri.parse('https://api.dropbox.com/oauth2/token');
@@ -120,7 +120,7 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
   }
 
   @override
-  String get handlerId => id;
+  String get handlerId => _id;
 
   @override
   Future<bool> get handlerIsEnabled async {
@@ -284,7 +284,7 @@ class DropboxAudioMeta implements AudioMeta {
   DropboxAudioMeta({
     required this.name,
     required this.code,
-  }) : handlerId = DropboxHandler.id;
+  }) : handlerId = DropboxHandler._id;
 }
 
 class DropboxAudioSource implements AudioSource {

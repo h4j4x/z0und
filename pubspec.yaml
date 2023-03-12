@@ -11,16 +11,20 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  extension_google_sign_in_as_googleapis_auth: ^2.0.9
   flutter_dotenv: ^5.0.2
   flutter_inappwebview: ^6.0.0-beta.22
   flutter_secure_storage: ^8.0.0
   get_it: ^7.2.0
+  googleapis: ^10.1.0
+  google_sign_in: ^6.0.2
   http: ^0.13.5
   isar: ^3.0.5
   isar_flutter_libs: ^3.0.5
   just_audio: ^0.9.31
   loading_animation_widget: ^1.2.0+4
   provider: ^6.0.5
+  firebase_core: ^2.7.1
 
 dev_dependencies:
   flutter_test:
