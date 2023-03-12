@@ -81,7 +81,7 @@ class GoogleHandler implements AudioMetaHandler {
               .toList();
         }
       } catch (error) {
-        debugPrint('GOOGLE driveApi error: $error');
+        debugPrint('GOOGLE listAudiosMetas error: $error');
       } finally {
         httpClient.close();
       }
@@ -92,7 +92,23 @@ class GoogleHandler implements AudioMetaHandler {
   @override
   Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta) async {
     await hasAccount;
-    // TODO: implement fetchAudioSource
+    final httpClient = (await googleSignIn.authenticatedClient());
+    if (httpClient != null) {
+      try {
+        final driveApi = DriveApi(httpClient);
+        final file = await driveApi.files.get(
+          audioMeta.code,
+          $fields: 'webContentLink',
+        );
+        if (file is File && file.webContentLink != null) {
+          return GoogleAudioSource(file.webContentLink!, expiresInDays: 7);
+        }
+      } catch (error) {
+        debugPrint('GOOGLE fetchAudioSource error: $error');
+      } finally {
+        httpClient.close();
+      }
+    }
     return Future.value(null);
   }
 }
@@ -122,4 +138,19 @@ class GoogleAudioMeta implements AudioMeta {
     required this.name,
     required this.code,
   }) : handlerId = GoogleHandler._id;
+}
+
+class GoogleAudioSource implements AudioSource {
+  @override
+  final AudioSourceType sourceType;
+
+  @override
+  final String source;
+
+  @override
+  final DateTime expiresAt;
+
+  GoogleAudioSource(this.source, {required int expiresInDays})
+      : sourceType = AudioSourceType.url,
+        expiresAt = DateTime.now().add(Duration(days: expiresInDays));
 }
