@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../helper/duration.dart';
-import '../model/playing_audio.dart';
 import '../service/audio_player.dart';
 
 class PlayingNowWidget extends StatelessWidget {
@@ -15,7 +14,6 @@ class PlayingNowWidget extends StatelessWidget {
       return Container(height: .0);
     }
     final playingNow = audioPlayer.playingNow!;
-    final isLoading = audioPlayer.loadingAudio != null;
     return Material(
       elevation: 8.0,
       child: Container(
@@ -28,13 +26,13 @@ class PlayingNowWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: ListTile(
-                    title: Text(playingNow.audioMeta.name),
-                    subtitle: Text(playingNow.audioMeta.handlerId),
+                    title: Text(playingNow.name),
+                    subtitle: Text(playingNow.handlerId),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: playingNow.state == PlayingState.playing
+                  child: audioPlayer.isPlaying
                       ? LoadingAnimationWidget.staggeredDotsWave(
                           color: Theme.of(context).primaryColor,
                           size: 18.0,
@@ -45,14 +43,14 @@ class PlayingNowWidget extends StatelessWidget {
                         ),
                 ),
                 IconButton(
-                  icon: playingNow.state == PlayingState.playing
+                  icon: audioPlayer.isPlaying
                       ? const Icon(Icons.pause_circle_filled_sharp)
                       : const Icon(Icons.play_circle_filled_sharp),
-                  onPressed: !isLoading
+                  onPressed: !audioPlayer.isLoading
                       ? () {
                           final audioPlayer =
                               AudioPlayer.of(context, listen: false);
-                          if (playingNow.state == PlayingState.playing) {
+                          if (audioPlayer.isPlaying) {
                             audioPlayer.pause();
                           } else {
                             audioPlayer.resume();
@@ -62,7 +60,7 @@ class PlayingNowWidget extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_next_sharp),
-                  onPressed: !isLoading
+                  onPressed: !audioPlayer.isLoading
                       ? () {
                           final audioPlayer =
                               AudioPlayer.of(context, listen: false);
@@ -72,7 +70,7 @@ class PlayingNowWidget extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_sharp),
-                  onPressed: !isLoading
+                  onPressed: !audioPlayer.isLoading
                       ? () {
                           final audioPlayer =
                               AudioPlayer.of(context, listen: false);
@@ -83,10 +81,10 @@ class PlayingNowWidget extends StatelessWidget {
               ],
             ),
             if (audioPlayer.playingPosition != null &&
-                playingNow.audioMeta.durationInSeconds != null)
+                playingNow.durationInSeconds != null)
               ..._positionIndicator(
                 audioPlayer.playingPosition!,
-                Duration(seconds: playingNow.audioMeta.durationInSeconds!),
+                Duration(seconds: playingNow.durationInSeconds!),
               ),
           ],
         ),

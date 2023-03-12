@@ -9,21 +9,21 @@ const iconPadding = 3.0;
 
 class AudioListItemWidget extends StatelessWidget {
   final AudioMeta audioMeta;
+  final Function(AudioMeta) onPlay;
 
   const AudioListItemWidget({
     super.key,
     required this.audioMeta,
+    required this.onPlay,
   });
 
   @override
   Widget build(BuildContext context) {
     final audioPlayer = AudioPlayer.of(context);
-    final playingAudio = audioPlayer.playingNow;
-    final isActive = playingAudio?.audioMeta == audioMeta;
-    final isLoading = audioPlayer.loadingAudio == audioMeta;
-    final isPlaying = isActive && !isLoading && playingAudio?.isPlaying == true;
-    final isPaused = isActive && !isLoading && playingAudio?.isPaused == true;
-    final isEmpty = !isLoading && !isPlaying && !isPaused;
+    final isActive = audioPlayer.playingNow == audioMeta;
+    final isLoading = isActive && audioPlayer.isLoading;
+    final isPlaying = isActive && audioPlayer.isPlaying;
+    final isPaused = isActive && audioPlayer.isPaused;
     const iconWidth = 10.0;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
@@ -60,7 +60,7 @@ class AudioListItemWidget extends StatelessWidget {
                 size: iconWidth,
               ),
             ),
-          if (isEmpty) Container(width: iconWidth + (iconPadding * 3)),
+          if (!isActive) Container(width: iconWidth + (iconPadding * 3)),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -88,13 +88,13 @@ class AudioListItemWidget extends StatelessWidget {
               textScaleFactor: 0.8,
             ),
           IconButton(
-            onPressed: audioPlayer.loadingAudio == null
+            onPressed: (!audioPlayer.isLoading)
                 ? () {
                     final player = AudioPlayer.of(context, listen: false);
                     if (isPlaying) {
                       player.pause();
                     } else {
-                      player.play(audioMeta);
+                      onPlay(audioMeta);
                     }
                   }
                 : null,

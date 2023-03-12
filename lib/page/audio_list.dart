@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../handler/audio_meta_handler.dart';
 import '../model/audio_meta.dart';
+import '../service/audio_player.dart';
 import '../service/data.dart';
 import '../widget/audio_list_item.dart';
 import '../widget/message_options.dart';
@@ -107,6 +108,12 @@ class _AudioListPageState extends State<AudioListPage> {
       itemCount: audiosMetas.length,
       itemBuilder: (context, index) => AudioListItemWidget(
         audioMeta: audiosMetas[index],
+        onPlay: (audioMeta) {
+          AudioPlayer.of(context, listen: false).play(
+            audiosMetas,
+            audiosMetas.indexOf(audioMeta),
+          );
+        },
       ),
     );
   }

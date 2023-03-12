@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 
 import '../../model/audio_meta.dart';
+import '../../model/audio_meta_playlist.dart';
 import '../../model/audio_source.dart';
-import '../../model/playing_audio.dart';
+import '../../model/playing_state.dart';
 import '../audio_player.dart';
 import '../data.dart';
 
@@ -12,8 +13,9 @@ import '../data.dart';
 /// * [Just audio documentation](https://pub.dev/packages/just_audio#tutorials)
 class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   final just_audio.AudioPlayer _player;
-  AudioMeta? _loadingAudio;
-  PlayingAudio? _playingNow;
+
+  AudioMetaPlaylist? _playlist;
+  PlayingState? _playingState;
   Duration? _playingPosition;
 
   JustAudioPlayer.create() : _player = just_audio.AudioPlayer() {
@@ -24,39 +26,55 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
     _player.playerStateStream.listen((state) {
       final isReady = state.processingState == just_audio.ProcessingState.ready;
       if (isReady && state.playing) {
-        _playingNow?.state = PlayingState.playing;
+        _playingState = PlayingState.playing;
       } else if (isReady ||
           state.processingState == just_audio.ProcessingState.completed) {
-        _playingNow?.state = PlayingState.paused;
+        _playingState = PlayingState.paused;
+      } else if (state.processingState != just_audio.ProcessingState.idle) {
+        _playingState = PlayingState.loading;
       }
       notifyListeners();
     });
   }
 
   @override
-  AudioMeta? get loadingAudio => _loadingAudio;
+  AudioMeta? get playingNow => _playlist?.current;
 
   @override
-  PlayingAudio? get playingNow => _playingNow;
+  bool get isLoading => _playingState == PlayingState.loading;
+
+  @override
+  bool get isPlaying => _playingState == PlayingState.playing;
+
+  @override
+  bool get isPaused => _playingState == PlayingState.paused;
 
   @override
   Duration? get playingPosition => _playingPosition;
 
   @override
-  Future play(AudioMeta audioMeta) async {
-    if (_loadingAudio != null) {
+  Future play(List<AudioMeta> playlist, int index) async {
+    if (_playingState == PlayingState.loading) {
       return Future.value(null);
     }
-    if (_playingNow?.audioMeta == audioMeta) {
-      return _player.play();
-    }
-    _loadingAudio = audioMeta;
+    final isSameAudioActive = _playlist?.current == playlist[index];
+
+    _playlist = AudioMetaPlaylist(list: playlist, index: index);
     notifyListeners();
 
-    return _play(audioMeta);
+    if (!isSameAudioActive) {
+      _playingState = PlayingState.loading;
+      _playingPosition = Duration.zero;
+      notifyListeners();
+
+      _player.stop();
+      await _loadAudioMeta(_playlist!.current);
+    }
+
+    return _player.play();
   }
 
-  Future _play(AudioMeta audioMeta) async {
+  Future _loadAudioMeta(AudioMeta audioMeta) async {
     final audioSource = await DataService().audioSourceOf(audioMeta);
     // todo: throw exception if audioSource == null
 
@@ -65,16 +83,9 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
 
     if (audioMeta.durationInSeconds != duration!.inSeconds) {
       audioMeta.durationInSeconds = duration.inSeconds;
-      await DataService().saveAudioMeta(audioMeta);
+      DataService().saveAudioMeta(audioMeta);
     }
-
-    await _player.stop();
-
-    _loadingAudio = null;
-    _playingNow = PlayingAudio(audioMeta);
-    notifyListeners();
-
-    return _player.play();
+    return Future.value(null);
   }
 
   Future<Duration?> _loadAudioSource(AudioSource audioSource) {
@@ -99,14 +110,23 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   @override
   Future stop() async {
     await _player.stop();
-    _playingNow = null;
+    _playlist = null;
     notifyListeners();
     return Future.value(null);
   }
 
   @override
-  Future playNext() {
-    // todo
+  Future playNext() async {
+    _playingState = PlayingState.loading;
+    _playingPosition = Duration.zero;
+    notifyListeners();
+
+    _player.stop();
+    if (_playlist?.advanceNext == true) {
+      notifyListeners();
+      await _loadAudioMeta(_playlist!.current);
+      return _player.play();
+    }
     return Future.value(null);
   }
 }
