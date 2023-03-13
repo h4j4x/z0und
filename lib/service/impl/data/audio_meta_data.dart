@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 
-import '../model/audio_meta.dart';
+import '../../../model/audio_meta.dart';
 
 part 'audio_meta_data.g.dart';
 

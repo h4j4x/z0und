@@ -1,11 +1,11 @@
 import 'package:isar/isar.dart';
 
-import '../../data/audio_meta_data.dart';
-import '../../data/audio_source_data.dart';
 import '../../handler/audio_meta_handler.dart';
 import '../../model/audio_meta.dart';
 import '../../model/audio_source.dart';
 import '../data.dart';
+import 'data/audio_meta_data.dart';
+import 'data/audio_source_data.dart';
 
 /// Isar integration.
 ///

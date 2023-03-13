@@ -1,5 +1,3 @@
-import 'package:isar/isar.dart';
-
 import '../ioc.dart';
 import '../model/audio_meta.dart';
 import '../model/audio_source.dart';
@@ -16,6 +14,6 @@ abstract class DataService {
   /// Fetch audio source of audio meta.
   Future<AudioSource?> audioSourceOf(AudioMeta audioMeta);
 
-  /// Saves audio meta.
-  Future<Id> saveAudioMeta(AudioMeta audioMeta);
+  /// Saves audio meta and returns [id].
+  Future<int> saveAudioMeta(AudioMeta audioMeta);
 }
