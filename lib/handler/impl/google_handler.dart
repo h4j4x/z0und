@@ -33,7 +33,10 @@ class GoogleHandler implements AudioMetaHandler {
 
   GoogleHandler._()
       : googleSignIn = GoogleSignIn(
-          scopes: <String>[DriveApi.driveReadonlyScope],
+          scopes: <String>[
+            DriveApi.driveMetadataReadonlyScope,
+            DriveApi.driveReadonlyScope,
+          ],
         );
 
   Future auth() async {
