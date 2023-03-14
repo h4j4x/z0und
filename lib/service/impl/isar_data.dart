@@ -73,7 +73,7 @@ class IsarDataService implements DataService {
   }
 
   @override
-  Future<Id> saveAudioMeta(AudioMeta audioMeta) async {
+  Future<int> saveAudioMeta(AudioMeta audioMeta) async {
     var audioMetaIsar = await _isar.audios_metas
         .filter()
         .codeEqualTo(audioMeta.code)
@@ -117,5 +117,16 @@ class IsarDataService implements DataService {
       await _isar.audios_sources.put(sourceIsar!);
     });
     return sourceIsar.id;
+  }
+
+  @override
+  Future removeAudioSource(AudioSource audioSource) {
+    if (audioSource is AudioSourceData) {
+      return _isar.audios_sources
+          .filter()
+          .idEqualTo(audioSource.id)
+          .deleteFirst();
+    }
+    return Future.value(null);
   }
 }

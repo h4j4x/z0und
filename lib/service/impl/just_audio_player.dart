@@ -76,14 +76,23 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
 
   Future _loadAudioMeta(AudioMeta audioMeta) async {
     final audioSource = await DataService().audioSourceOf(audioMeta);
-    // todo: throw exception if audioSource == null
+    if (audioSource == null) {
+      throw AudioSourceNotAvailableException();
+    }
 
-    final duration = await _loadAudioSource(audioSource!);
-    // todo: throw exception if duration == null
-
-    if (audioMeta.durationInSeconds != duration!.inSeconds) {
-      audioMeta.durationInSeconds = duration.inSeconds;
-      DataService().saveAudioMeta(audioMeta);
+    try {
+      final duration = await _loadAudioSource(audioSource);
+      if (duration == null) {
+        throw AudioSourceNotValidException();
+      }
+      if (audioMeta.durationInSeconds != duration.inSeconds) {
+        audioMeta.durationInSeconds = duration.inSeconds;
+        DataService().saveAudioMeta(audioMeta);
+      }
+    } catch (error) {
+      debugPrint('JustAudioPlayer error: $error');
+      DataService().removeAudioSource(audioSource);
+      throw AudioSourceNotValidException();
     }
     return Future.value(null);
   }

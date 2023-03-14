@@ -38,3 +38,7 @@ abstract class AudioPlayer implements ChangeNotifier {
   /// Plays next audio in playlist.
   Future playNext();
 }
+
+class AudioSourceNotAvailableException implements Exception {}
+
+class AudioSourceNotValidException implements Exception {}

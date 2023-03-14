@@ -16,4 +16,7 @@ abstract class DataService {
 
   /// Saves audio meta and returns [id].
   Future<int> saveAudioMeta(AudioMeta audioMeta);
+
+  /// Removes audio source.
+  Future removeAudioSource(AudioSource audioSource);
 }
