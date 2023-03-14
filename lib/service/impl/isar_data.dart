@@ -94,12 +94,15 @@ class IsarDataService implements DataService {
     return audioMetaIsar.id;
   }
 
-  Future _removeAudiosMetas({required List<int> excludeIds}) {
-    return _isar.audios_metas
-        .filter()
-        .not()
-        .anyOf(excludeIds, (query, id) => query.idEqualTo(id))
-        .deleteAll();
+  Future _removeAudiosMetas({required List<int> excludeIds}) async {
+    await _isar.writeTxn(() async {
+      return _isar.audios_metas
+          .filter()
+          .not()
+          .anyOf(excludeIds, (query, id) => query.idEqualTo(id))
+          .deleteAll();
+    });
+    return Future.value(null);
   }
 
   Future<Id> _saveAudioSource(AudioSource audioSource, int audioMetaId) async {
@@ -120,12 +123,14 @@ class IsarDataService implements DataService {
   }
 
   @override
-  Future removeAudioSource(AudioSource audioSource) {
+  Future removeAudioSource(AudioSource audioSource) async {
     if (audioSource is AudioSourceData) {
-      return _isar.audios_sources
-          .filter()
-          .idEqualTo(audioSource.id)
-          .deleteFirst();
+      await _isar.writeTxn(() async {
+        return _isar.audios_sources
+            .filter()
+            .idEqualTo(audioSource.id)
+            .deleteFirst();
+      });
     }
     return Future.value(null);
   }

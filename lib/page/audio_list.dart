@@ -129,7 +129,7 @@ class _AudioListPageState extends State<AudioListPage> {
 
   void onPlayError(String message) {
     UiHelper.showAlert(context, message: message);
-    AudioPlayer.of(context, listen: false).stop();
+    AudioPlayer.of(context, listen: false).stop(); // todo: next or stop
   }
 
   void navigateLogin() async {

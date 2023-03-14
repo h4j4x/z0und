@@ -120,6 +120,7 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   Future stop() async {
     await _player.stop();
     _playlist = null;
+    _playingState = null;
     notifyListeners();
     return Future.value(null);
   }
