@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../handler/audio_meta_handler.dart';
+import '../helper/ui.dart';
 import '../model/audio_meta.dart';
 import '../service/audio_player.dart';
 import '../service/data.dart';
@@ -108,14 +109,27 @@ class _AudioListPageState extends State<AudioListPage> {
       itemCount: audiosMetas.length,
       itemBuilder: (context, index) => AudioListItemWidget(
         audioMeta: audiosMetas[index],
-        onPlay: (audioMeta) {
-          AudioPlayer.of(context, listen: false).play(
-            audiosMetas,
-            audiosMetas.indexOf(audioMeta),
-          );
-        },
+        onPlay: onPlay,
       ),
     );
+  }
+
+  void onPlay(audioMeta) async {
+    try {
+      await AudioPlayer.of(context, listen: false).play(
+        audiosMetas,
+        audiosMetas.indexOf(audioMeta),
+      );
+    } on AudioSourceNotValidException {
+      onPlayError('AudioSource NotValid ERROR TODO');
+    } on AudioSourceNotAvailableException {
+      onPlayError('AudioSource NotAvailable ERROR TODO');
+    }
+  }
+
+  void onPlayError(String message) {
+    UiHelper.showAlert(context, message: message);
+    AudioPlayer.of(context, listen: false).stop();
   }
 
   void navigateLogin() async {
