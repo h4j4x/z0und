@@ -148,8 +148,8 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
       );
       final files = (data['entries'] as List?) ?? [];
       return files
-          .where((entry) => DropboxAudioMeta.canParse(entry))
-          .map<AudioMeta>((entry) => DropboxAudioMeta.fromMap(entry))
+          .where((entry) => _DropboxAudioMeta.canParse(entry))
+          .map<AudioMeta>((entry) => _DropboxAudioMeta.fromMap(entry))
           .toList();
     } catch (e) {
       debugPrint('List sources dropbox error: $e');
@@ -173,7 +173,7 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
         body: body,
       );
       if (data.containsKey('link') && data['link'] is String) {
-        return DropboxAudioSource(
+        return _DropboxAudioSource(
           data['link'].toString(),
           expiresInHours: expiresInHours,
         );
@@ -250,7 +250,7 @@ class DropboxAuth {
   }
 }
 
-class DropboxAudioMeta implements AudioMeta {
+class _DropboxAudioMeta implements AudioMeta {
   static bool canParse(entry) =>
       entry is Map &&
       entry.containsKey('name') &&
@@ -258,7 +258,7 @@ class DropboxAudioMeta implements AudioMeta {
       entry['path_lower'] is String &&
       entry['name'].toString().endsWith('.mp3');
 
-  static AudioMeta fromMap(Map map) => DropboxAudioMeta(
+  static AudioMeta fromMap(Map map) => _DropboxAudioMeta(
         name: map['name'].toString(),
         code: map['path_lower'].toString(),
       );
@@ -281,13 +281,13 @@ class DropboxAudioMeta implements AudioMeta {
   @override
   bool get enabled => true;
 
-  DropboxAudioMeta({
+  _DropboxAudioMeta({
     required this.name,
     required this.code,
   }) : handlerId = DropboxHandler._id;
 }
 
-class DropboxAudioSource implements AudioSource {
+class _DropboxAudioSource implements AudioSource {
   @override
   final AudioSourceType sourceType;
 
@@ -297,7 +297,7 @@ class DropboxAudioSource implements AudioSource {
   @override
   final DateTime expiresAt;
 
-  DropboxAudioSource(this.source, {required int expiresInHours})
+  _DropboxAudioSource(this.source, {required int expiresInHours})
       : sourceType = AudioSourceType.url,
         expiresAt = DateTime.now().add(Duration(hours: expiresInHours));
 }

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart';
+import 'package:http/http.dart';
 
 import '../../firebase_options.dart';
 import '../../ioc.dart';
@@ -65,28 +66,29 @@ class GoogleHandler implements AudioMetaHandler {
   @override
   Future<List<AudioMeta>> listAudiosMetas() async {
     await hasAccount;
-    final httpClient = (await googleSignIn.authenticatedClient());
-    if (httpClient != null) {
+    final apiWrapper = await _DriveApiWrapper.create(googleSignIn);
+    if (apiWrapper != null) {
       try {
-        final driveApi = DriveApi(httpClient);
-        final files = await driveApi.files.list(
+        final files = await apiWrapper.driveApi.files.list(
           corpora: 'user',
           pageSize: 100,
           q: 'mimeType contains \'audio/\'',
         );
         if (files.files != null) {
           return files.files!
-              .where((file) => GoogleAudioMeta.canParse(file))
-              .map<AudioMeta>((file) => GoogleAudioMeta(
-                    name: file.name!,
-                    code: file.id!,
-                  ))
+              .where((file) => _GoogleAudioMeta.canParse(file))
+              .map<AudioMeta>(
+                (file) => _GoogleAudioMeta(
+                  name: file.name!,
+                  code: file.id!,
+                ),
+              )
               .toList();
         }
       } catch (error) {
         debugPrint('GOOGLE listAudiosMetas error: $error');
       } finally {
-        httpClient.close();
+        apiWrapper.close();
       }
     }
     return Future.value([]);
@@ -95,28 +97,50 @@ class GoogleHandler implements AudioMetaHandler {
   @override
   Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta) async {
     await hasAccount;
-    final httpClient = (await googleSignIn.authenticatedClient());
-    if (httpClient != null) {
+    final apiWrapper = await _DriveApiWrapper.create(googleSignIn);
+    if (apiWrapper != null) {
       try {
-        final driveApi = DriveApi(httpClient);
-        final file = await driveApi.files.get(
+        final file = await apiWrapper.driveApi.files.get(
           audioMeta.code,
-          $fields: 'webContentLink',
+          $fields: 'webViewLink',
         );
         if (file is File && file.webContentLink != null) {
-          return GoogleAudioSource(file.webContentLink!, expiresInDays: 7);
+          return _GoogleAudioSource(file.webViewLink!, expiresInDays: 7);
         }
       } catch (error) {
         debugPrint('GOOGLE fetchAudioSource error: $error');
       } finally {
-        httpClient.close();
+        apiWrapper.close();
       }
     }
     return Future.value(null);
   }
 }
 
-class GoogleAudioMeta implements AudioMeta {
+class _DriveApiWrapper {
+  final Client client;
+  final DriveApi driveApi;
+
+  _DriveApiWrapper({
+    required this.client,
+    required this.driveApi,
+  });
+
+  void close() => client.close();
+
+  static Future<_DriveApiWrapper?> create(GoogleSignIn googleSignIn) async {
+    final httpClient = await googleSignIn.authenticatedClient();
+    if (httpClient != null) {
+      return _DriveApiWrapper(
+        client: httpClient,
+        driveApi: DriveApi(httpClient),
+      );
+    }
+    return null;
+  }
+}
+
+class _GoogleAudioMeta implements AudioMeta {
   static bool canParse(File file) => file.name != null && file.id != null;
 
   @override
@@ -137,13 +161,13 @@ class GoogleAudioMeta implements AudioMeta {
   @override
   bool get enabled => true;
 
-  GoogleAudioMeta({
+  _GoogleAudioMeta({
     required this.name,
     required this.code,
   }) : handlerId = GoogleHandler._id;
 }
 
-class GoogleAudioSource implements AudioSource {
+class _GoogleAudioSource implements AudioSource {
   @override
   final AudioSourceType sourceType;
 
@@ -153,7 +177,7 @@ class GoogleAudioSource implements AudioSource {
   @override
   final DateTime expiresAt;
 
-  GoogleAudioSource(this.source, {required int expiresInDays})
+  _GoogleAudioSource(this.source, {required int expiresInDays})
       : sourceType = AudioSourceType.url,
         expiresAt = DateTime.now().add(Duration(days: expiresInDays));
 }
