@@ -23,6 +23,7 @@ dependencies:
   isar_flutter_libs: ^3.0.5
   just_audio: ^0.9.31
   loading_animation_widget: ^1.2.0+4
+  path_provider: ^2.0.13
   provider: ^6.0.5
   firebase_core: ^2.7.1
 

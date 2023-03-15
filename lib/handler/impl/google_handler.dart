@@ -6,6 +6,7 @@ import 'package:googleapis/drive/v3.dart';
 import 'package:http/http.dart';
 
 import '../../firebase_options.dart';
+import '../../helper/file.dart';
 import '../../ioc.dart';
 import '../../model/audio_meta.dart';
 import '../../model/audio_source.dart';
@@ -100,16 +101,13 @@ class GoogleHandler implements AudioMetaHandler {
     final apiWrapper = await _DriveApiWrapper.create(googleSignIn);
     if (apiWrapper != null) {
       try {
-        final file = await apiWrapper.driveApi.files.get(
+        final media = await apiWrapper.driveApi.files.get(
           audioMeta.code,
           downloadOptions: DownloadOptions.fullMedia,
         );
-        if (file is Media) {
-          final audioMedia = AudioMedia(
-            stream: file.stream,
-            length: file.length,
-          );
-          return _GoogleAudioSource(audioMedia, expiresInDays: 7);
+        if (media is Media) {
+          final filePath = await _saveMediaAsFile(audioMeta, media);
+          return _GoogleAudioSource(filePath, expiresInDays: 7);
         }
       } catch (error) {
         debugPrint('GOOGLE fetchAudioSource error: $error');
@@ -118,6 +116,14 @@ class GoogleHandler implements AudioMetaHandler {
       }
     }
     return Future.value(null);
+  }
+
+  Future<String> _saveMediaAsFile(AudioMeta audioMeta, Media media) async {
+    final file = await FileHelper.writeDocumentsFile(
+      filename: audioMeta.name,
+      stream: media.stream,
+    );
+    return file.path;
   }
 }
 
@@ -175,15 +181,13 @@ class _GoogleAudioSource implements AudioSource {
   @override
   final AudioSourceType sourceType;
 
-  final AudioMedia sourceValue;
+  @override
+  final String source;
 
   @override
   final DateTime expiresAt;
 
-  _GoogleAudioSource(this.sourceValue, {required int expiresInDays})
-      : sourceType = AudioSourceType.url,
+  _GoogleAudioSource(this.source, {required int expiresInDays})
+      : sourceType = AudioSourceType.file,
         expiresAt = DateTime.now().add(Duration(days: expiresInDays));
-
-  @override
-  Future<String> get source => sourceValue.serialize();
 }

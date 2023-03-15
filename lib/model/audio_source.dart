@@ -9,4 +9,5 @@ abstract class AudioSource {
 
 enum AudioSourceType {
   url,
+  file,
 }

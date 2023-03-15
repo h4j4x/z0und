@@ -99,7 +99,9 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
     if (audioSource.sourceType == AudioSourceType.url) {
       return _player.setUrl(audioSource.source);
     }
-    // todo
+    if (audioSource.sourceType == AudioSourceType.file) {
+      return _player.setFilePath(audioSource.source);
+    }
     return Future.value(null);
   }
 
