@@ -106,8 +106,11 @@ class GoogleHandler implements AudioMetaHandler {
           downloadOptions: DownloadOptions.fullMedia,
         );
         if (media is Media) {
-          final filePath = await _saveMediaAsFile(audioMeta, media);
-          return _GoogleAudioSource(filePath, expiresInDays: 7);
+          final file = await FileHelper.writeDocumentsFile(
+            filename: audioMeta.name,
+            stream: media.stream,
+          );
+          return _GoogleAudioSource(file.path, expiresInDays: 7);
         }
       } catch (error) {
         debugPrint('GOOGLE fetchAudioSource error: $error');
@@ -116,14 +119,6 @@ class GoogleHandler implements AudioMetaHandler {
       }
     }
     return Future.value(null);
-  }
-
-  Future<String> _saveMediaAsFile(AudioMeta audioMeta, Media media) async {
-    final file = await FileHelper.writeDocumentsFile(
-      filename: audioMeta.name,
-      stream: media.stream,
-    );
-    return file.path;
   }
 }
 

@@ -25,15 +25,19 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
     });
     _player.playerStateStream.listen((state) {
       final isReady = state.processingState == just_audio.ProcessingState.ready;
+      final isCompleted =
+          state.processingState == just_audio.ProcessingState.completed;
       if (isReady && state.playing) {
         _playingState = PlayingState.playing;
-      } else if (isReady ||
-          state.processingState == just_audio.ProcessingState.completed) {
+      } else if (isReady || isCompleted) {
         _playingState = PlayingState.paused;
       } else if (state.processingState != just_audio.ProcessingState.idle) {
         _playingState = PlayingState.loading;
       }
       notifyListeners();
+      if (isCompleted) {
+        playNext();
+      }
     });
   }
 
@@ -127,7 +131,7 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
 
   @override
   Future playNext() async {
-    _playingState = PlayingState.loading;
+    _playingState = null;
     _playingPosition = Duration.zero;
     notifyListeners();
 
