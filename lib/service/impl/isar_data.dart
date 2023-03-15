@@ -45,19 +45,26 @@ class IsarDataService implements DataService {
 
   @override
   Future<AudioSource?> audioSourceOf(AudioMeta audioMeta) async {
-    final audioMetaId = (audioMeta is AudioMetaData)
-        ? audioMeta.id
-        : await saveAudioMeta(audioMeta);
-    final audioSource = await _isar.audios_sources
+    final audioSource = await _audioSourceOf(audioMeta);
+    if (audioSource != null) {
+      return audioSource;
+    }
+    final audioMetaId = await _audioMetaId(audioMeta);
+    return _fetchSource(audioMeta, audioMetaId);
+  }
+
+  Future<int> _audioMetaId(AudioMeta audioMeta) => (audioMeta is AudioMetaData)
+      ? Future.value(audioMeta.id)
+      : saveAudioMeta(audioMeta);
+
+  Future<AudioSource?> _audioSourceOf(AudioMeta audioMeta) async {
+    final audioMetaId = await _audioMetaId(audioMeta);
+    return _isar.audios_sources
         .filter()
         .audioMetaIdEqualTo(audioMetaId)
         .and()
         .expiresAtGreaterThan(DateTime.now())
         .findFirst();
-    if (audioSource != null) {
-      return audioSource;
-    }
-    return _fetchSource(audioMeta, audioMetaId);
   }
 
   Future<AudioSource?> _fetchSource(AudioMeta audioMeta, int metaId) async {
@@ -123,15 +130,14 @@ class IsarDataService implements DataService {
   }
 
   @override
-  Future removeAudioSource(AudioSource audioSource) async {
-    if (audioSource is AudioSourceData) {
-      await _isar.writeTxn(() async {
-        return _isar.audios_sources
-            .filter()
-            .idEqualTo(audioSource.id)
-            .deleteFirst();
-      });
-    }
+  Future removeAudioSourceOf(AudioMeta audioMeta) async {
+    final audioMetaId = await _audioMetaId(audioMeta);
+    await _isar.writeTxn(() async {
+      await _isar.audios_sources
+          .filter()
+          .audioMetaIdEqualTo(audioMetaId)
+          .deleteAll();
+    });
     return Future.value(null);
   }
 }

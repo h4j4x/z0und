@@ -79,7 +79,6 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
     if (audioSource == null) {
       throw AudioSourceNotAvailableException();
     }
-
     try {
       final duration = await _loadAudioSource(audioSource);
       if (duration == null) {
@@ -91,7 +90,6 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       }
     } catch (error) {
       debugPrint('JustAudioPlayer error: $error');
-      DataService().removeAudioSource(audioSource);
       throw AudioSourceNotValidException();
     }
     return Future.value(null);
@@ -138,5 +136,11 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       return _player.play();
     }
     return Future.value(null);
+  }
+
+  @override
+  Future dispose() async {
+    await _player.dispose();
+    return super.dispose();
   }
 }

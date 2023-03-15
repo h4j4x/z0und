@@ -102,10 +102,14 @@ class GoogleHandler implements AudioMetaHandler {
       try {
         final file = await apiWrapper.driveApi.files.get(
           audioMeta.code,
-          $fields: 'webViewLink',
+          downloadOptions: DownloadOptions.fullMedia,
         );
-        if (file is File && file.webContentLink != null) {
-          return _GoogleAudioSource(file.webViewLink!, expiresInDays: 7);
+        if (file is Media) {
+          final audioMedia = AudioMedia(
+            stream: file.stream,
+            length: file.length,
+          );
+          return _GoogleAudioSource(audioMedia, expiresInDays: 7);
         }
       } catch (error) {
         debugPrint('GOOGLE fetchAudioSource error: $error');
@@ -171,13 +175,15 @@ class _GoogleAudioSource implements AudioSource {
   @override
   final AudioSourceType sourceType;
 
-  @override
-  final String source;
+  final AudioMedia sourceValue;
 
   @override
   final DateTime expiresAt;
 
-  _GoogleAudioSource(this.source, {required int expiresInDays})
+  _GoogleAudioSource(this.sourceValue, {required int expiresInDays})
       : sourceType = AudioSourceType.url,
         expiresAt = DateTime.now().add(Duration(days: expiresInDays));
+
+  @override
+  Future<String> get source => sourceValue.serialize();
 }

@@ -114,22 +114,23 @@ class _AudioListPageState extends State<AudioListPage> {
     );
   }
 
-  void onPlay(audioMeta) async {
+  void onPlay(AudioMeta audioMeta) async {
     try {
       await AudioPlayer.of(context, listen: false).play(
         audiosMetas,
         audiosMetas.indexOf(audioMeta),
       );
     } on AudioSourceNotValidException {
-      onPlayError('AudioSource NotValid ERROR TODO');
+      onPlayError(audioMeta, 'AudioSource NotValid ERROR TODO');
     } on AudioSourceNotAvailableException {
-      onPlayError('AudioSource NotAvailable ERROR TODO');
+      onPlayError(audioMeta, 'AudioSource NotAvailable ERROR TODO');
     }
   }
 
-  void onPlayError(String message) {
+  void onPlayError(AudioMeta audioMeta, String message) {
     UiHelper.showAlert(context, message: message);
     AudioPlayer.of(context, listen: false).stop(); // todo: next or stop
+    DataService().removeAudioSourceOf(audioMeta);
   }
 
   void navigateLogin() async {
