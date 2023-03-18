@@ -47,7 +47,7 @@ class _AudioListPageState extends State<AudioListPage> {
             icon: const Icon(Icons.settings_sharp),
           ),
           IconButton(
-            onPressed: !loading ? updateHandlersCount : null,
+            onPressed: !loading ? scanAudiosMetas : null,
             icon: const Icon(Icons.manage_search_sharp),
           ),
           IconButton(
@@ -160,9 +160,9 @@ class _AudioListPageState extends State<AudioListPage> {
     setState(() {
       loading = true;
     });
-    final sources = await DataService().scanAudiosMetas();
+    final list = await DataService().scanAudiosMetas();
     audiosMetas.clear();
-    audiosMetas.addAll(sources);
+    audiosMetas.addAll(list);
     setState(() {
       loading = false;
     });

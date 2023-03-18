@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
+  firebase_core: ^2.8.0
   flutter_dotenv: ^5.0.2
   flutter_inappwebview: ^6.0.0-beta.22
   flutter_secure_storage: ^8.0.0
@@ -25,7 +26,6 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   path_provider: ^2.0.13
   provider: ^6.0.5
-  firebase_core: ^2.7.1
 
 dev_dependencies:
   flutter_test:

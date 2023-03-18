@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 
 import '../../handler/audio_meta_handler.dart';
+import '../../helper/file.dart';
 import '../../model/audio_meta.dart';
 import '../../model/audio_source.dart';
 import '../data.dart';
@@ -28,12 +29,13 @@ class IsarDataService implements DataService {
     final handlers = await AudioMetaHandler.enabledHandlers();
     final ids = <Id>[];
     for (final handler in handlers) {
-      final sources = await handler.listAudiosMetas();
-      for (final source in sources) {
-        final id = await saveAudioMeta(source);
+      final list = await handler.listAudiosMetas();
+      for (final audioMeta in list) {
+        final id = await saveAudioMeta(audioMeta);
         ids.add(id);
       }
     }
+    await FileHelper.clearDocumentsFolder();
     await _removeAudiosMetas(excludeIds: ids);
     return allAudiosMetas();
   }
