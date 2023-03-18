@@ -81,11 +81,9 @@ class PlayingNowWidget extends StatelessWidget {
               ],
             ),
             if (audioPlayer.playingPosition != null &&
-                playingNow.durationInSeconds != null)
+                playingNow.duration != null)
               ..._positionIndicator(
-                audioPlayer.playingPosition!,
-                Duration(seconds: playingNow.durationInSeconds!),
-              ),
+                  audioPlayer.playingPosition!, playingNow.duration!),
           ],
         ),
       ),

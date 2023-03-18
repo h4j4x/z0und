@@ -81,10 +81,9 @@ class AudioListItemWidget extends StatelessWidget {
               ],
             ),
           ),
-          if (audioMeta.durationInSeconds != null)
+          if (audioMeta.duration != null)
             Text(
-              Duration(seconds: audioMeta.durationInSeconds!)
-                  .minutesFormatted(),
+              audioMeta.duration!.minutesFormatted(),
               textScaleFactor: 0.8,
             ),
           IconButton(

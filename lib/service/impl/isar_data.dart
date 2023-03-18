@@ -95,7 +95,7 @@ class IsarDataService implements DataService {
       ..handlerIdValue = audioMeta.handlerId
       ..codeValue = audioMeta.code
       ..audioName = audioMeta.audioName
-      ..durationInSeconds = audioMeta.durationInSeconds;
+      ..duration = audioMeta.duration;
     audioMetaIsar.isEnabled ??= true;
     await _isar.writeTxn(() async {
       await _isar.audios_metas.put(audioMetaIsar!);

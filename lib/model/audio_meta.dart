@@ -10,9 +10,10 @@ abstract class AudioMeta {
 
   String? get audioName;
 
-  int? get durationInSeconds;
+  /// Duration of audio meta.
+  Duration? get duration;
 
-  set durationInSeconds(int? value);
+  set duration(Duration? value);
 
   bool get enabled;
 }

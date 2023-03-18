@@ -28,13 +28,19 @@ class AudioMetaData implements AudioMeta {
   @override
   String? audioName;
 
-  @override
   int? durationInSeconds;
 
   bool? isEnabled;
 
   @override
   bool get enabled => isEnabled ?? true;
+
+  @override
+  Duration? get duration =>
+      durationInSeconds != null ? Duration(seconds: durationInSeconds!) : null;
+
+  @override
+  set duration(Duration? duration) => durationInSeconds = duration?.inSeconds;
 
   @override
   bool operator ==(Object other) {

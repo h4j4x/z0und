@@ -17,28 +17,14 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   AudioMetaPlaylist? _playlist;
   PlayingState? _playingState;
   Duration? _playingPosition;
+  bool _loadingNext = false;
 
   JustAudioPlayer.create() : _player = just_audio.AudioPlayer() {
     _player.positionStream.listen((position) {
       _playingPosition = position;
       notifyListeners();
     });
-    _player.playerStateStream.listen((state) {
-      final isReady = state.processingState == just_audio.ProcessingState.ready;
-      final isCompleted =
-          state.processingState == just_audio.ProcessingState.completed;
-      if (isReady && state.playing) {
-        _playingState = PlayingState.playing;
-      } else if (isReady || isCompleted) {
-        _playingState = PlayingState.paused;
-      } else if (state.processingState != just_audio.ProcessingState.idle) {
-        _playingState = PlayingState.loading;
-      }
-      notifyListeners();
-      if (isCompleted) {
-        playNext();
-      }
-    });
+    _player.playerStateStream.listen(_updateState);
   }
 
   @override
@@ -88,8 +74,8 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       if (duration == null) {
         throw AudioSourceNotValidException();
       }
-      if (audioMeta.durationInSeconds != duration.inSeconds) {
-        audioMeta.durationInSeconds = duration.inSeconds;
+      if (audioMeta.duration != duration) {
+        audioMeta.duration = duration;
         DataService().saveAudioMeta(audioMeta);
       }
     } catch (error) {
@@ -107,6 +93,27 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       return _player.setFilePath(audioSource.source);
     }
     return Future.value(null);
+  }
+
+  void _updateState(just_audio.PlayerState state) {
+    final isReady = state.processingState == just_audio.ProcessingState.ready;
+    final isCompleted =
+        state.processingState == just_audio.ProcessingState.completed;
+    if (isReady && state.playing) {
+      _loadingNext = false;
+      _playingState = PlayingState.playing;
+    } else if (isReady || isCompleted) {
+      _playingState = PlayingState.paused;
+    } else if (state.processingState != just_audio.ProcessingState.idle) {
+      _playingState = PlayingState.loading;
+    } else {
+      _playingState = null;
+    }
+    notifyListeners();
+    if (isCompleted && !_loadingNext) {
+      _loadingNext = true;
+      playNext();
+    }
   }
 
   @override

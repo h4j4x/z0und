@@ -276,7 +276,7 @@ class _DropboxAudioMeta implements AudioMeta {
   String? audioName;
 
   @override
-  int? durationInSeconds;
+  Duration? duration;
 
   @override
   bool get enabled => true;
