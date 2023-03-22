@@ -24,7 +24,6 @@ class AudioListItemWidget extends StatelessWidget {
     final isLoading = isActive && audioPlayer.isLoading;
     final isPlaying = isActive && audioPlayer.isPlaying;
     final isPaused = isActive && audioPlayer.isPaused;
-    const iconWidth = 10.0;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       decoration: BoxDecoration(
@@ -39,28 +38,8 @@ class AudioListItemWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (isLoading)
-            _leadingIcon(
-              LoadingAnimationWidget.dotsTriangle(
-                color: Theme.of(context).primaryColor,
-                size: iconWidth,
-              ),
-            ),
-          if (isPlaying)
-            _leadingIcon(
-              LoadingAnimationWidget.staggeredDotsWave(
-                color: Theme.of(context).primaryColor,
-                size: iconWidth,
-              ),
-            ),
-          if (isPaused)
-            _leadingIcon(
-              LoadingAnimationWidget.waveDots(
-                color: Theme.of(context).primaryColor,
-                size: iconWidth,
-              ),
-            ),
-          if (!isActive) Container(width: iconWidth + (iconPadding * 3)),
+          _leadingIcon(context, audioMeta,
+              isLoading: isLoading, isPlaying: isPlaying, isPaused: isPaused),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -106,11 +85,42 @@ class AudioListItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _leadingIcon(Widget icon) => Padding(
+  Widget _leadingIcon(
+    BuildContext context,
+    AudioMeta audioMeta, {
+    required bool isLoading,
+    required bool isPlaying,
+    required bool isPaused,
+  }) {
+    Widget? icon;
+    const iconWidth = 10.0;
+    if (isLoading) {
+      icon = LoadingAnimationWidget.dotsTriangle(
+        color: Theme.of(context).primaryColor,
+        size: iconWidth,
+      );
+    }
+    if (isPlaying) {
+      icon = LoadingAnimationWidget.staggeredDotsWave(
+        color: Theme.of(context).primaryColor,
+        size: iconWidth,
+      );
+    }
+    if (isPaused) {
+      icon = LoadingAnimationWidget.waveDots(
+        color: Theme.of(context).primaryColor,
+        size: iconWidth,
+      );
+    }
+    if (icon != null) {
+      return Padding(
         padding: const EdgeInsets.only(
           left: iconPadding,
           right: iconPadding * 2,
         ),
         child: icon,
       );
+    }
+    return Container(width: iconWidth + (iconPadding * 3));
+  }
 }
