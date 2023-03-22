@@ -10,6 +10,9 @@ abstract class AudioMeta {
 
   String? get audioName;
 
+  /// Detected name of audio.
+  set audioName(String? value);
+
   /// Duration of audio meta.
   Duration? get duration;
 

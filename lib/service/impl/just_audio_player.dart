@@ -74,8 +74,11 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       if (duration == null) {
         throw AudioSourceNotValidException();
       }
-      if (audioMeta.duration != duration) {
+      var audioName = audioMeta.audioName;
+      audioName ??= await _loadAudioName(audioSource);
+      if (audioMeta.duration != duration || audioMeta.audioName != audioName) {
         audioMeta.duration = duration;
+        audioMeta.audioName = audioName;
         DataService().saveAudioMeta(audioMeta);
       }
     } catch (error) {
@@ -92,6 +95,11 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
     if (audioSource.sourceType == AudioSourceType.file) {
       return _player.setFilePath(audioSource.source);
     }
+    return Future.value(null);
+  }
+
+  Future<String?> _loadAudioName(AudioSource audioSource) async {
+    // todo: use metadata service
     return Future.value(null);
   }
 

@@ -18,8 +18,8 @@ class IsarDataService implements DataService {
 
   static Future<DataService> create() async {
     final isar = await Isar.open([
-      AudioMetaDataSchema,
-      AudioSourceDataSchema,
+      IsarAudioMetaSchema,
+      IsarAudioSourceSchema,
     ]);
     return IsarDataService._(isar);
   }
@@ -41,8 +41,10 @@ class IsarDataService implements DataService {
   }
 
   @override
-  Future<List<AudioMeta>> allAudiosMetas({bool enabled = true}) {
-    return _isar.audios_metas.filter().isEnabledEqualTo(enabled).findAll();
+  Future<List<AudioMeta>> allAudiosMetas({bool enabled = true}) async {
+    final list =
+        await _isar.audios_metas.filter().isEnabledEqualTo(enabled).findAll();
+    return list.map((audioMeta) => AudioMetaData(audioMeta)).toList();
   }
 
   @override
@@ -51,22 +53,23 @@ class IsarDataService implements DataService {
     if (audioSource != null) {
       return audioSource;
     }
-    final audioMetaId = await _audioMetaId(audioMeta);
+    final audioMetaId = await saveAudioMeta(audioMeta);
     return _fetchSource(audioMeta, audioMetaId);
   }
 
-  Future<int> _audioMetaId(AudioMeta audioMeta) => (audioMeta is AudioMetaData)
-      ? Future.value(audioMeta.id)
-      : saveAudioMeta(audioMeta);
-
   Future<AudioSource?> _audioSourceOf(AudioMeta audioMeta) async {
-    final audioMetaId = await _audioMetaId(audioMeta);
-    return _isar.audios_sources
+    final audioMetaId = await saveAudioMeta(audioMeta);
+    final audioSource = await _isar.audios_sources
         .filter()
         .audioMetaIdEqualTo(audioMetaId)
         .and()
-        .expiresAtGreaterThan(DateTime.now())
+        .expiresAtMillisGreaterThan(DateTime.now().millisecondsSinceEpoch)
         .findFirst();
+    if (audioSource != null) {
+      // todo: test audiosource has correct sourceType
+      return AudioSourceData(audioSource);
+    }
+    return null;
   }
 
   Future<AudioSource?> _fetchSource(AudioMeta audioMeta, int metaId) async {
@@ -89,13 +92,13 @@ class IsarDataService implements DataService {
         .and()
         .handlerIdEqualTo(audioMeta.handlerId)
         .findFirst();
-    audioMetaIsar ??= AudioMetaData();
+    audioMetaIsar ??= IsarAudioMeta();
     audioMetaIsar
-      ..nameValue = audioMeta.name
-      ..handlerIdValue = audioMeta.handlerId
-      ..codeValue = audioMeta.code
+      ..name = audioMeta.name
+      ..handlerId = audioMeta.handlerId
+      ..code = audioMeta.code
       ..audioName = audioMeta.audioName
-      ..duration = audioMeta.duration;
+      ..durationInSeconds = audioMeta.duration?.inSeconds;
     audioMetaIsar.isEnabled ??= true;
     await _isar.writeTxn(() async {
       await _isar.audios_metas.put(audioMetaIsar!);
@@ -119,11 +122,11 @@ class IsarDataService implements DataService {
         .filter()
         .audioMetaIdEqualTo(audioMetaId)
         .findFirst();
-    sourceIsar ??= AudioSourceData();
+    sourceIsar ??= IsarAudioSource();
     sourceIsar
       ..audioMetaId = audioMetaId
-      ..sourceTypeValue = audioSource.sourceType
-      ..sourceValue = audioSource.source
+      ..sourceType = audioSource.sourceType
+      ..source = audioSource.source
       ..expiresAtMillis = audioSource.expiresAt.millisecondsSinceEpoch;
     await _isar.writeTxn(() async {
       await _isar.audios_sources.put(sourceIsar!);
@@ -133,7 +136,7 @@ class IsarDataService implements DataService {
 
   @override
   Future removeAudioSourceOf(AudioMeta audioMeta) async {
-    final audioMetaId = await _audioMetaId(audioMeta);
+    final audioMetaId = await saveAudioMeta(audioMeta);
     await _isar.writeTxn(() async {
       await _isar.audios_sources
           .filter()
@@ -141,5 +144,75 @@ class IsarDataService implements DataService {
           .deleteAll();
     });
     return Future.value(null);
+  }
+}
+
+class AudioMetaData implements AudioMeta {
+  final IsarAudioMeta data;
+
+  AudioMetaData(this.data);
+
+  @override
+  String get name => data.name ?? '';
+
+  @override
+  String get handlerId => data.handlerId ?? '';
+
+  @override
+  String get code => data.code ?? '';
+
+  @override
+  String? get audioName => data.audioName;
+
+  @override
+  set audioName(String? value) => data.audioName = value;
+
+  @override
+  bool get enabled => data.isEnabled ?? true;
+
+  @override
+  @ignore
+  Duration? get duration => data.durationInSeconds != null
+      ? Duration(seconds: data.durationInSeconds!)
+      : null;
+
+  @override
+  set duration(Duration? duration) =>
+      data.durationInSeconds = duration?.inSeconds;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is AudioMeta) {
+      return other.code == data.code && other.handlerId == data.handlerId;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode {
+    if (data.code != null && data.handlerId != null) {
+      return data.code!.hashCode ^ data.handlerId!.hashCode;
+    }
+    return 0;
+  }
+}
+
+class AudioSourceData implements AudioSource {
+  final IsarAudioSource data;
+
+  AudioSourceData(this.data);
+
+  @override
+  String get source => data.source ?? '';
+
+  @override
+  AudioSourceType get sourceType => data.sourceType ?? AudioSourceType.url;
+
+  @override
+  DateTime get expiresAt {
+    if (data.expiresAtMillis != null) {
+      return DateTime.fromMillisecondsSinceEpoch(data.expiresAtMillis!);
+    }
+    return DateTime.now();
   }
 }
