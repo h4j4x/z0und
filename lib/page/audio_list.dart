@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_l10n.dart';
 
 import '../handler/audio_meta_handler.dart';
 import '../helper/ui.dart';
@@ -40,7 +41,7 @@ class _AudioListPageState extends State<AudioListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AUDIOS TODO'),
+        title: Text(L10n.of(context).audiosList),
         actions: [
           IconButton(
             onPressed: !loading ? navigateLogin : null,
@@ -66,12 +67,13 @@ class _AudioListPageState extends State<AudioListPage> {
   }
 
   Widget body() {
+    final l10n = L10n.of(context);
     if (enabledHandlersCount == 0) {
       return MessageOptionsWidget(
-        message: 'NO SOURCES TODO',
+        message: l10n.notConnectedAccounts,
         options: [
           ListTile(
-            title: const Text('LOGIN TODO'),
+            title: Text(l10n.connectAccounts),
             trailing: const Icon(Icons.arrow_forward_sharp),
             onTap: navigateLogin,
           ),
@@ -80,20 +82,20 @@ class _AudioListPageState extends State<AudioListPage> {
     }
     if (audiosMetas.isEmpty) {
       return MessageOptionsWidget(
-        message: 'NO AUDIO YET TODO',
+        message: l10n.notDetectedAudios,
         options: [
           ListTile(
-            title: const Text('SCAN TODO'),
+            title: Text(l10n.scanAudios),
             trailing: const Icon(Icons.manage_search_sharp),
             onTap: !loading ? scanAudiosMetas : null,
           ),
           ListTile(
-            title: const Text('RELOAD TODO'),
+            title: Text(l10n.reloadAudios),
             trailing: const Icon(Icons.refresh_sharp),
             onTap: !loading ? loadAudiosMetas : null,
           ),
           ListTile(
-            title: const Text('ADD LOGIN TODO'),
+            title: Text(l10n.connectAccounts),
             trailing: const Icon(Icons.arrow_forward_sharp),
             onTap: navigateLogin,
           ),
@@ -121,15 +123,15 @@ class _AudioListPageState extends State<AudioListPage> {
         audiosMetas.indexOf(audioMeta),
       );
     } on AudioSourceNotValidException {
-      onPlayError(audioMeta, 'AudioSource NotValid ERROR TODO');
+      onPlayError(audioMeta, L10n.of(context).invalidAudioSource);
     } on AudioSourceNotAvailableException {
-      onPlayError(audioMeta, 'AudioSource NotAvailable ERROR TODO');
+      onPlayError(audioMeta, L10n.of(context).unavailableAudioSource);
     }
   }
 
   void onPlayError(AudioMeta audioMeta, String message) {
     UiHelper.showAlert(context, message: message);
-    AudioPlayer.of(context, listen: false).stop(); // todo: next or stop
+    AudioPlayer.of(context, listen: false).playNext();
     DataService().removeAudioSourceOf(audioMeta);
   }
 

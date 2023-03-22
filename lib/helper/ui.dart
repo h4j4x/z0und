@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
+
 class UiHelper {
   UiHelper._();
 
@@ -8,8 +10,9 @@ class UiHelper {
     required String message,
     bool isError = true,
   }) {
-    // todo: colorScheme success
-    final color = isError ? Theme.of(context).colorScheme.error : Colors.green;
+    final color = isError
+        ? Theme.of(context).colorScheme.error
+        : Theme.of(context).colorScheme.success;
     final snackBar = SnackBar(
       content: Text(message),
       backgroundColor: color,

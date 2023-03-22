@@ -20,6 +20,12 @@ void initTheme() {
   });
 }
 
+extension AppColorScheme on ColorScheme {
+  Color get success => brightness == Brightness.light
+      ? const Color(0xff29860d)
+      : const Color(0xff15851d);
+}
+
 ThemeData? lightTheme() {
   return FlexThemeData.light(
     scheme: _scheme(),

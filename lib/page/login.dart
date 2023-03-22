@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_l10n.dart';
 
 import '../handler/impl/dropbox_handler.dart';
 import '../handler/impl/google_handler.dart';
+import '../theme.dart';
 import 'openid_login.dart';
 
 class LoginPage extends StatefulWidget {
@@ -39,22 +41,25 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LOGIN TODO'),
+        title: Text(l10n.connectedAccounts),
       ),
       body: ListView(
         padding: const EdgeInsets.all(8.0),
         children: [
           if (dropboxEnabled)
             authButton(
-              title: 'DROPBOX TODO',
+              linkedTitle: l10n.dropboxConnected,
+              notLinkedTitle: l10n.connectDropbox,
               linked: dropboxLinked,
               onAction: onDropbox,
             ),
           if (googleEnabled)
             authButton(
-              title: 'GOOGLE TODO',
+              linkedTitle: l10n.googleConnected,
+              notLinkedTitle: l10n.connectGoogle,
               linked: googleLinked,
               onAction: onGoogle,
             ),
@@ -64,12 +69,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void onDropbox() async {
+    final l10n = L10n.of(context);
     if (dropboxLinked == true) {
-      await confirmUnlink('Are you sure to unlink Dropbox TODO?');
+      await confirmUnlink(l10n.confirmToUnlinkDropbox);
     } else if (dropboxLinked == false) {
       await OpenidLoginPage.pushRouteTo(
         context,
-        title: 'DROPBOX TODO',
+        title: l10n.connectDropbox,
         handler: DropboxHandler(),
       );
     }
@@ -87,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void onGoogle() async {
     if (googleLinked == true) {
-      await confirmUnlink('Are you sure to unlink Google TODO?');
+      await confirmUnlink(L10n.of(context).confirmToUnlinkGoogle);
     } else if (googleLinked == false) {
       await GoogleHandler().auth();
     }
@@ -103,32 +109,36 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future confirmUnlink(String description) => showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Please Confirm TODO'),
-          content: Text(description),
-          actions: [
-            TextButton(
-              onPressed: () {
-                DropboxHandler().removeAuth();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Yes TODO'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('No TODO'),
-            )
-          ],
-        );
-      });
+  Future confirmUnlink(String description) {
+    final l10n = L10n.of(context);
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(l10n.confirmToUnlink),
+            content: Text(description),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  DropboxHandler().removeAuth();
+                  Navigator.of(context).pop();
+                },
+                child: Text(l10n.yes),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(l10n.no),
+              )
+            ],
+          );
+        });
+  }
 
   Widget authButton({
-    required String title,
+    required String linkedTitle,
+    required String notLinkedTitle,
     required bool? linked,
     required VoidCallback onAction,
   }) {
@@ -143,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
     } else if (linked == true) {
       leading = Icon(
         Icons.check_circle_sharp,
-        color: Theme.of(context).colorScheme.primary, // todo .success
+        color: Theme.of(context).colorScheme.success,
       );
       trailing = Icon(
         Icons.delete_sharp,
@@ -158,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
     }
     return ListTile(
       leading: leading,
-      title: Text(title),
+      title: Text(linked == true ? linkedTitle : notLinkedTitle),
       trailing: trailing,
       onTap: (linked != null) ? onAction : null,
     );

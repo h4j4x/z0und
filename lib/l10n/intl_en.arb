@@ -1,0 +1,22 @@
+{
+  "appTitle": "z0und",
+  "audiosList": "Audios",
+  "back": "Back",
+  "confirmToUnlink": "Confirm that you want to unlink the account",
+  "confirmToUnlinkDropbox": "Are you sure you want to unlink your Dropbox account?",
+  "confirmToUnlinkGoogle": "Are you sure you want to unlink your Google account?",
+  "connectAccounts": "Connect accounts",
+  "connectedAccounts": "Connected accounts",
+  "connectDropbox": "Connect Dropbox",
+  "connectGoogle": "Connect Google",
+  "dropboxConnected": "Dropbox connected",
+  "googleConnected": "Google connected",
+  "invalidAudioSource": "Audio could not be processed",
+  "unavailableAudioSource": "Audio could not be loaded",
+  "no": "No",
+  "notConnectedAccounts": "No linked account",
+  "notDetectedAudios": "No audio could be detected on connected accounts :(",
+  "reloadAudios": "Reload detected audios",
+  "scanAudios": "Scan audios on connected accounts",
+  "yes": "Yes"
+}

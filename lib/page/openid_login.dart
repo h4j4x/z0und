@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_l10n.dart';
 
 import '../handler/openid_handler.dart';
 import '../widget/message_options.dart';
@@ -56,7 +57,7 @@ class _OpenidLoginPageState extends State<OpenidLoginPage>
         options: [
           ListTile(
             leading: const Icon(Icons.arrow_back_sharp),
-            title: const Text('EXIT TODO'),
+            title: Text(L10n.of(context).back),
             onTap: () {
               Navigator.of(context).pop();
             },
