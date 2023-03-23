@@ -66,7 +66,6 @@ class IsarDataService implements DataService {
         .expiresAtMillisGreaterThan(DateTime.now().millisecondsSinceEpoch)
         .findFirst();
     if (audioSource != null) {
-      // todo: test audiosource has correct sourceType
       return AudioSourceData(audioSource);
     }
     return null;
@@ -142,6 +141,14 @@ class IsarDataService implements DataService {
           .filter()
           .audioMetaIdEqualTo(audioMetaId)
           .deleteAll();
+    });
+    return Future.value(null);
+  }
+
+  Future clear() async {
+    await _isar.writeTxn(() async {
+      await _isar.audios_metas.filter().idGreaterThan(0).deleteAll();
+      await _isar.audios_sources.filter().idGreaterThan(0).deleteAll();
     });
     return Future.value(null);
   }
