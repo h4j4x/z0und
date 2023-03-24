@@ -17,4 +17,6 @@ abstract class HttpService {
     String? basicAuthUser,
     String? basicAuthPass,
   });
+
+  Future<Stream<List<int>>> getStream(Uri uri);
 }

@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../config.dart';
+import '../../helper/file.dart';
 import '../../helper/string.dart';
 import '../../helper/uri.dart';
 import '../../ioc.dart';
 import '../../model/audio_meta.dart';
 import '../../model/audio_source.dart';
+import '../../service/http.dart';
 import '../../service/storage.dart';
 import '../audio_meta_handler.dart';
 import '../openid_handler.dart';
@@ -162,7 +164,6 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
   @override
   Future<AudioSource?> fetchAudioSource(AudioMeta audioMeta) async {
     final uri = _apiBaseUri('/files/get_temporary_link');
-    const expiresInHours = 4;
     final token = await authToken;
     final body = <String, dynamic>{
       'path': audioMeta.code,
@@ -173,10 +174,12 @@ class DropboxHandler implements OpenidHandler, AudioMetaHandler {
         body: body,
       );
       if (data.containsKey('link') && data['link'] is String) {
-        return _DropboxAudioSource(
-          data['link'].toString(),
-          expiresInHours: expiresInHours,
+        final stream = await HttpService().getStream(Uri.parse(data['link']));
+        final file = await FileHelper.writeDocumentsFile(
+          filename: audioMeta.name,
+          stream: stream,
         );
+        return _DropboxAudioSource(file.path, expiresInDays: 365);
       }
     } catch (e) {
       debugPrint('fetch audio source dropbox error: $e');
@@ -273,7 +276,10 @@ class _DropboxAudioMeta implements AudioMeta {
   final String code;
 
   @override
-  String? audioName;
+  String? title;
+
+  @override
+  String? artist;
 
   @override
   Duration? duration;
@@ -289,7 +295,7 @@ class _DropboxAudioMeta implements AudioMeta {
 
 class _DropboxAudioSource implements AudioSource {
   @override
-  final AudioSourceType sourceType;
+  AudioSourceType get sourceType => AudioSourceType.file;
 
   @override
   final String source;
@@ -297,7 +303,6 @@ class _DropboxAudioSource implements AudioSource {
   @override
   final DateTime expiresAt;
 
-  _DropboxAudioSource(this.source, {required int expiresInHours})
-      : sourceType = AudioSourceType.url,
-        expiresAt = DateTime.now().add(Duration(hours: expiresInHours));
+  _DropboxAudioSource(this.source, {required int expiresInDays})
+      : expiresAt = DateTime.now().add(Duration(days: expiresInDays));
 }

@@ -69,6 +69,15 @@ class MockHttpService extends _i1.Mock implements _i2.HttpService {
         ),
         returnValue: _i3.Future<dynamic>.value(),
       ) as _i3.Future<dynamic>);
+  @override
+  _i3.Future<_i3.Stream<List<int>>> getStream(Uri? uri) => (super.noSuchMethod(
+        Invocation.method(
+          #getStream,
+          [uri],
+        ),
+        returnValue: _i3.Future<_i3.Stream<List<int>>>.value(
+            _i3.Stream<List<int>>.empty()),
+      ) as _i3.Future<_i3.Stream<List<int>>>);
 }
 
 /// A class which mocks [ConfigService].

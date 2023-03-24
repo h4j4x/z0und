@@ -8,12 +8,17 @@ abstract class AudioMeta {
   /// Code of audio meta for it's handler.
   String get code;
 
-  String? get audioName;
+  /// Title of audio.
+  String? get title;
 
-  /// Detected name of audio.
-  set audioName(String? value);
+  set title(String? value);
 
-  /// Duration of audio meta.
+  /// Artist of audio.
+  String? get artist;
+
+  set artist(String? value);
+
+  /// Duration of audio.
   Duration? get duration;
 
   set duration(Duration? value);

@@ -5,10 +5,12 @@ import 'package:provider/single_child_widget.dart';
 import 'handler/impl/device_handler.dart';
 import 'handler/impl/dropbox_handler.dart';
 import 'handler/impl/google_handler.dart';
+import 'service/audio_info.dart';
 import 'service/audio_player.dart';
 import 'service/config.dart';
 import 'service/data.dart';
 import 'service/http.dart';
+import 'service/impl/dart_tags_audio_info.dart';
 import 'service/impl/dotenv_config.dart';
 import 'service/impl/flutter_http.dart';
 import 'service/impl/isar_data.dart';
@@ -42,6 +44,9 @@ class Ioc {
     );
     GetIt.I.registerSingleton<DeviceAudioMetaHandler>(
       DeviceAudioMetaHandler.create(),
+    );
+    GetIt.I.registerLazySingleton<AudioInfoService>(
+      () => DartTagsAudioInfoService.create(),
     );
   }
 

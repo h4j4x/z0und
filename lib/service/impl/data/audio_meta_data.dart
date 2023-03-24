@@ -14,7 +14,9 @@ class IsarAudioMeta {
 
   String? code;
 
-  String? audioName;
+  String? title;
+
+  String? artist;
 
   int? durationInSeconds;
 

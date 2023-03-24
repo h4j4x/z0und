@@ -26,8 +26,15 @@ class PlayingNowWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: ListTile(
-                    title: Text(playingNow.name),
-                    subtitle: Text(playingNow.handlerId),
+                    title: Text(playingNow.title ?? playingNow.name),
+                    subtitle: Row(
+                      children: [
+                        Expanded(
+                          child: Text(playingNow.artist ?? ''),
+                        ),
+                        Text(playingNow.handlerId),
+                      ],
+                    ),
                   ),
                 ),
                 Padding(

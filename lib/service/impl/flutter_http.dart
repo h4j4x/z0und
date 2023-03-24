@@ -60,4 +60,15 @@ class FlutterHttpService implements HttpService {
     debugPrint('---- ${response.reasonPhrase} : $responseJson');
     throw Exception('Failed TODO'); // todo
   }
+
+  @override
+  Future<Stream<List<int>>> getStream(Uri uri) async {
+    final response = await http.get(uri);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return Stream<List<int>>.value(response.bodyBytes);
+    }
+    debugPrint(' http GET STREAM ${uri.toString()}: ${response.statusCode}');
+    debugPrint('---- ${response.reasonPhrase}');
+    throw Exception('Failed TODO'); // todo
+  }
 }

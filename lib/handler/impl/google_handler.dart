@@ -110,7 +110,7 @@ class GoogleHandler implements AudioMetaHandler {
             filename: audioMeta.name,
             stream: media.stream,
           );
-          return _GoogleAudioSource(file.path, expiresInDays: 7);
+          return _GoogleAudioSource(file.path, expiresInDays: 365);
         }
       } catch (error) {
         debugPrint('GOOGLE fetchAudioSource error: $error');
@@ -158,7 +158,10 @@ class _GoogleAudioMeta implements AudioMeta {
   final String code;
 
   @override
-  String? audioName;
+  String? title;
+
+  @override
+  String? artist;
 
   @override
   Duration? duration;
@@ -174,7 +177,7 @@ class _GoogleAudioMeta implements AudioMeta {
 
 class _GoogleAudioSource implements AudioSource {
   @override
-  final AudioSourceType sourceType;
+  AudioSourceType get sourceType => AudioSourceType.file;
 
   @override
   final String source;
@@ -183,6 +186,5 @@ class _GoogleAudioSource implements AudioSource {
   final DateTime expiresAt;
 
   _GoogleAudioSource(this.source, {required int expiresInDays})
-      : sourceType = AudioSourceType.file,
-        expiresAt = DateTime.now().add(Duration(days: expiresInDays));
+      : expiresAt = DateTime.now().add(Duration(days: expiresInDays));
 }

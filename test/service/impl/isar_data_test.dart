@@ -76,7 +76,10 @@ class TestAudioMeta implements AudioMeta {
   final String id;
 
   @override
-  String? audioName;
+  String? title;
+
+  @override
+  String? artist;
 
   @override
   Duration? duration;

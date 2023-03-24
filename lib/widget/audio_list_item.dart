@@ -47,14 +47,25 @@ class AudioListItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  audioMeta.name,
+                  audioMeta.title ?? audioMeta.name,
                   textScaleFactor: 1.1,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: iconPadding),
-                  child: Text(
-                    audioMeta.handlerId,
-                    textScaleFactor: 0.7,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          audioMeta.artist ?? '',
+                          textScaleFactor: 0.75,
+                        ),
+                      ),
+                      Text(
+                        audioMeta.handlerId,
+                        textScaleFactor: 0.7,
+                      ),
+                    ],
                   ),
                 ),
               ],

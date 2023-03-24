@@ -151,11 +151,9 @@ P _isarAudioSourceDeserializeProp<P>(
 }
 
 const _IsarAudioSourcesourceTypeEnumValueMap = {
-  r'url': r'url',
   r'file': r'file',
 };
 const _IsarAudioSourcesourceTypeValueEnumMap = {
-  r'url': AudioSourceType.url,
   r'file': AudioSourceType.file,
 };
 

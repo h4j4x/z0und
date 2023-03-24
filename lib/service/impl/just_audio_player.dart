@@ -5,6 +5,7 @@ import '../../model/audio_meta.dart';
 import '../../model/audio_meta_playlist.dart';
 import '../../model/audio_source.dart';
 import '../../model/playing_state.dart';
+import '../audio_info.dart';
 import '../audio_player.dart';
 import '../data.dart';
 
@@ -70,17 +71,15 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
       throw AudioSourceNotAvailableException();
     }
     try {
-      final duration = await _loadAudioSource(audioSource);
-      if (duration == null) {
+      audioMeta.duration = await _loadAudioSource(audioSource);
+      if (audioMeta.duration == null) {
         throw AudioSourceNotValidException();
       }
-      var audioName = audioMeta.audioName;
-      audioName ??= await _loadAudioName(audioSource);
-      if (audioMeta.duration != duration || audioMeta.audioName != audioName) {
-        audioMeta.duration = duration;
-        audioMeta.audioName = audioName;
-        DataService().saveAudioMeta(audioMeta);
+      if (audioMeta.title == null) {
+        final audioInfo = await AudioInfoService().fetchAudioInfo(audioSource);
+        audioInfo?.update(audioMeta);
       }
+      DataService().saveAudioMeta(audioMeta);
     } catch (error) {
       debugPrint('JustAudioPlayer error: $error');
       throw AudioSourceNotValidException();
@@ -89,17 +88,9 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   }
 
   Future<Duration?> _loadAudioSource(AudioSource audioSource) {
-    if (audioSource.sourceType == AudioSourceType.url) {
-      return _player.setUrl(audioSource.source);
-    }
     if (audioSource.sourceType == AudioSourceType.file) {
       return _player.setFilePath(audioSource.source);
     }
-    return Future.value(null);
-  }
-
-  Future<String?> _loadAudioName(AudioSource audioSource) async {
-    // todo: use metadata service
     return Future.value(null);
   }
 

@@ -96,7 +96,8 @@ class IsarDataService implements DataService {
       ..name = audioMeta.name
       ..handlerId = audioMeta.handlerId
       ..code = audioMeta.code
-      ..audioName = audioMeta.audioName
+      ..title = audioMeta.title
+      ..artist = audioMeta.artist
       ..durationInSeconds = audioMeta.duration?.inSeconds;
     audioMetaIsar.isEnabled ??= true;
     await _isar.writeTxn(() async {
@@ -169,10 +170,16 @@ class AudioMetaData implements AudioMeta {
   String get code => data.code ?? '';
 
   @override
-  String? get audioName => data.audioName;
+  String? get title => data.title;
 
   @override
-  set audioName(String? value) => data.audioName = value;
+  set title(String? value) => data.title = value;
+
+  @override
+  String? get artist => data.artist;
+
+  @override
+  set artist(String? value) => data.artist = value;
 
   @override
   bool get enabled => data.isEnabled ?? true;
@@ -213,7 +220,7 @@ class AudioSourceData implements AudioSource {
   String get source => data.source ?? '';
 
   @override
-  AudioSourceType get sourceType => data.sourceType ?? AudioSourceType.url;
+  AudioSourceType get sourceType => data.sourceType ?? AudioSourceType.file;
 
   @override
   DateTime get expiresAt {
