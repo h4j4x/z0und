@@ -35,6 +35,9 @@ abstract class AudioPlayer implements ChangeNotifier {
   /// Stops active [playingNow].
   Future stop();
 
+  /// Plays previous audio in playlist.
+  Future playPrevious();
+
   /// Plays next audio in playlist.
   Future playNext();
 }

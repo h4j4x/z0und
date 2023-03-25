@@ -16,6 +16,8 @@
   "no": "No",
   "notConnectedAccounts": "No linked account",
   "notDetectedAudios": "No audio could be detected on connected accounts :(",
+  "nothingHere": "Nothing here at this time :(",
+  "playingNow": "Playing now",
   "reloadAudios": "Reload detected audios",
   "scanAudios": "Scan audios on connected accounts",
   "yes": "Yes"

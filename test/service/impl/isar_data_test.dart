@@ -14,6 +14,7 @@ void main() async {
   await Isar.initializeIsarCore(
     libraries: {
       Abi.linuxX64: path.join(testDir, 'binaries', 'libisar_linux_x64.so'),
+      Abi.macosX64: path.join(testDir, 'binaries', 'libisar_macos.dylib'),
     },
   );
 

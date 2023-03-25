@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../helper/duration.dart';
+import '../page/now_playing.dart';
 import '../service/audio_player.dart';
 
 class PlayingNowWidget extends StatelessWidget {
@@ -25,16 +26,19 @@ class PlayingNowWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: ListTile(
-                    title: Text(playingNow.title ?? playingNow.name),
-                    subtitle: Row(
-                      children: [
-                        Expanded(
-                          child: Text(playingNow.artist ?? ''),
-                        ),
-                        Text(playingNow.handlerId),
-                      ],
+                  child: InkWell(
+                    child: ListTile(
+                      title: Text(playingNow.title ?? playingNow.name),
+                      subtitle: Row(
+                        children: [
+                          Expanded(
+                            child: Text(playingNow.artist ?? ''),
+                          ),
+                          Text(playingNow.handlerId),
+                        ],
+                      ),
                     ),
+                    onTap: () => NowPlayingPage.pushRouteTo(context),
                   ),
                 ),
                 Padding(

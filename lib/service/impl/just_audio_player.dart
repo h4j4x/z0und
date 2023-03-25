@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 
 import '../../model/audio_meta.dart';
-import '../../model/audio_meta_playlist.dart';
 import '../../model/audio_source.dart';
 import '../../model/playing_state.dart';
+import '../../model/playlist.dart';
 import '../audio_info.dart';
 import '../audio_player.dart';
 import '../data.dart';
@@ -15,7 +15,7 @@ import '../data.dart';
 class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   final just_audio.AudioPlayer _player;
 
-  AudioMetaPlaylist? _playlist;
+  Playlist<AudioMeta>? _playlist;
   PlayingState? _playingState;
   Duration? _playingPosition;
   bool _loadingNext = false;
@@ -50,7 +50,7 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
     }
     final isSameAudioActive = _playlist?.current == playlist[index];
 
-    _playlist = AudioMetaPlaylist(list: playlist, index: index);
+    _playlist = Playlist<AudioMeta>(list: playlist, index: index);
     notifyListeners();
 
     if (!isSameAudioActive) {
@@ -136,13 +136,18 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   }
 
   @override
-  Future playNext() async {
+  Future playPrevious() => _advancePlay(-1);
+
+  @override
+  Future playNext() => _advancePlay(1);
+
+  Future _advancePlay(int step) async {
     _playingState = null;
     _playingPosition = Duration.zero;
     notifyListeners();
 
     _player.stop();
-    if (_playlist?.advanceNext == true) {
+    if (_playlist?.advance(step) == true) {
       notifyListeners();
       await _loadAudioMeta(_playlist!.current);
       return _player.play();

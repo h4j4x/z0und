@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:dart_tags/dart_tags.dart';
 
-import '../../model/audio_source.dart';
 import '../../model/audio_info.dart';
+import '../../model/audio_source.dart';
 import '../audio_info.dart';
 
 class DartTagsAudioInfoService implements AudioInfoService {
