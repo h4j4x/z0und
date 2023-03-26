@@ -7,11 +7,12 @@ import 'theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Ioc.createServices();
   initTheme();
+  await Ioc.createServices();
+  final providers = await Ioc.createProviders();
   runApp(
     MultiProvider(
-      providers: Ioc.createProviders(),
+      providers: providers,
       child: const App(),
     ),
   );

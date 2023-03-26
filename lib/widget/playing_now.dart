@@ -31,9 +31,10 @@ class PlayingNowWidget extends StatelessWidget {
                       title: Text(playingNow.title ?? playingNow.name),
                       subtitle: Row(
                         children: [
-                          Expanded(
-                            child: Text(playingNow.artist ?? ''),
-                          ),
+                          if (playingNow.artist?.isNotEmpty == true)
+                            Expanded(
+                              child: Text(playingNow.artist!),
+                            ),
                           Text(playingNow.handlerId),
                         ],
                       ),
@@ -58,15 +59,8 @@ class PlayingNowWidget extends StatelessWidget {
                       ? const Icon(Icons.pause_circle_filled_sharp)
                       : const Icon(Icons.play_circle_filled_sharp),
                   onPressed: !audioPlayer.isLoading
-                      ? () {
-                          final audioPlayer =
-                              AudioPlayer.of(context, listen: false);
-                          if (audioPlayer.isPlaying) {
-                            audioPlayer.pause();
-                          } else {
-                            audioPlayer.resume();
-                          }
-                        }
+                      ? () =>
+                          AudioPlayer.of(context, listen: false).togglePlay()
                       : null,
                 ),
                 IconButton(

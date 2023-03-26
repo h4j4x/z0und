@@ -28,18 +28,21 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
     }
     final playingNow = audioPlayer.playingNow!;
     final l10n = L10n.of(context);
+    final hasPosition =
+        audioPlayer.playingPosition != null && playingNow.duration != null;
     return Scaffold(
       appBar: AppBar(
         title: Text(playingNow.title ?? l10n.playingNow),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
         children: [
           audioDescription(playingNow),
-          if (audioPlayer.playingPosition != null &&
-              playingNow.duration != null)
+          const SizedBox(height: 20.0),
+          if (hasPosition)
             ...positionIndicator(
                 audioPlayer.playingPosition!, playingNow.duration!),
+          if (hasPosition) const SizedBox(height: 20.0),
           audioControl(audioPlayer),
         ],
       ),
@@ -52,9 +55,10 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
           textAlign: TextAlign.center),
       subtitle: Row(
         children: [
-          Expanded(
-            child: Text(playingNow.artist ?? ''),
-          ),
+          if (playingNow.artist?.isNotEmpty == true)
+            Expanded(
+              child: Text(playingNow.artist!),
+            ),
           Text(playingNow.handlerId),
         ],
       ),
@@ -62,18 +66,17 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
   }
 
   List<Widget> positionIndicator(Duration position, Duration duration) {
-    final positionPercent =
-        position.inSeconds.toDouble() / duration.inSeconds.toDouble();
     return [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6.0),
-        child: LinearProgressIndicator(value: positionPercent),
+      Slider.adaptive(
+        value: position.inSeconds.toDouble(),
+        max: duration.inSeconds.toDouble(),
+        onChanged: (value) => AudioPlayer.of(context, listen: false)
+            .seek(Duration(seconds: value.toInt())),
+        semanticFormatterCallback: (value) =>
+            Duration(seconds: value.toInt()).minutesFormatted(),
       ),
       Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 2.0,
-          horizontal: 8.0,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -92,6 +95,8 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
   }
 
   Widget audioControl(AudioPlayer audioPlayer) {
+    const skipIconSize = 40.0;
+    const playIconSize = skipIconSize * 1.8;
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -99,35 +104,25 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.skip_previous_sharp),
+          iconSize: skipIconSize,
           onPressed: !audioPlayer.isLoading
-              ? () {
-                  final audioPlayer = AudioPlayer.of(context, listen: false);
-                  audioPlayer.playPrevious();
-                }
+              ? () => AudioPlayer.of(context, listen: false).playPrevious()
               : null,
         ),
         IconButton(
           icon: audioPlayer.isPlaying
               ? const Icon(Icons.pause_circle_filled_sharp)
               : const Icon(Icons.play_circle_filled_sharp),
+          iconSize: playIconSize,
           onPressed: !audioPlayer.isLoading
-              ? () {
-                  final audioPlayer = AudioPlayer.of(context, listen: false);
-                  if (audioPlayer.isPlaying) {
-                    audioPlayer.pause();
-                  } else {
-                    audioPlayer.resume();
-                  }
-                }
+              ? () => AudioPlayer.of(context, listen: false).togglePlay()
               : null,
         ),
         IconButton(
           icon: const Icon(Icons.skip_next_sharp),
+          iconSize: skipIconSize,
           onPressed: !audioPlayer.isLoading
-              ? () {
-                  final audioPlayer = AudioPlayer.of(context, listen: false);
-                  audioPlayer.playNext();
-                }
+              ? () => AudioPlayer.of(context, listen: false).playNext()
               : null,
         ),
         const Spacer(),

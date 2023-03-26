@@ -13,6 +13,11 @@ class Playlist<T> {
     }
   }
 
+  Playlist.from(Playlist<T> playlist, {bool? loop})
+      : list = playlist.list,
+        loop = loop ?? playlist.loop,
+        _index = playlist._index;
+
   T get current => list[_index];
 
   bool advance(int step) {

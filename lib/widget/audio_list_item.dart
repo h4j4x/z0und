@@ -55,12 +55,13 @@ class AudioListItemWidget extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: Text(
-                          audioMeta.artist ?? '',
-                          textScaleFactor: 0.75,
+                      if (audioMeta.artist?.isNotEmpty == true)
+                        Expanded(
+                          child: Text(
+                            audioMeta.artist!,
+                            textScaleFactor: 0.75,
+                          ),
                         ),
-                      ),
                       Text(
                         audioMeta.handlerId,
                         textScaleFactor: 0.7,

@@ -23,6 +23,12 @@ abstract class AudioPlayer implements ChangeNotifier {
   /// Gets playing position.
   Duration? get playingPosition;
 
+  /// Gets [loop] enabled;
+  bool get loop;
+
+  /// Sets [loop] value;
+  set loop(bool value);
+
   /// Plays given [index] inside [playlist].
   Future play(List<AudioMeta> playlist, int index);
 
@@ -40,6 +46,12 @@ abstract class AudioPlayer implements ChangeNotifier {
 
   /// Plays next audio in playlist.
   Future playNext();
+
+  /// Pauses or resumes active [playingNow].
+  Future togglePlay();
+
+  /// Seeks to a particular [position] in active [playingNow].
+  Future seek(Duration position);
 }
 
 class AudioSourceNotAvailableException implements Exception {}

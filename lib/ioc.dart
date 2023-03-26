@@ -50,9 +50,12 @@ class Ioc {
     );
   }
 
-  static List<SingleChildWidget> createProviders() => <SingleChildWidget>[
-        ChangeNotifierProvider<AudioPlayer>(
-          create: (_) => JustAudioPlayer.create(),
-        ),
-      ];
+  static Future<List<SingleChildWidget>> createProviders() async {
+    final justAudioPlayer = await JustAudioPlayer.create();
+    return <SingleChildWidget>[
+      ChangeNotifierProvider<AudioPlayer>(
+        create: (_) => justAudioPlayer,
+      ),
+    ];
+  }
 }

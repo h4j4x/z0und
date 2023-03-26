@@ -8,6 +8,9 @@ import '../../model/playlist.dart';
 import '../audio_info.dart';
 import '../audio_player.dart';
 import '../data.dart';
+import '../storage.dart';
+
+const _loopStorageKey = 'AUDIO_PLAYER_LOOP';
 
 /// Just audio integration.
 ///
@@ -19,13 +22,20 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   PlayingState? _playingState;
   Duration? _playingPosition;
   bool _loadingNext = false;
+  bool _loop = true;
 
-  JustAudioPlayer.create() : _player = just_audio.AudioPlayer() {
+  static Future<JustAudioPlayer> create() async {
+    final loop = await StorageService().readBool(_loopStorageKey);
+    return JustAudioPlayer._create(loop ?? true);
+  }
+
+  JustAudioPlayer._create(bool loop) : _player = just_audio.AudioPlayer() {
     _player.positionStream.listen((position) {
       _playingPosition = position;
       notifyListeners();
     });
     _player.playerStateStream.listen(_updateState);
+    _loop = loop;
   }
 
   @override
@@ -44,13 +54,28 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   Duration? get playingPosition => _playingPosition;
 
   @override
+  bool get loop => _loop;
+
+  @override
+  set loop(bool value) {
+    if (_loop != value) {
+      StorageService().writeBool(_loopStorageKey, value);
+      _loop = value;
+      if (_playlist != null) {
+        _playlist = Playlist.from(_playlist!, loop: _loop);
+      }
+      notifyListeners();
+    }
+  }
+
+  @override
   Future play(List<AudioMeta> playlist, int index) async {
     if (_playingState == PlayingState.loading) {
       return Future.value(null);
     }
     final isSameAudioActive = _playlist?.current == playlist[index];
 
-    _playlist = Playlist<AudioMeta>(list: playlist, index: index);
+    _playlist = Playlist<AudioMeta>(list: playlist, loop: loop, index: index);
     notifyListeners();
 
     if (!isSameAudioActive) {
@@ -141,14 +166,27 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   @override
   Future playNext() => _advancePlay(1);
 
-  Future _advancePlay(int step) async {
-    _playingState = null;
-    _playingPosition = Duration.zero;
-    notifyListeners();
+  @override
+  Future togglePlay() {
+    if (isPlaying) {
+      return pause();
+    }
+    return resume();
+  }
 
-    _player.stop();
-    if (_playlist?.advance(step) == true) {
+  @override
+  Future seek(Duration position) => _player.seek(position);
+
+  Future _advancePlay(int step) async {
+    final nowPlaying = playingNow;
+    if (_playlist?.advance(step) == true && playingNow != nowPlaying) {
+      _playingState = null;
+      _playingPosition = Duration.zero;
       notifyListeners();
+
+      _player.stop();
+      notifyListeners();
+
       await _loadAudioMeta(_playlist!.current);
       return _player.play();
     }
