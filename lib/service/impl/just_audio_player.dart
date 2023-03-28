@@ -57,15 +57,13 @@ class JustAudioPlayer extends ChangeNotifier implements AudioPlayer {
   bool get loop => _loop;
 
   @override
-  set loop(bool value) {
-    if (_loop != value) {
-      StorageService().writeBool(_loopStorageKey, value);
-      _loop = value;
-      if (_playlist != null) {
-        _playlist = Playlist.from(_playlist!, loop: _loop);
-      }
-      notifyListeners();
+  void toggleLoop() {
+    _loop = !_loop;
+    StorageService().writeBool(_loopStorageKey, _loop);
+    if (_playlist != null) {
+      _playlist = Playlist.from(_playlist!, loop: _loop);
     }
+    notifyListeners();
   }
 
   @override

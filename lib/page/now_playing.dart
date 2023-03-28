@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_l10n.dart';
 import '../helper/duration.dart';
 import '../model/audio_meta.dart';
 import '../service/audio_player.dart';
+import '../theme.dart';
 import '../widget/message_options.dart';
 
 class NowPlayingPage extends StatefulWidget {
@@ -100,7 +101,16 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
-        const Icon(Icons.loop_sharp),
+        IconButton(
+          icon: Icon(
+            Icons.loop_sharp,
+            color:
+                audioPlayer.loop ? Theme.of(context).colorScheme.success : null,
+          ),
+          onPressed: !audioPlayer.isLoading
+              ? () => AudioPlayer.of(context, listen: false).toggleLoop()
+              : null,
+        ),
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.skip_previous_sharp),

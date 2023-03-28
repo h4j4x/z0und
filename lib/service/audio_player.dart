@@ -26,8 +26,8 @@ abstract class AudioPlayer implements ChangeNotifier {
   /// Gets [loop] enabled;
   bool get loop;
 
-  /// Sets [loop] value;
-  set loop(bool value);
+  /// Toggles [loop] value;
+  void toggleLoop();
 
   /// Plays given [index] inside [playlist].
   Future play(List<AudioMeta> playlist, int index);
